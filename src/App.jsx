@@ -44,6 +44,20 @@ function App() {
   const [isArabic, setIsArabic] = useState(true) // Default to Arabic
   const [cartItems, setCartItems] = useState([])
 
+  // Load cart from localStorage on app start
+  useEffect(() => {
+    const savedCart = localStorage.getItem('coffee-cart')
+    if (savedCart) {
+      try {
+        const parsedCart = JSON.parse(savedCart)
+        setCartItems(parsedCart)
+      } catch (error) {
+        console.error('Error parsing cart from localStorage:', error)
+        localStorage.removeItem('coffee-cart')
+      }
+    }
+  }, [])
+
   // Set RTL as default on app load
   useEffect(() => {
     document.documentElement.setAttribute('dir', 'rtl')
@@ -87,6 +101,11 @@ function App() {
     )
   }
 
+  const clearCart = () => {
+    setCartItems([])
+    localStorage.removeItem('coffee-cart')
+  }
+
   const cartTotal = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0)
   const cartItemsCount = cartItems.reduce((total, item) => total + item.quantity, 0)
 
@@ -97,6 +116,7 @@ function App() {
         addToCart,
         removeFromCart,
         updateCartItemQuantity,
+        clearCart,
         cartTotal,
         cartItemsCount
       }}>

@@ -17,7 +17,7 @@ const Home = () => {
       buttons: [
         {
           text: 'اطلبوا الآن',
-          link: '/shop',
+          link: '/Menu',
           className: 'btn-primary'
         },
         {
@@ -184,7 +184,6 @@ const Home = () => {
         autoPlayInterval={4000}
         showArrows={false}
         showDots={false}
-        overlayOpacity="bg-black/40"
       />
 
       {/* Welcome Section */}

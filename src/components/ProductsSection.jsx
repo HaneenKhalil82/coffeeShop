@@ -1,9 +1,10 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { useRTL } from '../App'
+import { useRTL, useCart } from '../App'
 
 const ProductsSection = () => {
   const { isArabic } = useRTL()
+  const { addToCart } = useCart()
 
   const content = isArabic ? {
     title: 'منتجاتنا المميزة',
@@ -14,15 +15,15 @@ const ProductsSection = () => {
       {
         id: 1,
         name: 'قهوة عربية فاخرة',
-        price: ' 50',
-        originalPrice: ' 60',
+        price: 50,
+        originalPrice: 60,
         image: '/images/arabic coffee.jpg',
         description: 'قهوة عربية أصيلة محمصة بعناية'
       },
       {
         id: 2,
         name: 'كابتشينو إيطالي',
-        price: ' 75',
+        price: 75,
         originalPrice: null,
         image: '/images/italian.webp',
         description: 'كابتشينو كريمي بالطريقة الإيطالية الأصيلة'
@@ -30,15 +31,15 @@ const ProductsSection = () => {
       {
         id: 3,
         name: 'لاتيه بالفانيليا',
-        price: '60',
-        originalPrice: ' 80',
+        price: 60,
+        originalPrice: 80,
         image: '/images/vanilla.webp',
         description: 'لاتيه طازج مع نكهة الفانيليا الطبيعية'
       },
       {
         id: 4,
         name: 'إسبريسو مركز',
-        price: '50',
+        price: 50,
         originalPrice: null,
         image: '/images/double.jpg',
         description: 'إسبريسو إيطالي قوي ومركز'
@@ -53,36 +54,56 @@ const ProductsSection = () => {
       {
         id: 1,
         name: 'Premium Arabic Coffee',
-        price: '$12',
-        originalPrice: '$16',
-        image: '/images/drink-1.jpg',
+        price: 12,
+        originalPrice: 16,
+        image: '/images/arabic coffee.jpg',
         description: 'Authentic Arabic coffee carefully roasted'
       },
       {
         id: 2,
         name: 'Italian Cappuccino',
-        price: '$7',
+        price: 7,
         originalPrice: null,
-        image: '/images/drink-2.jpg',
+        image: '/images/italian.webp',
         description: 'Creamy cappuccino in authentic Italian style'
       },
       {
         id: 3,
         name: 'Vanilla Latte',
-        price: '$8',
-        originalPrice: '$9',
-        image: '/images/drink-3.jpg',
+        price: 8,
+        originalPrice: 9,
+        image: '/images/vanilla.webp',
         description: 'Fresh latte with natural vanilla flavor'
       },
       {
         id: 4,
         name: 'Concentrated Espresso',
-        price: '$5',
+        price: 5,
         originalPrice: null,
-        image: '/images/drink-4.jpg',
+        image: '/images/double.jpg',
         description: 'Strong and concentrated Italian espresso'
       }
     ]
+  }
+
+  const handleAddToCart = (item) => {
+    addToCart(item)
+    // Show success message
+    const message = isArabic ? `تم إضافة ${item.name} إلى السلة!` : `${item.name} added to cart!`
+    
+    // Create a temporary toast notification
+    const toast = document.createElement('div')
+    toast.className = 'fixed top-24 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-bounce'
+    toast.textContent = message
+    toast.style.direction = isArabic ? 'rtl' : 'ltr'
+    
+    document.body.appendChild(toast)
+    
+    setTimeout(() => {
+      if (document.body.contains(toast)) {
+        document.body.removeChild(toast)
+      }
+    }, 3000)
   }
 
   return (
@@ -102,54 +123,61 @@ const ProductsSection = () => {
         {/* Products Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
           {content.products.map((product) => (
-            <Link 
-              key={product.id} 
-              to={`/product/${product.id}`}
-              className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 group block"
-            >
-              {/* Product Image */}
-              <div className="relative h-64 overflow-hidden">
-                <img 
-                  src={product.image} 
-                  alt={product.name}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                />
-                {product.originalPrice && (
-                  <div className="absolute top-4 right-4 bg-primary text-white px-2 py-1 rounded text-sm font-semibold">
-                    {isArabic ? 'خصم' : 'Sale'}
-                  </div>
-                )}
-              </div>
+            <div key={product.id} className="text-center group">
+              {/* Clickable Card Content */}
+              <Link to={`/product/${product.id}`} className="block cursor-pointer">
+                {/* Product Image */}
+                <div className="relative mb-12 overflow-hidden rounded-lg">
+                  <img 
+                    src={product.image} 
+                    alt={product.name}
+                    className="w-full h-96 object-cover transition-transform duration-300 group-hover:scale-105"
+                  />
+                  {product.originalPrice && (
+                    <div className="absolute top-4 right-4 bg-primary text-white px-2 py-1 rounded text-sm font-semibold">
+                      {isArabic ? 'خصم' : 'Sale'}
+                    </div>
+                  )}
+                </div>
 
-              {/* Product Info */}
-              <div className="p-6">
-                <h3 className="text-xl font-semibold mb-2 arabic-heading-font text-gray-900">
-                  {product.name}
-                </h3>
-                <p className="text-gray-600 text-sm mb-4 arabic-body">
-                  {product.description}
-                </p>
-                
-                {/* Price */}
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center space-x-2 space-x-reverse">
-                    <span className="text-2xl font-bold text-primary arabic-heading-font">
-                      {product.price} {isArabic ? 'ريال' : 'SAR'}
+                {/* Product Info */}
+                <div className="space-y-10 pb-6">
+                  {/* Product Name */}
+                  <h3 className="text-white text-3xl font-semibold uppercase tracking-wide arabic-heading-font hover:text-primary transition-colors duration-300">
+                    {product.name}
+                  </h3>
+                  
+                  {/* Description */}
+                  <p className="text-gray-300 text-xl leading-relaxed arabic-body px-8">
+                    {product.description}
+                  </p>
+                  
+                  {/* Price */}
+                  <div className="flex items-center justify-center space-x-2 space-x-reverse">
+                    <span className="text-white text-4xl font-bold">
+                      ${product.price}.00
                     </span>
                     {product.originalPrice && (
-                      <span className="text-lg text-gray-500 line-through arabic-heading-font">
-                        {product.originalPrice} {isArabic ? 'ريال' : 'SAR'}
+                      <span className="text-gray-400 text-2xl line-through">
+                        ${product.originalPrice}.00
                       </span>
                     )}
                   </div>
                 </div>
-
-                {/* View Details Button */}
-                <button className="w-full bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded transition-colors duration-300 arabic-body">
-                  {isArabic ? 'عرض التفاصيل' : 'View Details'}
-                </button>
-              </div>
-            </Link>
+              </Link>
+              
+              {/* Add to Cart Button - Outside the Link */}
+              <button 
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  handleAddToCart(product)
+                }}
+                className="border-2 border-primary text-primary px-12 py-5 text-lg font-medium uppercase tracking-wide hover:bg-primary hover:text-white transition-all duration-300 rounded-sm backdrop-blur-sm"
+              >
+                {content.addToCart}
+              </button>
+            </div>
           ))}
         </div>
 
@@ -157,7 +185,7 @@ const ProductsSection = () => {
         <div className="text-center">
           <Link 
             to="/shop" 
-            className="inline-block bg-transparent border-2 border-primary text-primary hover:bg-primary hover:text-white px-8 py-3 rounded transition-all duration-300 arabic-body text-lg"
+            className="inline-block border-2 border-primary text-primary hover:bg-primary hover:text-white px-8 py-3 rounded transition-all duration-300 arabic-body text-lg font-medium uppercase tracking-wide backdrop-blur-sm"
           >
             {content.viewAll}
           </Link>

@@ -11,6 +11,7 @@ const Contact = () => {
     subject: '',
     message: ''
   })
+  const [showModal, setShowModal] = useState(false)
 
   const content = isArabic ? {
     hero: {
@@ -123,6 +124,8 @@ const Contact = () => {
     e.preventDefault()
     // Handle form submission logic here
     console.log('Form submitted:', formData)
+    // Show success modal
+    setShowModal(true)
     // Reset form after submission
     setFormData({
       name: '',
@@ -131,7 +134,10 @@ const Contact = () => {
       subject: '',
       message: ''
     })
-    alert(isArabic ? 'تم إرسال رسالتكم بنجاح!' : 'Message sent successfully!')
+  }
+
+  const closeModal = () => {
+    setShowModal(false)
   }
 
   const socialLinks = [
@@ -141,18 +147,17 @@ const Contact = () => {
   ]
 
   return (
-    <div className="pt-16 md:pt-20">
-      {/* Hero Section */}
-     
+    <div className="pt-16 md:pt-20 relative min-h-screen bg-cover bg-center bg-no-repeat bg-fixed" style={{ backgroundImage: 'url(/images/hhh.jpg)' }}>
+      <div className="absolute inset-0 bg-black/70"></div>
 
       {/* Contact Information and Form */}
-      <section className="section-padding">
-        <div className="w-full px-4 md:px-6 lg:px-8">
+      <section className="section-padding relative z-10">
+        <div className="w-full px-6 sm:px-8 lg:px-12 max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             {/* Contact Information */}
-            <div className="space-y-8">
+            <div className="space-y-8 backdrop-blur-sm rounded-xl p-8 border-2 border-primary/30">
               <div>
-                <h2 className="text-3xl font-bold mb-8 arabic-heading-font">
+                <h2 className="text-3xl font-bold mb-8 arabic-heading-font text-primary">
                   {content.info.title}
                 </h2>
               </div>
@@ -163,10 +168,10 @@ const Contact = () => {
                   <FaMapMarkerAlt className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold mb-2 arabic-heading-font">
+                  <h3 className="text-lg font-semibold mb-2 arabic-heading-font text-white">
                     {content.info.address.title}
                   </h3>
-                  <p className="text-gray-600 arabic-body">
+                  <p className="text-gray-300 text-xl arabic-body">
                     {content.info.address.value}
                   </p>
                 </div>
@@ -178,10 +183,10 @@ const Contact = () => {
                   <FaPhone className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold mb-2 arabic-heading-font">
+                  <h3 className="text-lg font-semibold mb-2 arabic-heading-font text-white">
                     {content.info.phone.title}
                   </h3>
-                  <p className="text-gray-600 arabic-body" dir="ltr">
+                  <p className="text-gray-300 text-xl arabic-body" dir="ltr">
                     {content.info.phone.value}
                   </p>
                 </div>
@@ -193,10 +198,10 @@ const Contact = () => {
                   <FaEnvelope className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold mb-2 arabic-heading-font">
+                  <h3 className="text-lg font-semibold mb-2 arabic-heading-font text-white">
                     {content.info.email.title}
                   </h3>
-                  <p className="text-gray-600 arabic-body" dir="ltr">
+                  <p className="text-gray-300 text-xl arabic-body" dir="ltr">
                     {content.info.email.value}
                   </p>
                 </div>
@@ -208,11 +213,11 @@ const Contact = () => {
                   <FaClock className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold mb-2 arabic-heading-font">
+                  <h3 className="text-lg font-semibold mb-2 arabic-heading-font text-white">
                     {content.info.hours.title}
                   </h3>
                   {content.info.hours.values.map((time, index) => (
-                    <p key={index} className="text-gray-600 arabic-body">
+                    <p key={index} className="text-gray-300 text-xl arabic-body">
                       {time}
                     </p>
                   ))}
@@ -221,14 +226,14 @@ const Contact = () => {
             </div>
 
             {/* Contact Form */}
-            <div className="bg-gray-50 p-8 rounded-lg">
-              <h2 className="text-3xl font-bold mb-8 arabic-heading-font">
+            <div className="backdrop-blur-sm p-8 rounded-xl border-2 border-primary/30">
+              <h2 className="text-3xl font-bold mb-8 arabic-heading-font text-primary">
                 {content.form.title}
               </h2>
               
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2 arabic-body">
+                  <label className="block text-sm text-xl font-medium text-white mb-2 arabic-body">
                     {content.form.fields.name}
                   </label>
                   <input
@@ -244,7 +249,7 @@ const Contact = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2 arabic-body">
+                    <label className="block text-sm text-xl font-medium text-white mb-2 arabic-body">
                       {content.form.fields.email}
                     </label>
                     <input
@@ -259,7 +264,7 @@ const Contact = () => {
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2 arabic-body">
+                    <label className="block text-sm text-xl font-medium text-white mb-2 arabic-body">
                       {content.form.fields.phone}
                     </label>
                     <input
@@ -274,7 +279,7 @@ const Contact = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2 arabic-body">
+                  <label className="block text-sm text-xl font-medium text-white mb-2 arabic-body">
                     {content.form.fields.subject}
                   </label>
                   <input
@@ -289,7 +294,7 @@ const Contact = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2 arabic-body">
+                  <label className="block text-sm text-xl font-medium text-white mb-2 arabic-body">
                     {content.form.fields.message}
                   </label>
                   <textarea
@@ -316,12 +321,12 @@ const Contact = () => {
       </section>
 
       {/* Social Media Section */}
-      <section className="py-16 bg-gray-50">
-        <div className="w-full px-4 md:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold mb-4 arabic-heading-font">
+      <section className="py-16 relative z-10">
+        <div className="w-full px-4 md:px-6 lg:px-8 text-center backdrop-blur-sm bg-black/40 rounded-xl mx-auto max-w-4xl p-8 border-2 border-primary/30">
+          <h2 className="text-3xl font-bold mb-4 arabic-heading-font text-primary">
             {content.social.title}
           </h2>
-          <p className="text-gray-600 mb-8 arabic-body">
+          <p className="text-gray-300 mb-8 arabic-body">
             {content.social.description}
           </p>
           
@@ -340,17 +345,36 @@ const Contact = () => {
         </div>
       </section>
 
-      {/* Map Section */}
-      <section className="h-96 bg-gray-300">
-        <div className="w-full h-full flex items-center justify-center">
-          <div className="text-center">
-            <FaMapMarkerAlt className="w-12 h-12 text-primary mx-auto mb-4" />
-            <p className="text-gray-600 arabic-body">
-              {isArabic ? 'خريطة الموقع ستظهر هنا' : 'Map location will be displayed here'}
-            </p>
+      {/* Success Modal */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
+          <div className="bg-white rounded-xl p-8 max-w-md w-full mx-4 backdrop-blur-sm shadow-2xl border-2 border-primary/30">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-4 arabic-heading-font">
+                {isArabic ? 'تم الإرسال بنجاح!' : 'Message Sent Successfully!'}
+              </h3>
+              <p className="text-gray-600 mb-6 arabic-body">
+                {isArabic 
+                  ? 'شكراً لتواصلكم معنا. سنقوم بالرد عليكم في أقرب وقت ممكن.'
+                  : 'Thank you for contacting us. We will get back to you as soon as possible.'
+                }
+              </p>
+              <button
+                onClick={closeModal}
+                className="w-full bg-primary text-white py-3 px-6 rounded-lg hover:bg-primary/90 transition-colors duration-300 font-medium"
+              >
+                {isArabic ? 'حسناً' : 'OK'}
+              </button>
+            </div>
           </div>
         </div>
-      </section>
+      )}
+      
     </div>
   )
 }

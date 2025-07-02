@@ -117,23 +117,23 @@ const About = () => {
   }
 
   return (
-    <div className="pt-16 md:pt-20">
-    
+    <div className="pt-16 md:pt-20 relative min-h-screen bg-cover bg-center bg-no-repeat bg-fixed" style={{ backgroundImage: 'url(/images/hhh.jpg)' }}>
+      <div className="absolute inset-0 bg-black/70"></div>
 
       {/* Story Section */}
-      <section className="section-padding">
-        <div className="w-full px-4 md:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16 w-full">
+      <section className="section-padding relative z-10">
+        <div className="w-full px-6 sm:px-8 lg:px-12 max-w-none mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-16 items-center mb-20 w-full">
             <div
-              className="h-96 bg-cover bg-center rounded-lg w-full"
+              className="h-[550px] bg-cover bg-center rounded-xl shadow-2xl w-full border-2 border-primary/30 lg:col-span-3"
               style={{ backgroundImage: 'url(/images/about2.webp)' }}
             />
-            <div className="space-y-6 ">
-              <h2 className="text-4xl font-bold arabic-heading-font">
+            <div className="space-y-8 backdrop-blur-sm border-2 border-primary/30 rounded-xl p-8 md:p-10 lg:p-12 lg:col-span-2">
+              <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold arabic-heading-font text-primary">
                 {content.story.title}
               </h2>
               {content.story.description.map((paragraph, index) => (
-                <p key={index} className="text-gray-600 leading-relaxed arabic-body">
+                <p key={index} className="text-gray-300 leading-relaxed arabic-body text-base sm:text-lg lg:text-xl">
                   {paragraph}
                 </p>
               ))}
@@ -143,26 +143,26 @@ const About = () => {
       </section>
 
       {/* Values Section */}
-      <section className="section-padding bg-gray-50">
-        <div className="w-full px-4 md:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4 arabic-heading-font">
+      <section className="section-padding relative z-10">
+        <div className="w-full px-6 sm:px-8 lg:px-12 max-w-7xl mx-auto">
+          <div className="text-center mb-16 sm:mb-20">
+            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 arabic-heading-font text-primary">
               {content.values.title}
             </h2>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10">
             {content.values.items.map((value, index) => (
-              <div key={index} className="text-center p-6 bg-white rounded-lg shadow-lg">
-                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-primary text-2xl font-bold">
+              <div key={index} className="text-center p-8 backdrop-blur-sm rounded-xl shadow-2xl border border-primary/20 hover:border-primary/80 transition-all duration-300">
+                <div className="w-20 h-20 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-6 border-2 border-primary/80">
+                  <span className="text-primary text-3xl font-bold">
                     {index + 1}
                   </span>
                 </div>
-                <h3 className="text-xl font-semibold mb-3 arabic-heading-font">
+                <h3 className="text-3xl sm:text-2xl font-semibold mb-4 arabic-heading-font text-primary">
                   {value.title}
                 </h3>
-                <p className="text-gray-600 arabic-body">
+                <p className="text-gray-300 text-2xl arabic-body text-base sm:text-lg">
                   {value.description}
                 </p>
               </div>
@@ -171,57 +171,25 @@ const About = () => {
         </div>
       </section>
 
-      {/* Team Section */}
-      <section className="section-padding">
-        <div className="w-full px-4 md:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4 arabic-heading-font">
-              {content.team.title}
-            </h2>
-            <p className="text-gray-600 max-w-2xl mx-auto arabic-body">
-              {content.team.description}
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {content.team.members.map((member, index) => (
-              <div key={index} className="text-center group">
-                <div className="relative overflow-hidden rounded-lg mb-4">
-                  <img
-                    src={member.image}
-                    alt={member.name}
-                    className="w-full h-80 object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                  <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                </div>
-                <h3 className="text-xl font-semibold mb-2 arabic-heading-font">
-                  {member.name}
-                </h3>
-                <p className="text-primary arabic-body">
-                  {member.role}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
+      
       {/* Call to Action */}
-      <section className="section-padding bg-primary text-white">
-        <div className="w-full px-4 md:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl font-bold mb-6 arabic-heading-font">
-            {isArabic ? 'انضموا إلى مجتمعنا' : 'Join Our Community'}
-          </h2>
-          <p className="text-xl mb-8 max-w-2xl mx-auto opacity-90 arabic-body">
-            {isArabic 
-              ? 'اكتشفوا عالم القهوة معنا واستمتعوا بتجربة فريدة تجمع بين الجودة والأصالة'
-              : 'Discover the world of coffee with us and enjoy a unique experience that combines quality and authenticity'
-            }
-          </p>
-          <div className="space-x-4 space-x-reverse">
-            <button className="bg-white text-primary px-8 py-3 rounded hover:bg-gray-100 transition-colors duration-300">
-              {isArabic ? 'زوروا مقهانا' : 'Visit Our Café'}
-            </button>
+      <section className="section-padding relative z-10">
+        <div className="w-full px-6 sm:px-8 lg:px-12 max-w-7xl mx-auto text-center">
+          <div className="backdrop-blur-sm bg-primary/90 rounded-xl p-10 md:p-14 lg:p-16 shadow-2xl border border-primary/30">
+            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-8 arabic-heading-font text-white">
+              {isArabic ? 'انضموا إلى مجتمعنا' : 'Join Our Community'}
+            </h2>
+            <p className="text-xl sm:text-2xl lg:text-3xl mb-10 max-w-4xl mx-auto text-white/90 arabic-body leading-relaxed">
+              {isArabic 
+                ? 'اكتشفوا عالم القهوة معنا واستمتعوا بتجربة فريدة تجمع بين الجودة والأصالة'
+                : 'Discover the world of coffee with us and enjoy a unique experience that combines quality and authenticity'
+              }
+            </p>
+            <div className="space-x-4 space-x-reverse">
+              <button className="bg-white text-primary px-8 sm:px-10 lg:px-12 py-4 sm:py-5 lg:py-6 rounded-xl hover:bg-gray-100 transition-all duration-300 font-bold shadow-lg hover:shadow-xl transform hover:-translate-y-1 text-base sm:text-lg lg:text-xl">
+                {isArabic ? 'زوروا مقهانا' : 'Visit Our Café'}
+              </button>
+            </div>
           </div>
         </div>
       </section>

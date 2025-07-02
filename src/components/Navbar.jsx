@@ -5,7 +5,6 @@ import { useCart, useRTL } from '../App'
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [showShopDropdown, setShowShopDropdown] = useState(false)
   const location = useLocation()
   const { cartItemsCount } = useCart()
   const { isArabic, toggleLanguage } = useRTL()
@@ -16,7 +15,6 @@ const Navbar = () => {
 
   const closeMenu = () => {
     setIsMenuOpen(false)
-    setShowShopDropdown(false)
   }
 
   const isActive = (path) => {
@@ -25,7 +23,7 @@ const Navbar = () => {
 
   const navLinks = isArabic ? [
     { path: '/', label: 'الرئيسية' },
-    { path: '/menu', label: 'قائمة الطعام' },
+    { path: '/menu', label: ' المنتجات' },
     { path: '/about', label: 'من نحن' },
     { path: '/contact', label: 'اتصل بنا' }
   ] : [
@@ -33,18 +31,6 @@ const Navbar = () => {
     { path: '/menu', label: 'Menu' },
     { path: '/about', label: 'About' },
     { path: '/contact', label: 'Contact' }
-  ]
-
-  const shopDropdownItems = isArabic ? [
-    { path: '/shop', label: 'المتجر' },
-    { path: '/product/1', label: 'صفحة المنتج' },
-    { path: '/cart', label: 'السلة' },
-    { path: '/checkout', label: 'الدفع' }
-  ] : [
-    { path: '/shop', label: 'Shop' },
-    { path: '/product/1', label: 'Single Product' },
-    { path: '/cart', label: 'Cart' },
-    { path: '/checkout', label: 'Checkout' }
   ]
 
   return (
@@ -56,8 +42,8 @@ const Navbar = () => {
             <Link to="/" className="flex items-center" onClick={closeMenu}>
               <img 
                 src="/images/01-removebg-preview.png" 
-                alt={isArabic ? 'بلات - مذاق الين الطبيعي' : 'Blat - Natural Fresh Taste'} 
-                className="h-20 w-auto transition-opacity duration-300 hover:opacity-80 drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]"
+                alt={isArabic ? 'بلال - مذاق الين الطبيعي' : 'Blatl - Natural Fresh Taste Of Coffee'} 
+                className="h-20 w-auto transition-opacity duration-300 hover:opacity-80 drop-shadow-[0_0_8px_rgba(255,255,255,0.8)] invert"
               />
             </Link>
           </div>
@@ -81,31 +67,6 @@ const Navbar = () => {
                   )}
                 </Link>
               ))}
-              
-              {/* Shop Dropdown */}
-              <div 
-                className="relative"
-                onMouseEnter={() => setShowShopDropdown(true)}
-                onMouseLeave={() => setShowShopDropdown(false)}
-              >
-                <button className="px-3 py-2 text-lg font-medium transition-colors duration-300 text-white/90 hover:text-primary">
-                  {isArabic ? 'المتجر' : 'Shop'}
-                </button>
-                {showShopDropdown && (
-                  <div className="absolute top-full right-0 mt-2 w-48 bg-black/90 backdrop-blur-md rounded-lg shadow-lg border border-primary/20 overflow-hidden">
-                    {shopDropdownItems.map((item) => (
-                      <Link
-                        key={item.path}
-                        to={item.path}
-                        className="block px-4 py-3 text-lg text-white/90 hover:bg-primary hover:text-white transition-colors duration-200 text-right"
-                        onClick={closeMenu}
-                      >
-                        {item.label}
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </div>
             </div>
           </div>
 
@@ -166,23 +127,6 @@ const Navbar = () => {
                   {link.label}
                 </Link>
               ))}
-              
-              {/* Mobile Shop Menu */}
-              <div className="border-t border-primary/20 pt-4">
-                <p className="text-lg font-semibold text-primary mb-2 text-right">
-                  {isArabic ? 'المتجر' : 'Shop'}
-                </p>
-                {shopDropdownItems.map((item) => (
-                  <Link
-                    key={item.path}
-                    to={item.path}
-                    className="block py-2 pr-4 text-xl text-white/80 hover:text-primary transition-colors duration-300 text-right"
-                    onClick={closeMenu}
-                  >
-                    {item.label}
-                  </Link>
-                ))}
-              </div>
             </div>
           </div>
         )}

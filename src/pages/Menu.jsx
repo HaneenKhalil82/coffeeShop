@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useRTL, useCart } from '../App'
 
 const Menu = () => {
@@ -323,40 +324,47 @@ const Menu = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {content.menuItems[activeCategory]?.map((item, index) => (
               <div key={index} className="text-center group">
-                {/* Image */}
-                <div className="relative mb-12 overflow-hidden rounded-lg">
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                    className="w-full h-96 object-cover transition-transform duration-300 group-hover:scale-105"
-                  />
-                </div>
-                
-                {/* Content */}
-                <div className="space-y-10 pb-6">
-                  {/* Product Name */}
-                  <h3 className="text-white text-3xl font-semibold uppercase tracking-wide arabic-heading-font">
-                    {item.name}
-                  </h3>
-                  
-                  {/* Description */}
-                  <p className="text-gray-300 text-xl leading-relaxed arabic-body px-8">
-                    {item.description}
-                  </p>
-                  
-                  {/* Price */}
-                  <div className="text-white text-4xl font-bold py-6">
-                    ${item.price}.00
+                {/* Clickable Card Content */}
+                <Link to={`/product/${item.id}`} className="block cursor-pointer">
+                  {/* Image */}
+                  <div className="relative mb-12 overflow-hidden rounded-lg">
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="w-full h-96 object-cover transition-transform duration-300 group-hover:scale-105"
+                    />
                   </div>
                   
-                  {/* Add to Cart Button */}
-                  <button 
-                    onClick={() => handleAddToCart(item)}
-                    className="border-2 border-primary text-primary px-12 py-5 text-lg font-medium uppercase tracking-wide hover:bg-primary hover:text-white transition-all duration-300 rounded-sm backdrop-blur-sm"
-                  >
-                    {content.addToCartButton}
-                  </button>
-                </div>
+                  {/* Content */}
+                  <div className="space-y-10 pb-6">
+                    {/* Product Name */}
+                    <h3 className="text-white text-3xl font-semibold uppercase tracking-wide arabic-heading-font hover:text-primary transition-colors duration-300">
+                      {item.name}
+                    </h3>
+                    
+                    {/* Description */}
+                    <p className="text-gray-300 text-xl leading-relaxed arabic-body px-8">
+                      {item.description}
+                    </p>
+                    
+                    {/* Price */}
+                    <div className="text-white text-4xl font-bold py-6">
+                      ${item.price}.00
+                    </div>
+                  </div>
+                </Link>
+                
+                {/* Add to Cart Button - Outside the Link */}
+                <button 
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    handleAddToCart(item)
+                  }}
+                  className="border-2 border-primary text-primary px-12 py-5 text-lg font-medium uppercase tracking-wide hover:bg-primary hover:text-white transition-all duration-300 rounded-sm backdrop-blur-sm"
+                >
+                  {content.addToCartButton}
+                </button>
               </div>
             ))}
           </div>
