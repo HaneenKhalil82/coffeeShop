@@ -33,11 +33,13 @@ const Checkout = () => {
   const [loading, setLoading] = useState(false)
   const [toast, setToast] = useState(null)
   const [errors, setErrors] = useState({})
+  const [showOrderConfirmModal, setShowOrderConfirmModal] = useState(false)
   const [formData, setFormData] = useState({
     // Customer Info
     firstName: '',
     lastName: '',
     email: '',
+    phoneCountry: 'saudi', // 'saudi' or 'egypt'
     phone: '',
     
     // Delivery Info
@@ -79,7 +81,12 @@ const Checkout = () => {
       firstName: 'الاسم الأول',
       lastName: 'الاسم الأخير',
       email: 'البريد الإلكتروني',
+      phoneCountry: 'الدولة',
       phone: 'رقم الهاتف'
+    },
+    phoneCountries: {
+      saudi: 'المملكة العربية السعودية (+966)',
+      egypt: 'مصر (+20)'
     },
     deliveryInfo: {
       title: 'معلومات التوصيل',
@@ -119,7 +126,8 @@ const Checkout = () => {
       firstName: 'أدخل اسمك الأول',
       lastName: 'أدخل اسمك الأخير',
       email: 'أدخل بريدك الإلكتروني',
-      phone: 'أدخل رقم هاتفك',
+      phoneSaudi: '5X XXX XXXX',
+      phoneEgypt: '1X XXXX XXXX',
       address: 'أدخل عنوانك الكامل',
       city: 'أدخل المدينة',
       district: 'أدخل الحي',
@@ -138,10 +146,18 @@ const Checkout = () => {
       trackOrder: 'تتبع الطلب',
       continueShopping: 'متابعة التسوق'
     },
+    orderConfirmModal: {
+      title: 'تأكيد الطلب',
+      message: 'هل أنت متأكد من أنك تريد تأكيد طلبك؟',
+      orderTotal: 'إجمالي الطلب',
+      confirmButton: 'نعم، أكد الطلب',
+      cancelButton: 'إلغاء'
+    },
     validation: {
       required: 'هذا الحقل مطلوب',
       emailInvalid: 'بريد إلكتروني غير صالح',
-      phoneInvalid: 'رقم هاتف غير صالح',
+      phoneInvalidSaudi: 'رقم هاتف سعودي غير صالح - يجب أن يبدأ بـ 5 ويتكون من 9 أرقام',
+      phoneInvalidEgypt: 'رقم هاتف مصري غير صالح - يجب أن يبدأ بـ 1 ويتكون من 10 أرقام',
       cardInvalid: 'رقم بطاقة غير صالح',
       expiryInvalid: 'تاريخ انتهاء غير صالح',
       cvvInvalid: 'رمز أمان غير صالح'
@@ -165,7 +181,12 @@ const Checkout = () => {
       firstName: 'First Name',
       lastName: 'Last Name',
       email: 'Email',
+      phoneCountry: 'Country',
       phone: 'Phone Number'
+    },
+    phoneCountries: {
+      saudi: 'Saudi Arabia (+966)',
+      egypt: 'Egypt (+20)'
     },
     deliveryInfo: {
       title: 'Delivery Information',
@@ -205,7 +226,8 @@ const Checkout = () => {
       firstName: 'Enter your first name',
       lastName: 'Enter your last name',
       email: 'Enter your email',
-      phone: 'Enter your phone number',
+      phoneSaudi: '5X XXX XXXX',
+      phoneEgypt: '1X XXXX XXXX',
       address: 'Enter your full address',
       city: 'Enter city',
       district: 'Enter district',
@@ -224,10 +246,18 @@ const Checkout = () => {
       trackOrder: 'Track Order',
       continueShopping: 'Continue Shopping'
     },
+    orderConfirmModal: {
+      title: 'Confirm Order',
+      message: 'Are you sure you want to confirm your order?',
+      orderTotal: 'Order Total',
+      confirmButton: 'Yes, Confirm Order',
+      cancelButton: 'Cancel'
+    },
     validation: {
       required: 'This field is required',
       emailInvalid: 'Invalid email address',
-      phoneInvalid: 'Invalid phone number',
+      phoneInvalidSaudi: 'Invalid Saudi phone number - must start with 5 and be 9 digits',
+      phoneInvalidEgypt: 'Invalid Egyptian phone number - must start with 1 and be 10 digits',
       cardInvalid: 'Invalid card number',
       expiryInvalid: 'Invalid expiry date',
       cvvInvalid: 'Invalid CVV'
@@ -263,8 +293,20 @@ const Checkout = () => {
       }
       if (!formData.phone.trim()) {
         newErrors.phone = content.validation.required
-      } else if (!/^05\d{8}$/.test(formData.phone.replace(/\s/g, ''))) {
-        newErrors.phone = content.validation.phoneInvalid
+      } else {
+        const cleanPhone = formData.phone.replace(/\s/g, '')
+        
+        if (formData.phoneCountry === 'saudi') {
+          // Saudi format: 5XXXXXXXX (9 digits starting with 5)
+          if (!/^5\d{8}$/.test(cleanPhone)) {
+            newErrors.phone = content.validation.phoneInvalidSaudi
+          }
+        } else if (formData.phoneCountry === 'egypt') {
+          // Egyptian format: 1XXXXXXXXX (10 digits starting with 1)
+          if (!/^1[0125]\d{8}$/.test(cleanPhone)) {
+            newErrors.phone = content.validation.phoneInvalidEgypt
+          }
+        }
       }
 
       // Delivery info validation
@@ -321,17 +363,58 @@ const Checkout = () => {
     return v
   }
 
-  // Format phone number
-  const formatPhoneNumber = (value) => {
-    const v = value.replace(/\D/g, '')
-    if (v.length >= 3) {
-      return v.substring(0, 3) + ' ' + v.substring(3, 6) + ' ' + v.substring(6, 10)
+  // Format phone number based on selected country
+  const formatPhoneNumber = (value, country) => {
+    let v = value.replace(/\D/g, '')
+    
+    if (country === 'egypt') {
+      // Egyptian format: 1X XXXX XXXX (10 digits starting with 1)
+      // Auto-add 1 prefix if not present
+      if (v.length > 0 && !v.startsWith('1')) {
+        if (v.startsWith('0') || v.startsWith('2')) {
+          v = '1' + v
+        } else {
+          v = '1' + v
+        }
+      }
+      
+      // Limit to 10 digits
+      v = v.substring(0, 10)
+      
+      // Format as 1X XXXX XXXX
+      if (v.length >= 6) {
+        return v.substring(0, 2) + ' ' + v.substring(2, 6) + ' ' + v.substring(6, 10)
+      } else if (v.length >= 2) {
+        return v.substring(0, 2) + ' ' + v.substring(2)
+      }
+      return v
+    } else {
+      // Saudi format: 5X XXX XXXX (9 digits starting with 5)
+      // Auto-add 5 prefix if not present
+      if (v.length > 0 && !v.startsWith('5')) {
+        if (v.startsWith('0')) {
+          v = '5' + v.substring(1)
+        } else {
+          v = '5' + v
+        }
+      }
+      
+      // Limit to 9 digits
+      v = v.substring(0, 9)
+      
+      // Format as 5X XXX XXXX
+      if (v.length >= 5) {
+        return v.substring(0, 2) + ' ' + v.substring(2, 5) + ' ' + v.substring(5, 9)
+      } else if (v.length >= 2) {
+        return v.substring(0, 2) + ' ' + v.substring(2)
+      }
+      return v
     }
-    return v
   }
 
   const handleInputChange = (e) => {
     let { name, value } = e.target
+    let updatedFormData = { ...formData }
 
     // Format specific fields
     if (name === 'cardNumber') {
@@ -339,18 +422,26 @@ const Checkout = () => {
     } else if (name === 'expiryDate') {
       value = formatExpiryDate(value)
     } else if (name === 'phone') {
-      value = formatPhoneNumber(value)
+      value = formatPhoneNumber(value, formData.phoneCountry)
     } else if (name === 'cvv') {
       value = value.replace(/\D/g, '').substring(0, 4)
+    } else if (name === 'phoneCountry') {
+      // Clear phone number when country changes
+      updatedFormData.phone = ''
+      // Also clear phone error if exists
+      if (errors.phone) {
+        setErrors({
+          ...errors,
+          phone: ''
+        })
+      }
     }
 
-    setFormData({
-      ...formData,
-      [name]: value
-    })
+    updatedFormData[name] = value
+    setFormData(updatedFormData)
 
     // Clear error when user starts typing
-    if (errors[name]) {
+    if (errors[name] && name !== 'phoneCountry') {
       setErrors({
         ...errors,
         [name]: ''
@@ -372,12 +463,18 @@ const Checkout = () => {
     }
   }
 
-  const handlePlaceOrder = async () => {
+  const handlePlaceOrder = () => {
     if (!validateForm()) {
       showToast(content.messages.validationError, 'error')
       return
     }
+    
+    // Show confirmation modal first
+    setShowOrderConfirmModal(true)
+  }
 
+  const confirmPlaceOrder = async () => {
+    setShowOrderConfirmModal(false)
     setLoading(true)
     showToast(content.messages.processingOrder, 'info')
 
@@ -620,19 +717,40 @@ const Checkout = () => {
                       
                       <div>
                         <label className="block text-sm font-medium text-white mb-2 arabic-body">
+                          {content.customerInfo.phoneCountry}
+                        </label>
+                        <select
+                          name="phoneCountry"
+                          value={formData.phoneCountry}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-3 border border-white/20 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent arabic-body bg-white/10 text-white"
+                        >
+                          <option value="saudi" className="text-black">{content.phoneCountries.saudi}</option>
+                          <option value="egypt" className="text-black">{content.phoneCountries.egypt}</option>
+                        </select>
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-white mb-2 arabic-body">
                           {content.customerInfo.phone}
                         </label>
-                        <input
-                          type="tel"
-                          name="phone"
-                          value={formData.phone}
-                          onChange={handleInputChange}
-                          placeholder={content.placeholders.phone}
-                          className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent arabic-body bg-white/10 text-white placeholder-gray-300 ${
-                            errors.phone ? 'border-red-500' : 'border-white/20'
-                          }`}
-                          required
-                        />
+                        <div className="flex">
+                          <div className="flex items-center px-3 py-3 bg-white/20 border border-white/20 rounded-l-lg text-white font-medium">
+                            {formData.phoneCountry === 'egypt' ? '+20' : '+966'}
+                          </div>
+                          <input
+                            type="tel"
+                            name="phone"
+                            value={formData.phone}
+                            onChange={handleInputChange}
+                            placeholder={formData.phoneCountry === 'egypt' ? content.placeholders.phoneEgypt : content.placeholders.phoneSaudi}
+                            className={`flex-1 px-4 py-3 border rounded-r-lg focus:ring-2 focus:ring-primary focus:border-transparent arabic-body bg-white/10 text-white placeholder-gray-300 ${
+                              errors.phone ? 'border-red-500' : 'border-white/20'
+                            }`}
+                            dir="ltr"
+                            required
+                          />
+                        </div>
                         {errors.phone && (
                           <p className="mt-1 text-sm text-red-400 arabic-body">{errors.phone}</p>
                         )}
@@ -993,6 +1111,56 @@ const Checkout = () => {
           </div>
         </div>
       </section>
+
+      {/* Order Confirmation Modal */}
+      {showOrderConfirmModal && (
+        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md mx-4">
+            <div className="p-6">
+              <div className="text-center mb-6">
+                <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <FaExclamationTriangle className="w-8 h-8 text-amber-600" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2 arabic-heading-font">
+                  {content.orderConfirmModal.title}
+                </h3>
+                <p className="text-gray-600 arabic-body">
+                  {content.orderConfirmModal.message}
+                </p>
+              </div>
+
+              <div className="bg-gray-50 rounded-lg p-4 mb-6">
+                <div className="flex justify-between items-center">
+                  <span className="font-semibold text-gray-700 arabic-body">
+                    {content.orderConfirmModal.orderTotal}:
+                  </span>
+                  <span className="text-xl font-bold text-primary">
+                    ${total.toFixed(2)}
+                  </span>
+                </div>
+                <div className="text-sm text-gray-500 mt-2 arabic-body">
+                  {cartItems.length} {isArabic ? 'منتج' : 'items'}
+                </div>
+              </div>
+
+              <div className="flex space-x-3 space-x-reverse">
+                <button
+                  onClick={() => setShowOrderConfirmModal(false)}
+                  className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-300 arabic-body"
+                >
+                  {content.orderConfirmModal.cancelButton}
+                </button>
+                <button
+                  onClick={confirmPlaceOrder}
+                  className="flex-1 px-4 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors duration-300 arabic-body"
+                >
+                  {content.orderConfirmModal.confirmButton}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
