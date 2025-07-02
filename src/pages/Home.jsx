@@ -213,12 +213,12 @@ const Home = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="rounded-lg overflow-hidden">
               <img 
-                src="/images/grid_gal4.jpg" 
+                src="/images/cart1.jpg" 
                 alt="Coffee Shop Interior" 
                 className="w-full h-auto object-contain rounded-lg"
               />
             </div>
-            <div className="space-y-6">
+            <div className="space-y-6 border-2 border-primary/40 hover:border-primary/80 transition-all duration-300 p-8 rounded-lg">
               <div>
                 <span className="text-primary font-semibold text-4xl arabic-heading-font">
                   {content.about.subtitle}
