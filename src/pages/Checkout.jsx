@@ -240,7 +240,7 @@ const Checkout = () => {
     return (
       <div className="pt-16 md:pt-20">
         <section className="section-padding">
-          <div className="container-custom">
+          <div className="w-full px-4 md:px-6 lg:px-8">
             <div className="max-w-2xl mx-auto text-center">
               <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
                 <FaCheck className="w-10 h-10 text-white" />
@@ -286,7 +286,7 @@ const Checkout = () => {
     <div className="pt-16 md:pt-20">
       {/* Hero Section */}
       <section className="bg-gray-50 py-12">
-        <div className="container-custom">
+        <div className="w-full px-4 md:px-6 lg:px-8">
           <div className="text-center mb-8">
             <h1 className="text-4xl font-bold mb-4 arabic-heading-font">
               {content.title}
@@ -325,7 +325,7 @@ const Checkout = () => {
 
       {/* Checkout Content */}
       <section className="section-padding">
-        <div className="container-custom">
+        <div className="w-full px-4 md:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             {/* Checkout Form */}
             <div className="lg:col-span-2">

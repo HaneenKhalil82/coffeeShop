@@ -90,7 +90,7 @@ const Footer = () => {
 
   return (
     <footer className="bg-gray-900 text-white">
-      <div className="container-custom section-padding">
+              <div className="w-full px-4 md:px-6 lg:px-8 section-padding">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Company Info */}
           <div className="space-y-4">
@@ -183,20 +183,7 @@ const Footer = () => {
             <p className="text-gray-400 text-sm arabic-body">
               {content.copyright}
             </p>
-            <div className="flex space-x-6 space-x-reverse text-sm">
-              <Link 
-                to="/privacy" 
-                className="text-gray-400 hover:text-primary transition-colors duration-300 arabic-body"
-              >
-                {content.links.privacy}
-              </Link>
-              <Link 
-                to="/terms" 
-                className="text-gray-400 hover:text-primary transition-colors duration-300 arabic-body"
-              >
-                {content.links.terms}
-              </Link>
-            </div>
+           
           </div>
         </div>
       </div>

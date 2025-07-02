@@ -64,19 +64,19 @@ const Navbar = () => {
   return (
     <nav className={`fixed w-full z-50 transition-all duration-300 ${
       isScrolled 
-        ? 'bg-black shadow-lg backdrop-blur-md'
-        : 'bg-opacity-50'
+        ? 'bg-primary/80 shadow-lg backdrop-blur-md'
+        : 'bg-primary/60 backdrop-blur-sm'
     }`}>
-      <div className="container-custom">
-        <div className="flex items-center justify-between h-16 md:h-20">
+      <div className="w-full px-4 md:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-20 md:h-24">
           {/* Logo */}
           <div className="flex-shrink-0">
             <Link to="/" className="flex items-center" onClick={closeMenu}>
-              <span className={`text-2xl font-bold transition-colors duration-300 arabic-heading-font ${
+              <span className={`text-4xl font-bold transition-colors duration-300 arabic-heading-font ${
                 isScrolled ? 'text-dark' : 'text-white'
               }`}>
                 {isArabic ? 'مقهى' : 'Coffee'}
-                <small className={`text-sm mr-2 ${
+                <small className={`text-lg mr-2 ${
                   isScrolled ? 'text-primary' : 'text-white/80'
                 }`}>
                   {isArabic ? 'المزيج' : 'Blend'}
@@ -92,7 +92,7 @@ const Navbar = () => {
                 <Link
                   key={link.path}
                   to={link.path}
-                  className={`relative px-3 py-2 text-sm font-medium transition-colors duration-300 hover:text-primary ${
+                  className={`relative px-3 py-2 text-lg font-medium transition-colors duration-300 hover:text-primary ${
                     isActive(link.path)
                       ? isScrolled ? 'text-primary' : 'text-white'
                       : isScrolled ? 'text-gray-700 hover:text-primary' : 'text-white/90 hover:text-white'
@@ -111,7 +111,7 @@ const Navbar = () => {
                 onMouseEnter={() => setShowShopDropdown(true)}
                 onMouseLeave={() => setShowShopDropdown(false)}
               >
-                <button className={`px-3 py-2 text-sm font-medium transition-colors duration-300 ${
+                <button className={`px-3 py-2 text-lg font-medium transition-colors duration-300 ${
                   isScrolled ? 'text-gray-700 hover:text-primary' : 'text-white/90 hover:text-white'
                 }`}>
                   {isArabic ? 'المتجر' : 'Shop'}
@@ -122,7 +122,7 @@ const Navbar = () => {
                       <Link
                         key={item.path}
                         to={item.path}
-                        className="block px-4 py-3 text-sm text-gray-700 hover:bg-primary hover:text-white transition-colors duration-200 text-right"
+                        className="block px-4 py-3 text-lg text-gray-700 hover:bg-primary hover:text-white transition-colors duration-200 text-right"
                         onClick={closeMenu}
                       >
                         {item.label}
@@ -144,7 +144,7 @@ const Navbar = () => {
               }`}
               title={isArabic ? 'تبديل اللغة' : 'Toggle Language'}
             >
-              <FaLanguage className="w-5 h-5" />
+              <FaLanguage className="w-8 h-8" />
               <span className="sr-only">
                 {isArabic ? 'تبديل إلى الإنجليزية' : 'Switch to Arabic'}
               </span>
@@ -187,7 +187,7 @@ const Navbar = () => {
                 <Link
                   key={link.path}
                   to={link.path}
-                  className={`block py-2 text-base font-medium transition-colors duration-300 text-right ${
+                  className={`block py-2 text-xl font-medium transition-colors duration-300 text-right ${
                     isActive(link.path)
                       ? 'text-primary border-r-4 border-primary pr-4'
                       : 'text-gray-700 hover:text-primary hover:pr-4'
@@ -200,14 +200,14 @@ const Navbar = () => {
               
               {/* Mobile Shop Menu */}
               <div className="border-t border-gray-200 pt-4">
-                <p className="text-sm font-semibold text-gray-500 mb-2 text-right">
+                <p className="text-lg font-semibold text-gray-500 mb-2 text-right">
                   {isArabic ? 'المتجر' : 'Shop'}
                 </p>
                 {shopDropdownItems.map((item) => (
                   <Link
                     key={item.path}
                     to={item.path}
-                    className="block py-2 pr-4 text-base text-gray-600 hover:text-primary transition-colors duration-300 text-right"
+                    className="block py-2 pr-4 text-xl text-gray-600 hover:text-primary transition-colors duration-300 text-right"
                     onClick={closeMenu}
                   >
                     {item.label}

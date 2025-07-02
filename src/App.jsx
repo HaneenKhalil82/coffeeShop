@@ -17,6 +17,7 @@ import './App.css'
 // RTL Context
 const RTLContext = createContext()
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useRTL = () => {
   const context = useContext(RTLContext)
   if (!context) {
@@ -25,9 +26,11 @@ export const useRTL = () => {
   return context
 }
 
+
 // Cart Context
 const CartContext = createContext()
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useCart = () => {
   const context = useContext(CartContext)
   if (!context) {

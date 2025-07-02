@@ -120,7 +120,7 @@ const Cart = () => {
     <div className="pt-16 md:pt-20">
       {/* Hero Section */}
       <section className="bg-gray-50 py-12">
-        <div className="container-custom">
+        <div className="w-full px-4 md:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-4xl font-bold mb-4 arabic-heading-font">
               {content.title}
@@ -141,7 +141,7 @@ const Cart = () => {
 
       {/* Cart Content */}
       <section className="section-padding">
-        <div className="container-custom">
+        <div className="w-full px-4 md:px-6 lg:px-8">
           {sampleItems.length === 0 ? (
             /* Empty Cart */
             <div className="text-center py-16">
@@ -340,7 +340,7 @@ const Cart = () => {
       {/* Recommended Products */}
       {sampleItems.length > 0 && (
         <section className="py-16 bg-gray-50">
-          <div className="container-custom">
+          <div className="w-full px-4 md:px-6 lg:px-8">
             <h2 className="text-3xl font-bold text-center mb-12 arabic-heading-font">
               {isArabic ? 'منتجات قد تعجبك' : 'You Might Also Like'}
             </h2>

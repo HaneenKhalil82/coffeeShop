@@ -149,7 +149,7 @@ const Contact = () => {
           style={{ backgroundImage: 'url(/images/bg_4.jpg)' }}
         />
         <div className="absolute inset-0 bg-black/50" />
-        <div className="relative container-custom h-full flex items-center justify-center">
+        <div className="relative w-full px-4 md:px-6 lg:px-8 h-full flex items-center justify-center">
           <div className="text-center text-white">
             <h1 className="text-5xl font-bold mb-4 arabic-heading-font">
               {content.hero.title}
@@ -163,7 +163,7 @@ const Contact = () => {
 
       {/* Contact Information and Form */}
       <section className="section-padding">
-        <div className="container-custom">
+        <div className="w-full px-4 md:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             {/* Contact Information */}
             <div className="space-y-8">
@@ -333,7 +333,7 @@ const Contact = () => {
 
       {/* Social Media Section */}
       <section className="py-16 bg-gray-50">
-        <div className="container-custom text-center">
+        <div className="w-full px-4 md:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold mb-4 arabic-heading-font">
             {content.social.title}
           </h2>

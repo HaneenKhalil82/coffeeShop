@@ -118,34 +118,17 @@ const About = () => {
 
   return (
     <div className="pt-16 md:pt-20">
-      {/* Hero Section */}
-      <section className="relative h-96">
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: 'url(/images/bg_2.jpg)' }}
-        />
-        <div className="absolute inset-0 bg-black/50" />
-        <div className="relative container-custom h-full flex items-center justify-center">
-          <div className="text-center text-white">
-            <h1 className="text-5xl font-bold mb-4 arabic-heading-font">
-              {content.hero.title}
-            </h1>
-            <p className="text-xl opacity-90 arabic-body">
-              {content.hero.subtitle}
-            </p>
-          </div>
-        </div>
-      </section>
+    
 
       {/* Story Section */}
       <section className="section-padding">
-        <div className="container-custom">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16">
+        <div className="w-full px-4 md:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16 w-full">
             <div
-              className="h-96 bg-cover bg-center rounded-lg"
-              style={{ backgroundImage: 'url(/images/about.jpg)' }}
+              className="h-96 bg-cover bg-center rounded-lg w-full"
+              style={{ backgroundImage: 'url(/images/about2.webp)' }}
             />
-            <div className="space-y-6">
+            <div className="space-y-6 ">
               <h2 className="text-4xl font-bold arabic-heading-font">
                 {content.story.title}
               </h2>
@@ -161,7 +144,7 @@ const About = () => {
 
       {/* Values Section */}
       <section className="section-padding bg-gray-50">
-        <div className="container-custom">
+        <div className="w-full px-4 md:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4 arabic-heading-font">
               {content.values.title}
@@ -190,7 +173,7 @@ const About = () => {
 
       {/* Team Section */}
       <section className="section-padding">
-        <div className="container-custom">
+        <div className="w-full px-4 md:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4 arabic-heading-font">
               {content.team.title}
@@ -225,7 +208,7 @@ const About = () => {
 
       {/* Call to Action */}
       <section className="section-padding bg-primary text-white">
-        <div className="container-custom text-center">
+        <div className="w-full px-4 md:px-6 lg:px-8 text-center">
           <h2 className="text-4xl font-bold mb-6 arabic-heading-font">
             {isArabic ? 'انضموا إلى مجتمعنا' : 'Join Our Community'}
           </h2>
