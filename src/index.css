@@ -1,0 +1,93 @@
+@import url('https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700');
+@import url('https://fonts.googleapis.com/css?family=Josefin+Sans:400,700');
+@import url('https://fonts.googleapis.com/css?family=Great+Vibes');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    direction: rtl;
+  }
+  
+  body {
+    font-family: 'Noto Sans Arabic', 'Poppins', sans-serif;
+    direction: rtl;
+    text-align: right;
+  }
+  
+  * {
+    direction: rtl;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded transition-colors duration-300;
+  }
+  
+  .btn-secondary {
+    @apply bg-transparent border-2 border-white text-white hover:bg-white hover:text-dark px-6 py-3 rounded transition-all duration-300;
+  }
+  
+  .section-padding {
+    @apply py-16 md:py-24;
+  }
+  
+  .container-custom {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+  
+  .arabic-heading {
+    font-family: 'Amiri', serif;
+    font-weight: 700;
+  }
+  
+  .arabic-body {
+    font-family: 'Noto Sans Arabic', sans-serif;
+    line-height: 1.8;
+  }
+}
+
+/* RTL Support - Default for Arabic */
+html, body {
+  direction: rtl;
+}
+
+.text-left {
+  text-align: right;
+}
+
+.text-right {
+  text-align: left;
+}
+
+.ml-auto {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+.mr-auto {
+  margin-right: 0;
+  margin-left: auto;
+}
+
+/* Additional RTL adjustments */
+.flex-row-reverse {
+  flex-direction: row-reverse;
+}
+
+/* Custom Arabic styles */
+.arabic-text {
+  font-family: 'Noto Sans Arabic', sans-serif;
+  direction: rtl;
+  text-align: right;
+}
+
+.arabic-heading-font {
+  font-family: 'Amiri', serif;
+}
