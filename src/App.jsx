@@ -5,8 +5,8 @@ import Footer from './components/Footer'
 import Home from './pages/Home'
 import Menu from './pages/Menu'
 import About from './pages/About'
-import Services from './pages/Services'
-import Blog from './pages/Blog'
+
+
 import Shop from './pages/Shop'
 import Contact from './pages/Contact'
 import Cart from './pages/Cart'
@@ -108,8 +108,8 @@ function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/menu" element={<Menu />} />
                 <Route path="/about" element={<About />} />
-                <Route path="/services" element={<Services />} />
-                <Route path="/blog" element={<Blog />} />
+      
+        
                 <Route path="/shop" element={<Shop />} />
                 <Route path="/product/:id" element={<ProductSingle />} />
                 <Route path="/contact" element={<Contact />} />

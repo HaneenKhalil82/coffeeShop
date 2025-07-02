@@ -1,24 +1,14 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { FaBars, FaTimes, FaShoppingCart, FaLanguage } from 'react-icons/fa'
 import { useCart, useRTL } from '../App'
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [isScrolled, setIsScrolled] = useState(false)
   const [showShopDropdown, setShowShopDropdown] = useState(false)
   const location = useLocation()
   const { cartItemsCount } = useCart()
   const { isArabic, toggleLanguage } = useRTL()
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50)
-    }
-
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen)
@@ -36,15 +26,11 @@ const Navbar = () => {
   const navLinks = isArabic ? [
     { path: '/', label: 'الرئيسية' },
     { path: '/menu', label: 'قائمة الطعام' },
-    { path: '/services', label: 'الخدمات' },
-    { path: '/blog', label: 'المدونة' },
     { path: '/about', label: 'من نحن' },
     { path: '/contact', label: 'اتصل بنا' }
   ] : [
     { path: '/', label: 'Home' },
     { path: '/menu', label: 'Menu' },
-    { path: '/services', label: 'Services' },
-    { path: '/blog', label: 'Blog' },
     { path: '/about', label: 'About' },
     { path: '/contact', label: 'Contact' }
   ]
@@ -62,26 +48,17 @@ const Navbar = () => {
   ]
 
   return (
-    <nav className={`fixed w-full z-50 transition-all duration-300 ${
-      isScrolled 
-        ? 'bg-primary/80 shadow-lg backdrop-blur-md'
-        : 'bg-primary/60 backdrop-blur-sm'
-    }`}>
+    <nav className="fixed w-full z-[9999] bg-black backdrop-blur-md shadow-lg transition-all duration-300">
       <div className="w-full px-4 md:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20 md:h-24">
           {/* Logo */}
           <div className="flex-shrink-0">
             <Link to="/" className="flex items-center" onClick={closeMenu}>
-              <span className={`text-4xl font-bold transition-colors duration-300 arabic-heading-font ${
-                isScrolled ? 'text-dark' : 'text-white'
-              }`}>
-                {isArabic ? 'مقهى' : 'Coffee'}
-                <small className={`text-lg mr-2 ${
-                  isScrolled ? 'text-primary' : 'text-white/80'
-                }`}>
-                  {isArabic ? 'المزيج' : 'Blend'}
-                </small>
-              </span>
+              <img 
+                src="/images/01-removebg-preview.png" 
+                alt={isArabic ? 'بلات - مذاق الين الطبيعي' : 'Blat - Natural Fresh Taste'} 
+                className="h-20 w-auto transition-opacity duration-300 hover:opacity-80 drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]"
+              />
             </Link>
           </div>
 
@@ -92,10 +69,10 @@ const Navbar = () => {
                 <Link
                   key={link.path}
                   to={link.path}
-                  className={`relative px-3 py-2 text-lg font-medium transition-colors duration-300 hover:text-primary ${
+                  className={`relative px-3 py-2 text-lg font-medium transition-colors duration-300 ${
                     isActive(link.path)
-                      ? isScrolled ? 'text-primary' : 'text-white'
-                      : isScrolled ? 'text-gray-700 hover:text-primary' : 'text-white/90 hover:text-white'
+                      ? 'text-primary'
+                      : 'text-white/90 hover:text-primary'
                   }`}
                 >
                   {link.label}
@@ -111,18 +88,16 @@ const Navbar = () => {
                 onMouseEnter={() => setShowShopDropdown(true)}
                 onMouseLeave={() => setShowShopDropdown(false)}
               >
-                <button className={`px-3 py-2 text-lg font-medium transition-colors duration-300 ${
-                  isScrolled ? 'text-gray-700 hover:text-primary' : 'text-white/90 hover:text-white'
-                }`}>
+                <button className="px-3 py-2 text-lg font-medium transition-colors duration-300 text-white/90 hover:text-primary">
                   {isArabic ? 'المتجر' : 'Shop'}
                 </button>
                 {showShopDropdown && (
-                  <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-100 overflow-hidden">
+                  <div className="absolute top-full right-0 mt-2 w-48 bg-black/90 backdrop-blur-md rounded-lg shadow-lg border border-primary/20 overflow-hidden">
                     {shopDropdownItems.map((item) => (
                       <Link
                         key={item.path}
                         to={item.path}
-                        className="block px-4 py-3 text-lg text-gray-700 hover:bg-primary hover:text-white transition-colors duration-200 text-right"
+                        className="block px-4 py-3 text-lg text-white/90 hover:bg-primary hover:text-white transition-colors duration-200 text-right"
                         onClick={closeMenu}
                       >
                         {item.label}
@@ -139,9 +114,7 @@ const Navbar = () => {
             {/* Language Toggle */}
             <button
               onClick={toggleLanguage}
-              className={`p-2 rounded-full transition-colors duration-300 ${
-                isScrolled ? 'text-gray-700 hover:bg-gray-100' : 'text-white hover:bg-white/10'
-              }`}
+              className="p-2 rounded-full transition-colors duration-300 text-white hover:bg-white/10"
               title={isArabic ? 'تبديل اللغة' : 'Toggle Language'}
             >
               <FaLanguage className="w-8 h-8" />
@@ -153,9 +126,7 @@ const Navbar = () => {
             {/* Cart */}
             <Link
               to="/cart"
-              className={`relative p-2 rounded-full transition-colors duration-300 ${
-                isScrolled ? 'text-gray-700 hover:bg-gray-100' : 'text-white hover:bg-white/10'
-              }`}
+              className="relative p-2 rounded-full transition-colors duration-300 text-white hover:bg-white/10"
               title={isArabic ? 'السلة' : 'Shopping Cart'}
             >
               <FaShoppingCart className="w-5 h-5" />
@@ -169,9 +140,7 @@ const Navbar = () => {
             {/* Mobile Menu Button */}
             <button
               onClick={toggleMenu}
-              className={`lg:hidden p-2 rounded-md transition-colors duration-300 ${
-                isScrolled ? 'text-gray-700 hover:bg-gray-100' : 'text-white hover:bg-white/10'
-              }`}
+              className="lg:hidden p-2 rounded-md transition-colors duration-300 text-white hover:bg-white/10"
               aria-label={isArabic ? 'قائمة التنقل' : 'Navigation Menu'}
             >
               {isMenuOpen ? <FaTimes className="w-6 h-6" /> : <FaBars className="w-6 h-6" />}
@@ -181,7 +150,7 @@ const Navbar = () => {
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="lg:hidden bg-white border-t border-gray-200 shadow-lg">
+          <div className="lg:hidden bg-black/95 backdrop-blur-md border-t border-primary/20 shadow-lg">
             <div className="px-4 py-6 space-y-4">
               {navLinks.map((link) => (
                 <Link
@@ -190,7 +159,7 @@ const Navbar = () => {
                   className={`block py-2 text-xl font-medium transition-colors duration-300 text-right ${
                     isActive(link.path)
                       ? 'text-primary border-r-4 border-primary pr-4'
-                      : 'text-gray-700 hover:text-primary hover:pr-4'
+                      : 'text-white/90 hover:text-primary hover:pr-4'
                   }`}
                   onClick={closeMenu}
                 >
@@ -199,15 +168,15 @@ const Navbar = () => {
               ))}
               
               {/* Mobile Shop Menu */}
-              <div className="border-t border-gray-200 pt-4">
-                <p className="text-lg font-semibold text-gray-500 mb-2 text-right">
+              <div className="border-t border-primary/20 pt-4">
+                <p className="text-lg font-semibold text-primary mb-2 text-right">
                   {isArabic ? 'المتجر' : 'Shop'}
                 </p>
                 {shopDropdownItems.map((item) => (
                   <Link
                     key={item.path}
                     to={item.path}
-                    className="block py-2 pr-4 text-xl text-gray-600 hover:text-primary transition-colors duration-300 text-right"
+                    className="block py-2 pr-4 text-xl text-white/80 hover:text-primary transition-colors duration-300 text-right"
                     onClick={closeMenu}
                   >
                     {item.label}

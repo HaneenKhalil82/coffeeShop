@@ -9,29 +9,18 @@ const Footer = () => {
 
   const content = isArabic ? {
     companyName: 'مقهى المزيج',
-    companyDescription: 'بعيداً، وراء جبال الكلمات، بعيداً عن بلدان فوكاليا وكونسونانتيا، تعيش النصوص العمياء.',
+    companyDescription: 'اكتشفوا عالم القهوة معنا واستمتعوا بتجربة فريدة تجمع بين الجودة والأصالة',
     quickLinks: {
       title: 'روابط سريعة',
       links: [
         { path: '/', label: 'الرئيسية' },
         { path: '/about', label: 'من نحن' },
         { path: '/menu', label: 'قائمة الطعام' },
-        { path: '/services', label: 'الخدمات' },
-        { path: '/blog', label: 'المدونة' },
+
         { path: '/contact', label: 'اتصل بنا' }
       ]
     },
-    services: {
-      title: 'الخدمات',
-      items: [
-        'تصميم المواقع',
-        'تطوير المواقع',
-        'استراتيجية الأعمال',
-        'تحليل البيانات',
-        'التصميم الجرافيكي',
-        'أبحاث السوق'
-      ]
-    },
+
     contact: {
       title: 'هل لديكم أسئلة؟',
       address: 'شارع الملك فهد، حي العليا، الرياض، المملكة العربية السعودية',
@@ -52,22 +41,11 @@ const Footer = () => {
         { path: '/', label: 'Home' },
         { path: '/about', label: 'About' },
         { path: '/menu', label: 'Menu' },
-        { path: '/services', label: 'Services' },
-        { path: '/blog', label: 'Blog' },
+
         { path: '/contact', label: 'Contact' }
       ]
     },
-    services: {
-      title: 'Services',
-      items: [
-        'Web Design',
-        'Web Development',
-        'Business Strategy',
-        'Data Analysis',
-        'Graphic Design',
-        'Market Research'
-      ]
-    },
+
     contact: {
       title: 'Have a Questions?',
       address: '203 Fake St. Mountain View, San Francisco, California, USA',
@@ -82,16 +60,17 @@ const Footer = () => {
   }
 
   const socialLinks = [
-    { icon: FaFacebookF, href: '#', label: 'Facebook' },
-    { icon: FaTwitter, href: '#', label: 'Twitter' },
-    { icon: FaInstagram, href: '#', label: 'Instagram' },
-    { icon: FaLinkedinIn, href: '#', label: 'LinkedIn' }
+    { icon: FaFacebookF, href: 'https://www.facebook.com', label: 'Facebook' },
+   { icon: FaTwitter, href: 'https://x.com', label: 'Twitter' },
+    { icon: FaInstagram, href: 'https://www.instagram.com', label: 'Instagram' },
+    { icon: FaLinkedinIn, href: 'https://www.linkedin.com', label: 'LinkedIn' }
   ]
 
   return (
-    <footer className="bg-gray-900 text-white">
-              <div className="w-full px-4 md:px-6 lg:px-8 section-padding">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+    <footer className="bg-cover bg-center bg-no-repeat relative" style={{ backgroundImage: 'url(/images/hhh.jpg)' }}>
+      <div className="absolute inset-0 bg-black/80"></div>
+      <div className="w-full px-4 md:px-6 lg:px-8 section-padding relative z-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {/* Company Info */}
           <div className="space-y-4">
             <h3 className="text-2xl font-bold text-primary arabic-heading-font">
@@ -116,7 +95,7 @@ const Footer = () => {
 
           {/* Quick Links */}
           <div>
-            <h4 className="text-lg font-semibold mb-6 arabic-heading-font">
+            <h4 className="text-lg text-primary font-semibold mb-6 arabic-heading-font">
               {content.quickLinks.title}
             </h4>
             <ul className="space-y-3">
@@ -133,25 +112,11 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Services */}
-          <div>
-            <h4 className="text-lg font-semibold mb-6 arabic-heading-font">
-              {content.services.title}
-            </h4>
-            <ul className="space-y-3">
-              {content.services.items.map((service, index) => (
-                <li key={index}>
-                  <span className="text-gray-300 hover:text-primary transition-colors duration-300 cursor-pointer arabic-body">
-                    {service}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
+
 
           {/* Contact Info */}
           <div>
-            <h4 className="text-lg font-semibold mb-6 arabic-heading-font">
+            <h4 className="text-lg text-primary font-semibold mb-6 arabic-heading-font">
               {content.contact.title}
             </h4>
             <div className="space-y-4">

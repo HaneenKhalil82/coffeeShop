@@ -10,7 +10,7 @@ const Home = () => {
   // Hero slider data
   const heroSlides = isArabic ? [
     {
-      image: '/images/cart2.jpg',
+      image: '/images/latest_blog2.jpg',
       subtitle: 'أهلاً وسهلاً',
       title: 'أفضل تجربة لتذوق القهوة',
       description: 'استمتعوا بتجربة فريدة من نوعها مع أجود أنواع القهوة المحمصة بعناية فائقة',
@@ -28,7 +28,7 @@ const Home = () => {
       ]
     },
     {
-      image: '/images/bg_2.jpg',
+      image: '/images/chat.png',
       subtitle: 'قهوة مميزة',
       title: 'طعم لا يُنسى في كل رشفة',
       description: 'من أفضل مزارع القهوة في العالم، نقدم لكم تشكيلة متنوعة من النكهات الرائعة',
@@ -46,7 +46,7 @@ const Home = () => {
       ]
     },
     {
-      image: '/images/bg_3.jpg',
+      image: '/images/02.jpg',
       subtitle: 'أجواء مثالية',
       title: 'مكان مثالي للاسترخاء والعمل',
       description: 'استمتعوا بأجواء هادئة ومريحة، مثالية للقاء الأصدقاء أو العمل في هدوء',
@@ -56,15 +56,11 @@ const Home = () => {
           link: '/contact',
           className: 'btn-primary'
         },
-        {
-          text: 'خدماتنا',
-          link: '/services',
-          className: 'btn-secondary'
-        }
+
       ]
     },
     {
-      image: '/images/cart.jpg',
+      image: '/images/about2.webp',
       subtitle: 'تجربة شاملة',
       title: 'من القهوة إلى الحلويات الشهية',
       description: 'تشكيلة واسعة من المشروبات الساخنة والباردة مع أشهى الحلويات والمعجنات',
@@ -129,15 +125,11 @@ const Home = () => {
           link: '/contact',
           className: 'btn-primary'
         },
-        {
-          text: 'Our Services',
-          link: '/services',
-          className: 'btn-secondary'
-        }
+
       ]
     },
     {
-      image: '/images/bg_4.jpg',
+      image: '/images/hhh.jpg',
       subtitle: 'Complete Experience',
       title: 'From Coffee to Delicious Desserts',
       description: 'Wide selection of hot and cold beverages with the most delicious desserts and pastries',
@@ -161,24 +153,7 @@ const Home = () => {
       title: 'مرحباً بكم في مقهى المزيج',
       description: 'نحن فخورون بتقديم أجود أنواع القهوة المحمصة طازجة يومياً. تجربة فريدة تجمع بين الطعم الأصيل والجودة العالمية.'
     },
-    services: {
-      title: 'خدماتنا',
-      subtitle: 'ما نقدمه لكم',
-      items: [
-        {
-          title: 'قهوة طازجة',
-          description: 'قهوة محمصة يومياً من أجود البقول المنتقاة بعناية من أفضل مزارع العالم'
-        },
-        {
-          title: 'معجنات شهية',
-          description: 'مجموعة متنوعة من المعجنات والحلويات الطازجة المحضرة يومياً بأيدي خبراء'
-        },
-        {
-          title: 'أجواء مميزة',
-          description: 'مساحة مريحة وهادئة مثالية للعمل، الدراسة، أو قضاء وقت ممتع مع الأصدقاء'
-        }
-      ]
-    },
+
     about: {
       subtitle: 'قصتنا',
       title: 'شغف القهوة منذ سنوات',
@@ -190,24 +165,7 @@ const Home = () => {
       title: 'Welcome to CoffeeBlend',
       description: 'We are proud to serve the finest coffee beans roasted fresh daily. A unique experience that combines authentic taste with world-class quality.'
     },
-    services: {
-      title: 'Our Services',
-      subtitle: 'What We Offer',
-      items: [
-        {
-          title: 'Fresh Coffee',
-          description: 'Coffee roasted daily from the finest beans carefully selected from the best farms around the world'
-        },
-        {
-          title: 'Delicious Pastries',
-          description: 'A diverse selection of fresh pastries and desserts prepared daily by expert hands'
-        },
-        {
-          title: 'Great Atmosphere',
-          description: 'A comfortable and quiet space perfect for work, study, or spending quality time with friends'
-        }
-      ]
-    },
+
     about: {
       subtitle: 'Our Story',
       title: 'Coffee Passion for Years',
@@ -230,7 +188,7 @@ const Home = () => {
       />
 
       {/* Welcome Section */}
-      <section className="py-16 bg-cover bg-center bg-no-repeat relative" style={{ backgroundImage: 'url(/images/bg_4.jpg)' }}>
+      <section className="py-16 bg-cover bg-center bg-no-repeat relative" style={{ backgroundImage: 'url(/images/hhh.jpg)' }}>
         <div className="absolute inset-0 bg-gray-900/70"></div>
         <div className="w-full px-4 md:px-6 lg:px-8 relative z-10">
           <div className="text-center">
@@ -244,46 +202,13 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Services Section */}
-      <section className="section-padding bg-cover bg-center bg-no-repeat relative" style={{ backgroundImage: 'url(/images/bg_4.jpg)' }}>
-        <div className="absolute inset-0 bg-gray-900/70"></div>
-        <div className="w-full px-4 md:px-6 lg:px-8 relative z-10">
-          <div className="text-center mb-16">
-            <span className="text-primary font-semibold text-4xl arabic-heading-font">
-              {content.services.title}
-            </span>
-            <h2 className="text-3xl font-bold text-white mt-2 arabic-heading-font">
-              {content.services.subtitle}
-            </h2>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {content.services.items.map((service, index) => (
-              <div key={index} className="text-center p-8 bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
-                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <div className="text-primary text-2xl">
-                    {index === 0 ? <img src="/images/choose_icon2.png" alt="Coffee" className="w-20 h-20" /> :
-                     index === 1 ? <img src="/images/parallax_icon1.png" alt="Pastry" className="w-20 h-20" /> :
-                      <img src="/images/parallax_icon2.png" alt="Atmosphere" className="w-20 h-20" />}
-                  </div>
-                </div>
-                <h3 className="text-3xl font-semibold mb-4 arabic-heading-font">
-                  {service.title}
-                </h3>
-                <p className="text-gray-600  text-2xl leading-relaxed arabic-body">
-                  {service.description}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+
 
       {/* Products Section */}
       <ProductsSection />
 
       {/* About Preview Section */}
-      <section className="section-padding bg-cover bg-center bg-no-repeat relative" style={{ backgroundImage: 'url(/images/bg_4.jpg)' }}>
+      <section className="section-padding bg-cover bg-center bg-no-repeat relative" style={{ backgroundImage: 'url(/images/hhh.jpg)' }}>
         <div className="absolute inset-0 bg-gray-900/70"></div>
         <div className="w-full px-4 md:px-6 lg:px-8 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">

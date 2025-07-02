@@ -7,10 +7,7 @@ const Menu = () => {
   const [activeCategory, setActiveCategory] = useState('coffee')
 
   const content = isArabic ? {
-    hero: {
-      title: 'قائمة الطعام',
-      subtitle: 'اكتشفوا تشكيلتنا الرائعة'
-    },
+    
     categories: [
       { id: 'coffee', label: 'القهوة' },
       { id: 'drinks', label: 'المشروبات' },
@@ -142,10 +139,7 @@ const Menu = () => {
     addedToCart: 'تم إضافة المنتج إلى السلة!',
     addToCartButton: 'أضف إلى السلة'
   } : {
-    hero: {
-      title: 'Our Menu',
-      subtitle: 'Discover Our Amazing Selection'
-    },
+   
     categories: [
       { id: 'coffee', label: 'Coffee' },
       { id: 'drinks', label: 'Drinks' },
@@ -299,38 +293,21 @@ const Menu = () => {
   }
 
   return (
-    <div className="pt-16 md:pt-20">
-      {/* Hero Section */}
-      <section className="relative h-96">
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: 'url(/images/bg_3.jpg)' }}
-        />
-        <div className="absolute inset-0 bg-black/50" />
-        <div className="relative w-full px-4 md:px-6 lg:px-8 h-full flex items-center justify-center">
-          <div className="text-center text-white">
-            <h1 className="text-5xl font-bold mb-4 arabic-heading-font">
-              {content.hero.title}
-            </h1>
-            <p className="text-xl opacity-90 arabic-body">
-              {content.hero.subtitle}
-            </p>
-          </div>
-        </div>
-      </section>
+    <div className="pt-16 md:pt-20 relative min-h-screen bg-cover bg-center bg-no-repeat bg-fixed" style={{ backgroundImage: 'url(/images/hhh.jpg)' }}>
+      <div className="absolute inset-0 bg-black/60"></div>
 
       {/* Menu Categories */}
-      <section className="py-8 bg-white sticky top-16 z-40 border-b border-gray-200">
+      <section className="py-8 bg-black/40 backdrop-blur-sm border-b border-gray-700/50 relative">
         <div className="w-full px-4 md:px-6 lg:px-8">
           <div className="flex flex-wrap justify-center gap-4">
             {content.categories.map((category) => (
               <button
                 key={category.id}
                 onClick={() => setActiveCategory(category.id)}
-                className={`px-6 py-3 rounded-full transition-all duration-300 arabic-body ${
+                className={`px-6 py-3 rounded-full transition-all duration-300 arabic-body backdrop-blur-sm ${
                   activeCategory === category.id
                     ? 'bg-primary text-white shadow-lg'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    : 'bg-white/10 text-white hover:bg-white/20 border border-white/20'
                 }`}
               >
                 {category.label}
@@ -341,31 +318,41 @@ const Menu = () => {
       </section>
 
       {/* Menu Items */}
-      <section className="section-padding">
+      <section className="section-padding relative">
         <div className="w-full px-4 md:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {content.menuItems[activeCategory]?.map((item, index) => (
-              <div key={index} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
-                <div className="relative h-48">
+              <div key={index} className="text-center group">
+                {/* Image */}
+                <div className="relative mb-12 overflow-hidden rounded-lg">
                   <img
                     src={item.image}
                     alt={item.name}
-                    className="w-full h-full object-cover"
+                    className="w-full h-96 object-cover transition-transform duration-300 group-hover:scale-105"
                   />
-                  <div className="absolute top-4 right-4 bg-primary text-white px-3 py-1 rounded-full">
-                    {item.price} {isArabic ? 'ريال' : 'SAR'}
-                  </div>
                 </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-semibold mb-2 arabic-heading-font">
+                
+                {/* Content */}
+                <div className="space-y-10 pb-6">
+                  {/* Product Name */}
+                  <h3 className="text-white text-3xl font-semibold uppercase tracking-wide arabic-heading-font">
                     {item.name}
                   </h3>
-                  <p className="text-gray-600 mb-4 arabic-body">
+                  
+                  {/* Description */}
+                  <p className="text-gray-300 text-xl leading-relaxed arabic-body px-8">
                     {item.description}
                   </p>
+                  
+                  {/* Price */}
+                  <div className="text-white text-4xl font-bold py-6">
+                    ${item.price}.00
+                  </div>
+                  
+                  {/* Add to Cart Button */}
                   <button 
                     onClick={() => handleAddToCart(item)}
-                    className="w-full bg-primary text-white py-2 rounded hover:bg-primary/90 transition-colors duration-300"
+                    className="border-2 border-primary text-primary px-12 py-5 text-lg font-medium uppercase tracking-wide hover:bg-primary hover:text-white transition-all duration-300 rounded-sm backdrop-blur-sm"
                   >
                     {content.addToCartButton}
                   </button>
@@ -377,18 +364,18 @@ const Menu = () => {
       </section>
 
       {/* Call to Action */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-black/40 backdrop-blur-sm relative">
         <div className="w-full px-4 md:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold mb-4 arabic-heading-font">
+          <h2 className="text-3xl font-bold mb-4 arabic-heading-font text-white">
             {isArabic ? 'لم تجدوا ما تبحثون عنه؟' : 'Can\'t find what you\'re looking for?'}
           </h2>
-          <p className="text-gray-600 mb-8 arabic-body">
+          <p className="text-gray-300 mb-8 arabic-body">
             {isArabic 
               ? 'تواصلوا معنا وسنكون سعداء لمساعدتكم في العثور على الخيار المثالي'
               : 'Contact us and we\'ll be happy to help you find the perfect option'
             }
           </p>
-          <button className="bg-primary text-white px-8 py-3 rounded hover:bg-primary/90 transition-colors duration-300">
+          <button className="border-2 border-primary text-primary px-8 py-3 font-medium uppercase tracking-wide hover:bg-primary hover:text-white transition-all duration-300 rounded-sm backdrop-blur-sm">
             {isArabic ? 'اتصل بنا' : 'Contact Us'}
           </button>
         </div>

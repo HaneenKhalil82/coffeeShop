@@ -15,13 +15,13 @@
   }
   
   body {
-    font-family: 'Noto Sans Arabic', 'Poppins', sans-serif;
+    font-family: 'Poppins', 'Noto Sans Arabic', sans-serif;
     direction: rtl;
     text-align: right;
-    background-image: url('/images/bg_4.jpg');
+    line-height: 1.6;
+    background-image: url('/images/hhh.jpg');
     background-size: cover;
     background-position: center;
-    background-repeat: no-repeat;
     background-attachment: fixed;
   }
   

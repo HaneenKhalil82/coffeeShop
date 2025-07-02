@@ -143,23 +143,7 @@ const Contact = () => {
   return (
     <div className="pt-16 md:pt-20">
       {/* Hero Section */}
-      <section className="relative h-96">
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: 'url(/images/bg_4.jpg)' }}
-        />
-        <div className="absolute inset-0 bg-black/50" />
-        <div className="relative w-full px-4 md:px-6 lg:px-8 h-full flex items-center justify-center">
-          <div className="text-center text-white">
-            <h1 className="text-5xl font-bold mb-4 arabic-heading-font">
-              {content.hero.title}
-            </h1>
-            <p className="text-xl opacity-90 arabic-body">
-              {content.hero.subtitle}
-            </p>
-          </div>
-        </div>
-      </section>
+     
 
       {/* Contact Information and Form */}
       <section className="section-padding">

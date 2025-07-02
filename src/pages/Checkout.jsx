@@ -330,9 +330,9 @@ const Checkout = () => {
             {/* Checkout Form */}
             <div className="lg:col-span-2">
               {step === 1 && (
-                <div className="space-y-8">
+                <div className="bg-white rounded-lg shadow-lg p-6">
                   {/* Customer Information */}
-                  <div className="bg-white rounded-lg shadow-lg p-6">
+                  <div className="mb-8">
                     <h2 className="text-2xl font-semibold mb-6 arabic-heading-font">
                       {content.customerInfo.title}
                     </h2>
@@ -401,7 +401,7 @@ const Checkout = () => {
                   </div>
 
                   {/* Delivery Information */}
-                  <div className="bg-white rounded-lg shadow-lg p-6">
+                  <div className="border-t border-gray-200 pt-8">
                     <h2 className="text-2xl font-semibold mb-6 arabic-heading-font">
                       {content.deliveryInfo.title}
                     </h2>

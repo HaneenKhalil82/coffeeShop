@@ -281,8 +281,8 @@ const ProductSingle = () => {
   }
 
   return (
-    <div className="pt-20 md:pt-24 min-h-screen bg-cover bg-center bg-no-repeat relative" style={{ backgroundImage: 'url(/images/bg_4.jpg)' }}>
-      <div className="absolute inset-0 bg-white/20"></div>
+    <div className="pt-20 md:pt-24 min-h-screen bg-cover bg-center bg-no-repeat relative" style={{ backgroundImage: 'url(/images/hhh.jpg)' }}>
+      <div className="absolute inset-0 bg-black/60"></div>
       <div className="w-full px-4 md:px-6 lg:px-8 section-padding relative z-10">
         
         {/* Breadcrumb */}
@@ -301,7 +301,7 @@ const ProductSingle = () => {
         </nav>
 
         {/* Product Details - All in One Block */}
-        <div className="rounded-lg shadow-lg overflow-hidden max-w-7xl mx-auto bg-cover bg-center bg-no-repeat relative" style={{ backgroundImage: 'url(/images/bg_4.jpg)' }}>
+        <div className="rounded-lg shadow-lg overflow-hidden max-w-7xl mx-auto bg-cover bg-center bg-no-repeat relative" style={{ backgroundImage: 'url(/images/hhh.jpg)' }}>
           <div className="absolute inset-0 bg-white/85"></div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-7 relative z-10">
             
