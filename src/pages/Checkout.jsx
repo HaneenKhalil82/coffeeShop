@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { FaArrowLeft, FaArrowRight, FaCreditCard, FaPaypal, FaLock, FaCheck, FaExclamationTriangle, FaTimes } from 'react-icons/fa'
 import { useCart, useRTL } from '../App'
 
@@ -27,13 +27,14 @@ const Toast = ({ message, type, onClose }) => {
 const Checkout = () => {
   const { isArabic } = useRTL()
   const { cartItems, clearCart } = useCart()
-  const navigate = useNavigate()
 
   const [step, setStep] = useState(1) // 1: Info, 2: Payment, 3: Confirmation
   const [loading, setLoading] = useState(false)
   const [toast, setToast] = useState(null)
   const [errors, setErrors] = useState({})
   const [showOrderConfirmModal, setShowOrderConfirmModal] = useState(false)
+  const [showSuccessModal, setShowSuccessModal] = useState(false)
+  const [orderData, setOrderData] = useState(null)
   const [formData, setFormData] = useState({
     // Customer Info
     firstName: '',
@@ -57,12 +58,7 @@ const Checkout = () => {
     cardholderName: ''
   })
 
-  // Redirect if cart is empty
-  useEffect(() => {
-    if (cartItems.length === 0) {
-      navigate('/cart')
-    }
-  }, [cartItems, navigate])
+  // Note: Cart empty check is handled in the render logic below
 
   const showToast = (message, type = 'info') => {
     setToast({ message, type })
@@ -152,6 +148,14 @@ const Checkout = () => {
       orderTotal: 'إجمالي الطلب',
       confirmButton: 'نعم، أكد الطلب',
       cancelButton: 'إلغاء'
+    },
+    successModal: {
+      title: 'تم تأكيد طلبك بنجاح! 🎉',
+      orderNumber: 'رقم الطلب',
+      message: 'شكراً لك! تم استلام طلبك وسيتم التواصل معك قريباً لتأكيد التوصيل.',
+      estimatedDelivery: 'وقت التوصيل المتوقع: 30-45 دقيقة',
+      continueShoppingButton: 'متابعة التسوق',
+      closeButton: 'إغلاق'
     },
     validation: {
       required: 'هذا الحقل مطلوب',
@@ -252,6 +256,14 @@ const Checkout = () => {
       orderTotal: 'Order Total',
       confirmButton: 'Yes, Confirm Order',
       cancelButton: 'Cancel'
+    },
+    successModal: {
+      title: 'Order Confirmed Successfully! 🎉',
+      orderNumber: 'Order Number',
+      message: 'Thank you! Your order has been received and we will contact you shortly to confirm delivery.',
+      estimatedDelivery: 'Estimated delivery time: 30-45 minutes',
+      continueShoppingButton: 'Continue Shopping',
+      closeButton: 'Close'
     },
     validation: {
       required: 'This field is required',
@@ -486,7 +498,7 @@ const Checkout = () => {
       const orderNumber = Date.now().toString(36).toUpperCase()
       
       // Store order details
-      const orderData = {
+      const newOrderData = {
         orderNumber,
         items: cartItems,
         customerInfo: formData,
@@ -501,12 +513,12 @@ const Checkout = () => {
         status: 'confirmed'
       }
       
-      localStorage.setItem('lastOrder', JSON.stringify(orderData))
+      localStorage.setItem('lastOrder', JSON.stringify(newOrderData))
       
-      // Clear cart and show success
+      // Clear cart and show success modal
       clearCart()
-      showToast(content.messages.orderSuccess, 'success')
-      setStep(3)
+      setOrderData(newOrderData)
+      setShowSuccessModal(true)
       
     } catch {
       showToast(content.messages.orderError, 'error')
@@ -515,50 +527,21 @@ const Checkout = () => {
     }
   }
 
-  if (step === 3) {
-    const lastOrder = JSON.parse(localStorage.getItem('lastOrder') || '{}')
-    
+  // Redirect if cart is empty and no success modal is shown
+  if (cartItems.length === 0 && !showSuccessModal) {
     return (
-      <div className="pt-16 md:pt-20">
-        <section className="section-padding">
-          <div className="w-full px-4 md:px-6 lg:px-8">
-            <div className="max-w-2xl mx-auto text-center">
-              <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
-                <FaCheck className="w-10 h-10 text-white" />
-              </div>
-              
-              <h1 className="text-4xl font-bold mb-4 arabic-heading-font">
-                {content.confirmation.title}
-              </h1>
-              
-              <div className="bg-gray-50 rounded-lg p-6 mb-6">
-                <p className="text-lg mb-2 arabic-body">
-                  {content.confirmation.orderNumber}: #{lastOrder.orderNumber}
-                </p>
-                <p className="text-gray-600 arabic-body">
-                  {content.confirmation.message}
-                </p>
-              </div>
-              
-              <p className="text-primary font-semibold mb-8 arabic-body">
-                {content.confirmation.estimatedDelivery}
-              </p>
-              
-              <div className="space-y-4">
-                <button className="w-full bg-primary text-white py-3 px-6 rounded-lg hover:bg-primary/90 transition-colors duration-300">
-                  {content.confirmation.trackOrder}
-                </button>
-                
-                <Link
-                  to="/menu"
-                  className="block w-full bg-gray-200 text-gray-800 py-3 px-6 rounded-lg hover:bg-gray-300 transition-colors duration-300 text-center"
-                >
-                  {content.confirmation.continueShopping}
-                </Link>
-              </div>
-            </div>
-          </div>
-        </section>
+      <div className="pt-16 md:pt-20 flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4 arabic-heading-font">
+            {isArabic ? 'السلة فارغة' : 'Cart is Empty'}
+          </h1>
+          <Link
+            to="/menu"
+            className="bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors duration-300"
+          >
+            {isArabic ? 'متابعة التسوق' : 'Continue Shopping'}
+          </Link>
+        </div>
       </div>
     )
   }
@@ -578,7 +561,7 @@ const Checkout = () => {
 
       {/* Loading Overlay */}
       {loading && (
-        <div className="fixed inset-0 bg-black/80 z-40 flex items-center justify-center">
+        <div className="fixed inset-0 border-2 z-40 flex items-center justify-center">
           <div className="bg-white rounded-lg p-4 sm:p-6 text-center mx-4">
             <div className="animate-spin rounded-full h-8 w-8 sm:h-12 sm:w-12 border-b-2 border-primary mx-auto mb-3 sm:mb-4"></div>
             <p className="text-gray-700 text-sm sm:text-base arabic-body">{content.messages.processingOrder}</p>
@@ -587,7 +570,7 @@ const Checkout = () => {
       )}
 
       {/* Hero Section */}
-      <section className="bg-black/30 py-8 sm:py-12 relative z-10">
+      <section className=" py-8 sm:py-12 relative z-10">
         <div className="w-full px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
           {/* Breadcrumb */}
           <nav className="mb-6 sm:mb-8">
@@ -647,7 +630,7 @@ const Checkout = () => {
             {/* Checkout Form */}
             <div className="xl:col-span-2">
               {step === 1 && (
-                <div className="backdrop-blur-sm bg-black/60 rounded-xl shadow-2xl p-6 md:p-8">
+                <div className="backdrop-blur-sm border-2 border-primary/30 rounded-xl shadow-2xl p-6 md:p-8">
                   {/* Customer Information */}
                   <div className="mb-8">
                     <h2 className="text-xl sm:text-2xl font-semibold mb-6 arabic-heading-font text-white">
@@ -854,7 +837,7 @@ const Checkout = () => {
               )}
 
               {step === 2 && (
-                <div className="backdrop-blur-sm bg-black/60 rounded-xl shadow-2xl p-6 md:p-8">
+                <div className="backdrop-blur-sm border-2 border-primary/30 rounded-xl shadow-2xl p-6 md:p-8">
                   <h2 className="text-xl sm:text-2xl font-semibold mb-6 arabic-heading-font text-white">
                     {content.paymentInfo.title}
                   </h2>
@@ -1045,7 +1028,7 @@ const Checkout = () => {
 
             {/* Order Summary */}
             <div className="xl:col-span-1">
-              <div className="backdrop-blur-sm bg-black/60 rounded-xl shadow-2xl p-6 md:p-8 sticky top-24">
+              <div className="backdrop-blur-sm border-2 border-primary/30 rounded-xl shadow-2xl p-6 md:p-8 sticky top-24">
                 <h3 className="text-lg sm:text-xl font-semibold mb-6 arabic-heading-font text-white">
                   {content.orderSummary.title}
                 </h3>
@@ -1156,6 +1139,57 @@ const Checkout = () => {
                 >
                   {content.orderConfirmModal.confirmButton}
                 </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Success Modal */}
+      {showSuccessModal && orderData && (
+        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg mx-4">
+            <div className="p-6 sm:p-8">
+              <div className="text-center mb-6">
+                <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <FaCheck className="w-10 h-10 text-green-600" />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-2 arabic-heading-font">
+                  {content.successModal.title}
+                </h3>
+                <p className="text-gray-600 arabic-body">
+                  {content.successModal.message}
+                </p>
+              </div>
+
+              <div className="bg-green-50 rounded-lg p-4 mb-6">
+                <div className="text-center">
+                  <div className="text-sm text-green-600 mb-1 arabic-body">
+                    {content.successModal.orderNumber}
+                  </div>
+                  <div className="text-xl font-bold text-green-700 mb-3">
+                    #{orderData.orderNumber}
+                  </div>
+                  <div className="text-sm text-green-600 arabic-body">
+                    {content.successModal.estimatedDelivery}
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex space-x-3 space-x-reverse">
+                <button
+                  onClick={() => setShowSuccessModal(false)}
+                  className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-300 arabic-body"
+                >
+                  {content.successModal.closeButton}
+                </button>
+                <Link
+                  to="/menu"
+                  className="flex-1 px-4 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors duration-300 arabic-body text-center"
+                  onClick={() => setShowSuccessModal(false)}
+                >
+                  {content.successModal.continueShoppingButton}
+                </Link>
               </div>
             </div>
           </div>
