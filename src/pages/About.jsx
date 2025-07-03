@@ -123,6 +123,46 @@ const About = () => {
         backgroundImage="/images/bg_3.jpg"
         title={isArabic ? "من نحن" : "About Us"}
       />
+
+    <div className="relative w-full h-screen flex">
+      {/* Left Image */}
+      <div className="w-1/2 h-full">
+        <img
+          src="/images/bg_4.jpg"
+          alt="Left"
+          className="w-full h-full object-cover"
+        />
+      </div>
+
+      {/* Right Image */}
+      <div className="w-1/2 h-full">
+        <img
+          src="/images/about.jpg"
+          alt="Right"
+          className="w-full h-full object-cover"
+        />
+      </div>
+
+      {/* Overlay Text Box */}
+      <div className="absolute top-1/2 left-[43%] w-[40%] h-[70%] bg-black/60 text-gray-500 p-4 m-1 rounded-lg backdrop-blur-sm shadow-lg transform -translate-y-1/2">
+
+       
+        <div class="heading-section ftco-animate fadeInUp ftco-animated ">
+	        	<span className="subheading text-[#c49b63] text-[50px] leading-none" style={{ fontFamily: '"Great Vibes", cursive' }}>Discover</span>
+	          <h2 className="mb-4 text-[40px] "style={{ fontFamily: '"Josefin Sans", Arial, sans-serif' }}>Our Story</h2>
+	        </div>
+        <p className="text-sm md:text-base leading-relaxed opacity-90">
+          On her way she met a copy. The copy warned the Little Blind Text,
+          that where it came from it would have been rewritten a thousand
+          times and everything that was left from its origin would be the
+          word "and" and the Little Blind Text should turn around and return
+          to its own,country. But nothing the copy said could convince her and 
+          so it didn’t take long until a few insidious Copy Writers ambushed her,
+          made her drunk with Longe and Parole and dragged her into their agency,
+          where they abused her for their.
+        </p>
+      </div>
+    </div>
     <div className="pt-16 md:pt-20 relative min-h-screen bg-cover bg-center bg-no-repeat bg-fixed" style={{ backgroundImage: 'url(/images/hhh.jpg)' }}>
       <div className="absolute inset-0 bg-black/70"></div>
 
@@ -205,3 +245,6 @@ const About = () => {
 }
 
 export default About 
+
+
+
