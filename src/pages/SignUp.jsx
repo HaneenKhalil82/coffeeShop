@@ -286,13 +286,13 @@ const SignUp = () => {
         </div>
 
         {/* نموذج التسجيل */}
-        <div className="w-1/2 p-8">
+        <div className="w-1/2 p-5">
           <div className="text-center mb-8">
-            <Link to="/" className="block mb-4">
+            <Link to="/" className="block mb-2">
               <img
                 src="/images/Group.svg"
                 alt="شعار"
-                className="h-10 w-60 mx-auto"
+                className="h-12 w-60 mx-auto"
               />
             </Link>
             <p className="text-3xl text-gray-300 font-bold">إنشاء حساب</p>
