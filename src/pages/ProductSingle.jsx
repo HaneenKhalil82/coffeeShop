@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { FaStar, FaHeart, FaShoppingCart, FaMinus, FaPlus } from 'react-icons/fa'
 import { useRTL, useCart } from '../App'
+import HeroSection from './../components/HeroSection'
 
 const ProductSingle = () => {
   const { id } = useParams()
@@ -281,6 +282,11 @@ const ProductSingle = () => {
   }
 
   return (
+   <div className="pt-20 md:pt-24">
+     <HeroSection
+        backgroundImage="/images/bg_3.jpg"
+        title={isArabic ? "القائمه " : " Our Menu"}
+      />
     <div className="pt-20 md:pt-24 min-h-screen bg-cover bg-center bg-no-repeat relative" style={{ backgroundImage: 'url(/images/hhh.jpg)' }}>
       <div className="absolute inset-0 bg-black/60"></div>
       <div className="w-full px-4 md:px-6 lg:px-8 section-padding relative z-10">
@@ -468,6 +474,7 @@ const ProductSingle = () => {
         </div>
       </div>
     </div>
+  </div>
   )
 }
 

@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Navbar from './components/Navbar'
+// import HeroSlider from './components/HeroSlider'
 import Footer from './components/Footer'
 import Home from './pages/Home'
 import Menu from './pages/Menu'
@@ -8,7 +9,7 @@ import About from './pages/About'
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
 // import { useAuth } from "./contexts/AuthContext";
-import { Toaster } from "react-hot-toast";
+
 
 
 import Shop from './pages/Shop'
@@ -129,7 +130,10 @@ function App() {
        
         <Router>
           <div className={`App arabic-text ${isRTL ? 'rtl' : 'ltr'}`}>
+           
             <Navbar />
+            
+
             <main>
               <Routes>
                 <Route path="/" element={<Home />} />

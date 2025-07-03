@@ -1,5 +1,6 @@
 import React from 'react'
 import { useRTL } from '../App'
+import HeroSection from './../components/HeroSection'
 
 const About = () => {
   const { isArabic } = useRTL()
@@ -115,8 +116,13 @@ const About = () => {
       ]
     }
   }
-
+ 
   return (
+  <div className="pt-20 md:pt-24">
+     <HeroSection
+        backgroundImage="/images/bg_3.jpg"
+        title={isArabic ? "من نحن" : "About Us"}
+      />
     <div className="pt-16 md:pt-20 relative min-h-screen bg-cover bg-center bg-no-repeat bg-fixed" style={{ backgroundImage: 'url(/images/hhh.jpg)' }}>
       <div className="absolute inset-0 bg-black/70"></div>
 
@@ -194,6 +200,7 @@ const About = () => {
         </div>
       </section>
     </div>
+</div>
   )
 }
 
