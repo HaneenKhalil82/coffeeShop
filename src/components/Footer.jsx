@@ -27,7 +27,7 @@ const Footer = () => {
       phone: '+966 11 123 4567',
       email: 'info@coffeemix.sa'
     },
-    copyright: `حقوق الطبع والنشر ©${currentYear} جميع الحقوق محفوظة | هذا القالب مصنوع بـ ❤️ من قبل مقهى المزيج`,
+    copyright: `حقوق الطبع والنشر ©${currentYear} جميع الحقوق محفوظة | هذا القالب مصنوع ب من قبل مقهى المزيج`,
     links: {
       privacy: 'سياسة الخصوصية',
       terms: 'شروط الخدمة'
@@ -52,7 +52,7 @@ const Footer = () => {
       phone: '+2 392 3929 210',
       email: 'info@yourdomain.com'
     },
-    copyright: `Copyright ©${currentYear} All rights reserved | This template is made with ❤️ by CoffeeBlend`,
+    copyright: `Copyright ©${currentYear} All rights reserved | This template is made with by CoffeeBlend`,
     links: {
       privacy: 'Privacy Policy',
       terms: 'Terms of Service'
@@ -67,7 +67,9 @@ const Footer = () => {
   ]
 
   return (
-    <footer className="bg-cover bg-center bg-no-repeat relative" style={{ backgroundImage: 'url(/images/hhh.jpg)' }}>
+    <footer className="bg-cover bg-center bg-no-repeat relative bg-[#120f0f]" 
+    // style={{ backgroundImage: 'url(/images/hhh.jpg)' }}
+    >
       <div className="absolute inset-0 bg-black/80"></div>
       <div className="w-full px-4 md:px-6 lg:px-8 section-padding relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -143,7 +145,7 @@ const Footer = () => {
         </div>
 
         {/* Bottom Bar */}
-        <div className="border-t border-gray-800 mt-12 pt-8">
+        <div className=" mt-12 pt-8 center">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <p className="text-gray-400 text-sm arabic-body">
               {content.copyright}
