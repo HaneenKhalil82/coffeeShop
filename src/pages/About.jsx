@@ -1,166 +1,528 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useRTL } from '../App'
+import HeroSection from './../components/HeroSection'
+import { Link } from 'react-router-dom'
+import AOS from 'aos';
+import 'aos/dist/aos.css';
+
+
 import { FaTimes, FaEnvelope, FaPhone, FaMapMarkerAlt, FaCoffee, FaUsers, FaAward, FaHeart, FaChevronDown, FaChevronUp } from 'react-icons/fa'
 
 const About = () => {
-  const { isArabic } = useRTL()
-  const [showNewsletterModal, setShowNewsletterModal] = useState(false)
-  const [showContactModal, setShowContactModal] = useState(false)
-  const [expandedFAQ, setExpandedFAQ] = useState(null)
-  const [stats, setStats] = useState({ customers: 0, coffees: 0, years: 0, awards: 0 })
-  const [email, setEmail] = useState('')
+  const [expandedFAQ, setExpandedFAQ] = useState(null);
 
-  const content = isArabic ? {
-    hero: {
-      title: 'من نحن',
-      subtitle: 'تعرفوا على قصتنا'
-    },
-    story: {
-      title: 'قصة مقهى المزيج',
-      description: [
-        'بدأت رحلتنا في عام 2018 بحلم بسيط: تقديم أفضل قهوة في المنطقة. انطلقنا من شغفنا العميق بالقهوة وإيماننا بأن كوب القهوة الجيد يمكن أن يغير يوم شخص ما.',
-        'نختار حبوب القهوة بعناية فائقة من أفضل المزارع حول العالم. كل حبة قهوة تمر بعملية فحص دقيق لضمان الجودة العالية. نحمص قهوتنا يومياً لنضمن الطعم الطازج والرائحة العطرة.',
-        'مقهانا ليس مجرد مكان لتقديم القهوة، بل هو مجتمع صغير يجمع محبي القهوة وعشاق الأجواء الهادئة. نؤمن بأهمية خلق مساحة آمنة ومريحة حيث يمكن للناس الاسترخاء والعمل والتواصل.'
-      ]
-    },
-    values: {
-      title: 'قيمنا',
-      items: [
-        {
-          title: 'الجودة',
-          description: 'نلتزم بتقديم أعلى مستويات الجودة في كل ما نقدمه، من حبوب القهوة إلى الخدمة'
-        },
-        {
-          title: 'الأصالة',
-          description: 'نحافظ على الطرق التقليدية في تحضير القهوة مع لمسة عصرية'
-        },
-        {
-          title: 'المجتمع',
-          description: 'نسعى لبناء مجتمع قوي من محبي القهوة والثقافة'
-        },
-        {
-          title: 'الاستدامة',
-          description: 'نهتم بالبيئة ونتعامل مع موردين يشاركوننا نفس القيم'
-        }
-      ]
-    },
-    
-    
-    faq: {
-      title: 'أسئلة شائعة',
-      items: [
-        {
-          question: 'ما هي ساعات العمل؟',
-          answer: 'نحن مفتوحون يومياً من 7:00 صباحاً حتى 11:00 مساءً'
-        },
-        {
-          question: 'هل تقدمون خدمة التوصيل؟',
-          answer: 'نعم، نقدم خدمة التوصيل في جميع أنحاء المدينة خلال 30 دقيقة'
-        },
-        {
-          question: 'هل يمكنني حجز طاولة؟',
-          answer: 'نعم، يمكنكم حجز طاولة عبر الاتصال بنا أو من خلال تطبيقنا'
-        }
-      ]
-    }
-  } : {
-    hero: {
-      title: 'About Us',
-      subtitle: 'Discover Our Story'
-    },
-    story: {
-      title: 'The CoffeeBlend Story',
-      description: [
-        'Our journey began in 2018 with a simple dream: to serve the best coffee in the region. We started with a deep passion for coffee and a belief that a good cup of coffee can change someone\'s day.',
-        'We carefully select our coffee beans from the finest farms around the world. Every coffee bean goes through a rigorous inspection process to ensure high quality. We roast our coffee daily to guarantee fresh taste and aromatic fragrance.',
-        'Our café is not just a place to serve coffee, but a small community that brings together coffee lovers and those who appreciate peaceful atmospheres. We believe in the importance of creating a safe and comfortable space where people can relax, work, and connect.'
-      ]
-    },
-    values: {
-      title: 'Our Values',
-      items: [
-        {
-          title: 'Quality',
-          description: 'We are committed to providing the highest levels of quality in everything we offer, from coffee beans to service'
-        },
-        {
-          title: 'Authenticity',
-          description: 'We preserve traditional methods of coffee preparation with a modern touch'
-        },
-        {
-          title: 'Community',
-          description: 'We strive to build a strong community of coffee and culture lovers'
-        },
-        {
-          title: 'Sustainability',
-          description: 'We care about the environment and work with suppliers who share our values'
-        }
-      ]
-    },
-  
-    
-    faq: {
-      title: 'Frequently Asked Questions',
-      items: [
-        {
-          question: 'What are your opening hours?',
-          answer: 'We are open daily from 7:00 AM to 11:00 PM'
-        },
-        {
-          question: 'Do you offer delivery service?',
-          answer: 'Yes, we offer delivery service throughout the city within 30 minutes'
-        },
-        {
-          question: 'Can I make a reservation?',
-          answer: 'Yes, you can make a reservation by calling us or through our app'
-        }
-      ]
-    }
-  }
-
-  // Animated counter effect
   useEffect(() => {
-    const targetStats = { customers: 5000, coffees: 50000, years: 6, awards: 15 }
-    const duration = 2000
-    const steps = 60
-    const stepDuration = duration / steps
+  AOS.init({ duration: 1000 });
+}, []); 
 
-    const timers = Object.keys(targetStats).map((key) => {
-      const increment = targetStats[key] / steps
-      let currentValue = 0
 
-      return setInterval(() => {
-        currentValue += increment
-        if (currentValue >= targetStats[key]) {
-          currentValue = targetStats[key]
+useEffect(() => {
+  const counters = document.querySelectorAll('.counter');
+  const speed = 100;
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const counter = entry.target;
+        const updateCount = () => {
+          const target = +counter.getAttribute('data-count');
+          const count = +counter.innerText;
+          const increment = Math.ceil(target / speed);
+
+          if (count < target) {
+            counter.innerText = count + increment;
+            setTimeout(updateCount, 20);
+          } else {
+            counter.innerText = target;
+          }
+        };
+        updateCount();
+        observer.unobserve(counter);
+      }
+    });
+  }, { threshold: 1 });
+
+  counters.forEach(counter => observer.observe(counter));
+}, []);
+
+
+
+
+
+
+
+  const { isArabic } = useRTL()
+
+  // Define stats object
+  const stats = {
+    customers: 1280,
+    coffees: 15000,
+    years: 6,
+    awards: 12
+  };
+
+  // Define content object for FAQ
+  const content = {
+    faq: {
+      title: isArabic ? 'الأسئلة الشائعة' : 'Frequently Asked Questions',
+      items: [
+        {
+          question: isArabic ? 'ما هي ساعات العمل؟' : 'What are your opening hours?',
+          answer: isArabic ? 'نحن مفتوحون من الساعة 7 صباحاً حتى 11 مساءً جميع أيام الأسبوع.' : 'We are open from 7 AM to 11 PM every day of the week.'
+        },
+        {
+          question: isArabic ? 'هل تقدمون قهوة خالية من الكافيين؟' : 'Do you serve decaf coffee?',
+          answer: isArabic ? 'نعم، نقدم مجموعة متنوعة من القهوة الخالية من الكافيين.' : 'Yes, we offer a variety of decaffeinated coffee options.'
+        },
+        {
+          question: isArabic ? 'هل يمكن حجز طاولة؟' : 'Can I make a reservation?',
+          answer: isArabic ? 'نعم، يمكنكم حجز طاولة عبر الهاتف أو موقعنا الإلكتروني.' : 'Yes, you can make a reservation by phone or through our website.'
+        },
+        {
+          question: isArabic ? 'هل تقدمون خدمة التوصيل؟' : 'Do you offer delivery service?',
+          answer: isArabic ? 'نعم، نقدم خدمة التوصيل المجاني للطلبات التي تزيد عن 50 ريال.' : 'Yes, we offer free delivery for orders over 50 SAR.'
         }
-        setStats(prev => ({ ...prev, [key]: Math.floor(currentValue) }))
-      }, stepDuration)
-    })
-
-    const timeout = setTimeout(() => {
-      timers.forEach(timer => clearInterval(timer))
-    }, duration)
-
-    return () => {
-      timers.forEach(timer => clearInterval(timer))
-      clearTimeout(timeout)
+      ]
     }
-  }, [])
+  };
 
-  const handleNewsletterSubmit = (e) => {
-    e.preventDefault()
-    alert(isArabic ? 'شكراً لاشتراكك في النشرة الإخبارية!' : 'Thank you for subscribing to our newsletter!')
-    setEmail('')
-    setShowNewsletterModal(false)
-  }
+ const testimonials = isArabic ? [
+  
+  {
+    quote: "““Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life One day however a small.””",
+    name: "Louise Kelly",
+    role: "Illustrator Designer",
+    image: "/images/person_3.jpg",
+    className: "bg-primary w-[250px] h-[250px] mt-80"
+  },
+  {
+    quote: "“Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life One day however a small line of blind text by the name of Lorem Ipsum decided to leave for the far World of Grammar.”",
+    name: "Louise Kelly",
+    role: "Illustrator Designer",
+    image: "/images/person_2.jpg",
+    className: "bg-primary/90 w-[250px] h-[300px] mt-[270px]"
+  },
+  {
+    quote: "“Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life One day however a small  line of blind text by the name.”",
+    name: "Louise Kelly",
+    role: "Illustrator Designer",
+    image: "/images/rev3.jpg",
+   className: "bg-primary w-[250px] h-[250px] mt-80"
+  },
+  {
+    quote: "“Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life One day however a small  line of blind text by the name.”",
+    name: "Louise Kelly",
+    role: "Illustrator Designer",
+    image: "/images/quote_img.png",
+    className: "bg-primary/90 w-[250px] h-[300px] mt-[270px]"
+  },
+  {
+    quote: "“Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life One day however.”",
+    name: "Louise Kelly",
+    role: "Illustrator Designer",
+    image: "/images/person_4.jpg",
+    className: "bg-primary w-[250px] h-[250px] mt-80"
+    
+  },
+  
+]:[
+  {
+    quote: "“Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life One day however a small.”",
+    name: "Louise Kelly",
+    role: "Illustrator Designer",
+    image: "/images/person_3.jpg",
+   className: "bg-primary w-[250px] h-[250px] mt-80"
+  },
+  {
+    quote: "“Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life One day however a small line of blind text by the name of Lorem Ipsum decided to leave for the far World of Grammar.”",
+    name: "Louise Kelly",
+    role: "Illustrator Designer",
+    image: "/images/person_2.jpg",
+     className: "bg-primary/90 w-[250px] h-[300px] mt-[270px]"
+  },
+  {
+    quote: "“Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life One day however a small  line of blind text by the name. ”",
+    name: "Louise Kelly",
+    role: "Illustrator Designer",
+    image: "/images/rev3.jpg",
+    className: "bg-primary w-[250px] h-[250px] mt-80"
+  },
+  {
+    quote: "“Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life One day however a small  line of blind text by the name. ”",
+    name: "Louise Kelly",
+    role: "Illustrator Designer",
+    image: "/images/quote_img.png",
+    className: "bg-primary/90 w-[250px] h-[300px] mt-[270px]"
+  },
+  {
+    quote: "“Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life One day however.”",
+    name: "Louise Kelly",
+    role: "Illustrator Designer",
+    image: "/images/person_4.jpg",
+   className: "bg-primary w-[250px] h-[250px] mt-80"
+  },
 
+]
+
+ const contents = isArabic
+    ? {
+        subtitle: 'اكتشف',
+        title: 'قائمتنا',
+        description:
+          'نحن فخورون بتقديم أجود أنواع القهوة المحمصة طازجة يومياً. تجربة فريدة تجمع بين الطعم الأصيل والجودة العالمية..',
+      }
+    : {
+        subtitle: 'Discover',
+        title: 'OUR MENU',
+        description:
+          'Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts. Separated they live right at the coast of the Semantics, a large language ocean.',
+      }
+   
+
+    const content2 = isArabic
+    ? {
+        subtitle: 'اكتشف',
+        title: 'قصتنا',
+        paragraph:
+          ' بدأت رحلتنا في عام 2018 بحلم بسيط: تقديم أفضل قهوة في المنطقة. انطلقنا من شغفنا العميق بالقهوة وإيماننا بأن كوب القهوة الجيد يمكن أن يغير يوم شخص ما. نختار حبوب القهوة بعناية فائقة من أفضل المزارع حول العالم. كل حبة قهوة تمر بعملية فحص دقيق لضمان الجودة العالية. نحمص قهوتنا يومياً لنضمن الطعم الطازج والرائحة العطرة. قهانا ليس مجرد مكان لتقديم القهوة، بل هو مجتمع صغير يجمع محبي القهوة وعشاق الأجواء الهادئة. نؤمن بأهمية خلق مساحة آمنة ومريحة حيث يمكن للناس الاسترخاء والعمل والتواصل.'
+        
+        
+      }
+    : {
+        subtitle: 'Discover',
+        title: 'Our Story',
+        paragraph:
+          'Our journey began in 2018 with a simple dream: to serve the best coffee in the region. We started with a deep passion for coffee and a belief that a good cup of coffee can change someone\'s day.We carefully select our coffee beans from the finest farms around the world. Every coffee bean goes through a rigorous inspection process to ensure high quality. We roast our coffee daily to guarantee fresh taste and aromatic fragrance.Our café is not just a place to serve coffee, but a small community that brings together coffee lovers and those who appreciate peaceful atmospheres. We believe in the importance of creating a safe and comfortable space where people can relax, work, and connect.'
+      }
+
+
+
+
+
+
+  // const content = isArabic ? {
+  //   hero: {
+  //     title: 'من نحن',
+  //     subtitle: 'تعرفوا على قصتنا'
+  //   },
+  //   story: {
+  //     title: 'قصة مقهى المزيج',
+  //     description: [
+  //       'بدأت رحلتنا في عام 2018 بحلم بسيط: تقديم أفضل قهوة في المنطقة. انطلقنا من شغفنا العميق بالقهوة وإيماننا بأن كوب القهوة الجيد يمكن أن يغير يوم شخص ما.',
+  //       'نختار حبوب القهوة بعناية فائقة من أفضل المزارع حول العالم. كل حبة قهوة تمر بعملية فحص دقيق لضمان الجودة العالية. نحمص قهوتنا يومياً لنضمن الطعم الطازج والرائحة العطرة.',
+  //       'مقهانا ليس مجرد مكان لتقديم القهوة، بل هو مجتمع صغير يجمع محبي القهوة وعشاق الأجواء الهادئة. نؤمن بأهمية خلق مساحة آمنة ومريحة حيث يمكن للناس الاسترخاء والعمل والتواصل.'
+  //     ]
+  //   },
+  //   values: {
+  //     title: 'قيمنا',
+  //     items: [
+  //       {
+  //         title: 'الجودة',
+  //         description: 'نلتزم بتقديم أعلى مستويات الجودة في كل ما نقدمه، من حبوب القهوة إلى الخدمة'
+  //       },
+  //       {
+  //         title: 'الأصالة',
+  //         description: 'نحافظ على الطرق التقليدية في تحضير القهوة مع لمسة عصرية'
+  //       },
+  //       {
+  //         title: 'المجتمع',
+  //         description: 'نسعى لبناء مجتمع قوي من محبي القهوة والثقافة'
+  //       },
+  //       {
+  //         title: 'الاستدامة',
+  //         description: 'نهتم بالبيئة ونتعامل مع موردين يشاركوننا نفس القيم'
+  //       }
+  //     ]
+  //   },
+  //   team: {
+  //     title: 'فريقنا',
+  //     description: 'فريق من الخبراء المتحمسين لتقديم أفضل تجربة قهوة',
+  //     members: [
+  //       {
+  //         name: 'أحمد المحمد',
+  //         role: 'مؤسس ومدير عام',
+  //         image: '/images/person_2.jpg'
+  //       },
+  //       {
+  //         name: 'فاطمة السعد',
+  //         role: 'خبيرة تحميص القهوة',
+  //         image: '/images/person_3.jpg'
+  //       },
+  //       {
+  //         name: 'محمد العلي',
+  //         role: 'مدير العمليات',
+  //         image: '/images/person_4.jpg'
+  //       }
+  //     ]
+  //   }
+  // } : {
+  //   hero: {
+  //     title: 'About Us',
+  //     subtitle: 'Discover Our Story'
+  //   },
+  //   story: {
+  //     title: 'The CoffeeBlend Story',
+  //     description: [
+  //       'Our journey began in 2018 with a simple dream: to serve the best coffee in the region. We started with a deep passion for coffee and a belief that a good cup of coffee can change someone\'s day.',
+  //       'We carefully select our coffee beans from the finest farms around the world. Every coffee bean goes through a rigorous inspection process to ensure high quality. We roast our coffee daily to guarantee fresh taste and aromatic fragrance.',
+  //       'Our café is not just a place to serve coffee, but a small community that brings together coffee lovers and those who appreciate peaceful atmospheres. We believe in the importance of creating a safe and comfortable space where people can relax, work, and connect.'
+  //     ]
+  //   },
+  //   values: {
+  //     title: 'Our Values',
+  //     items: [
+  //       {
+  //         title: 'Quality',
+  //         description: 'We are committed to providing the highest levels of quality in everything we offer, from coffee beans to service'
+  //       },
+  //       {
+  //         title: 'Authenticity',
+  //         description: 'We preserve traditional methods of coffee preparation with a modern touch'
+  //       },
+  //       {
+  //         title: 'Community',
+  //         description: 'We strive to build a strong community of coffee and culture lovers'
+  //       },
+  //       {
+  //         title: 'Sustainability',
+  //         description: 'We care about the environment and work with suppliers who share our values'
+  //       }
+  //     ]
+  //   },
+  //   team: {
+  //     title: 'Our Team',
+  //     description: 'A team of experts passionate about delivering the best coffee experience',
+  //     members: [
+  //       {
+  //         name: 'Ahmed Al-Mohammed',
+  //         role: 'Founder & General Manager',
+  //         image: '/images/person_2.jpg'
+  //       },
+  //       {
+  //         name: 'Fatima Al-Saad',
+  //         role: 'Coffee Roasting Expert',
+  //         image: '/images/person_3.jpg'
+  //       },
+  //       {
+  //         name: 'Mohammed Al-Ali',
+  //         role: 'Operations Manager',
+  //         image: '/images/person_4.jpg'
+  //       }
+  //     ]
+  //   }
+  // }
+ 
   return (
-    <div className="pt-16 md:pt-20 relative min-h-screen bg-cover bg-center bg-no-repeat bg-fixed" style={{ backgroundImage: 'url(/images/hhh.jpg)' }}>
-      <div className="absolute inset-0 bg-black/70"></div>
+  <div className="pt-20 md:pt-24">
+     <HeroSection
+        backgroundImage="/images/bg_3.jpg"
+        title={isArabic ? "من نحن" : "About Us"}
+      />
+
+    <div className="relative w-full h-screen flex">
+      {/* Left Image */}
+      <div className="w-1/2 h-full">
+        <img
+          src="/images/bg_4.jpg"
+          alt="Left"
+          className="w-full h-full object-cover"
+        />
+      </div>
+
+      {/* Right Image */}
+      <div className="w-1/2 h-full">
+        <img
+          src="/images/about.jpg"
+          alt="Right"
+          className="w-full h-full object-cover"
+        />
+      </div>
+
+      {/* Overlay Text Box */}
+      
+    
+    <div
+  className={`absolute top-1/2 left-[43%] w-[40%] h-[70%] bg-black/40 text-gray-400 p-3 m-1 rounded-lg backdrop-blur-sm shadow-lg transform -translate-y-1/2
+    ${isArabic ? 'text-left rtl ' : 'text-right ltr'}`}>
+      <div className="heading-section ">
+        <span
+          className="subheading text-[#c49b63] text-[50px] leading-none "
+          style={{ fontFamily: '"Great Vibes", cursive' }}
+        >
+          {content2.subtitle}
+        </span>
+        <h2
+          className="mb-0 text-[30px] text-white p-2"
+          style={{ fontFamily: '"Josefin Sans", Arial, sans-serif' }}
+        >
+          {content2.title}
+        </h2>
+      </div>
+      <p className="text-sm md:text-base leading-relaxed opacity-90 p-2">
+        {content2.paragraph}
+      </p>
+    </div>
+    {/* </div> */}
+
+
+    </div>
+    <div className={`relative w-full h-screen flex ${isArabic ? 'text-left rtl' : 'text-right ltr'}`}> 
+      <div className="w-full h-full">
+        <img
+          src="/images/bg_1.jpg"
+          alt="Left"
+          className="w-full h-full object-cover"
+        />
+      </div>
+       <div className="absolute top-20 left-[38%] ">
+
+          {/* Testimony  */}
+        <div className=" text-center ">
+	       <span className="subheading  text-[#c49b63] text-[60px] leading-none" style={{ fontFamily: '"Great Vibes", cursive' }}>Testimony</span>
+	       <h2 className="mb-4 text-white text-[45px] "style={{ fontFamily: '"Josefin Sans", Arial, sans-serif' }}>CUSTOMERS SAYS</h2>
+	      </div>
+       </div>
+      
+       <div className={`absolute  bottom-0 left-0 gap-0 w-full flex ${isArabic ? 'text-left rtl' : 'text-right ltr'}`}> 
+         <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-1">
+       
+           {testimonials.map((t, index) => (
+         <div
+          key={index}
+         className={`${t.className} text-white p-6 shadow-lg flex flex-col justify-between`}>
+        <p className="text-sm leading-relaxed italic mb-6">{t.quote}</p>
+       <div className="flex items-center gap-3 mt-auto ${isArabic ? 'text-left rtl' : 'text-right ltr'}`}> ">
+         <img
+          src={t.image}
+          alt={t.name}
+          className="w-10 h-10 rounded-full object-cover"
+         />
+            <div>
+            <h4 className="text-sm font-semibold">{t.name}</h4>
+             <p className="text-xs opacity-80">{t.role}</p>
+            </div>
+          </div>
+         </div>
+             ))}
+         </div>
+        </div>
+       
+    </div>
+  <section className="w-full py-20 bg-cover bg-center bg-no-repeat " style={{ backgroundImage: "url('/images/bg_4.jpg')" }}>
+      <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+
+        {/* ✅ Left: Images Grid */}
+        <div className="grid grid-cols-2 gap-4">
+          <img src="/images/menu-2.jpg" alt="coffee1" className="rounded-lg w-full h-auto object-cover" />
+          <img src="/images/menu-1.jpg" alt="coffee2" className="rounded-lg w-full h-auto object-cover" />
+          <img src="/images/menu-4.jpg" alt="coffee3" className="rounded-lg w-full h-auto object-cover" />
+          <img src="/images/menu-3.jpg" alt="coffee4" className="rounded-lg w-full h-auto object-cover" />
+        </div>
+
+        <div className="text-white text-start">
+        <span
+         className="text-[#c49b63] text-[50px] block"
+         style={{ fontFamily: '"Great Vibes", cursive' }}
+        >
+        {contents.subtitle}
+      </span>
+      <h2 className="text-4xl font-bold mb-3">{contents.title}</h2>
+      <p className="text-lg opacity-80 leading-relaxed mb-8">{contents.description}</p>
+    
+          <Link
+           to="/menu"
+           className="inline-block border border-[#c49b63] text-[#c49b63] py-2 px-6 hover:bg-[#c49b63] hover:text-black transition duration-300"
+           >
+          {isArabic ? 'تصفح القائمة كاملة' : 'View Full Menu'}
+          </Link>
+
+        </div>
+
+      </div>
+    </section>
+   
+    <div className="  w-full bg-black/90 relative min-h-[400px]  bg-[1%_30%]   bg-no-repeat bg-cover bg-fixed" style={{ backgroundImage: 'url(/images/chat.png)', }}>
+     
+
+
+   {/* <div className="flex justify-center gap-40 flex-wrap py-40">
+  {[
+    {
+      image: '/images/choose_icon2.png',
+      line1: '500',
+      line2: 'staff'
+    },
+    {
+      image: '/images/choose_icon2.png',
+      line1: '10,567',
+      line2: 'Happy Customer'
+    },
+    {
+      image: '/images/choose_icon2.png',
+      line1: '85',
+      line2: 'Number of Awards'
+    },
+    {
+      image: '/images/choose_icon2.png',
+      line1: '2',
+      line2: 'Coffe Pranches'
+    }
+  ].map((item, index) => (
+    <div key={index} className="flex flex-col items-center group">
+      <button
+        className="w-24 h-24 border-2 border-[#c49b63] rounded-md transition-transform duration-300 group-hover:rotate-45 flex items-center justify-center"
+      >
+        <img src={item.image} alt={`icon-${index}`} className="w-8 h-8" />
+      </button>
+      <p className="mt-2 text-lg text-[#c49b63] font-semibold">{item.line1}</p>
+      <p className="text-xl text-gray-300">{item.line2}</p>
+    </div>
+  ))}
+</div> */}
+
+
+
+<div className="flex justify-center gap-20 flex-wrap py-40">
+  {[
+    { image: '/images/choose_icon2.png', line1: 500, line2: 'Sttaf' },
+    { image: '/images/choose_icon2.png', line1: 1280, line2: 'Happy Customer' },
+    { image: '/images/choose_icon2.png', line1: 85, line2: 'Number of Awards' },
+    { image: '/images/choose_icon2.png', line1: 2, line2: 'Coffe branches' }
+  ].map((item, index) => (
+    <div
+      key={index}
+      className="flex flex-col items-center group"
+      data-aos="fade-up"
+      data-aos-delay={index * 100}
+    >
+      <button className="w-24 h-24 border-2 border-[#c49b63] rounded-md transition-transform duration-300 group-hover:rotate-45 flex items-center justify-center">
+        <img src={item.image} alt={`icon-${index}`} className="w-8 h-8" />
+      </button>
+      
+      <p
+        className="text-xl text-gray-300 counter"
+        data-count={item.line1}
+      >
+        0
+      </p>
+       <p className="mt-2 text-lg text-[#c49b63] font-semibold">{item.line2}</p>
+    </div>
+  ))}
+</div>
+
+
+
+    </div>
+  
+
+
+
+
+    {/* <div className="pt-16 md:pt-20 relative min-h-screen bg-cover bg-center bg-no-repeat bg-fixed" style={{ backgroundImage: 'url(/images/hhh.jpg)' }}>
+      <div className="absolute inset-0 bg-black/70"></div> */}
 
       {/* Story Section */}
-      <section className="section-padding relative z-10">
+      {/* <section className="section-padding relative z-10">
         <div className="w-full px-6 sm:px-8 lg:px-12 max-w-none mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-16 items-center mb-20 w-full">
             <div
@@ -179,10 +541,10 @@ const About = () => {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Values Section */}
-      <section className="section-padding relative z-10">
+      {/* <section className="section-padding relative z-10">
         <div className="w-full px-6 sm:px-8 lg:px-12 max-w-7xl mx-auto">
           <div className="text-center mb-16 sm:mb-20">
             <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 arabic-heading-font text-primary">
@@ -208,7 +570,7 @@ const About = () => {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Statistics Section */}
       <section className="section-padding relative z-10">
@@ -275,7 +637,7 @@ const About = () => {
       </section>
 
       {/* Call to Action */}
-      <section className="section-padding relative z-10">
+      {/* <section className="section-padding relative z-10">
         <div className="w-full px-6 sm:px-8 lg:px-12 max-w-7xl mx-auto text-center">
           <div className="backdrop-blur-sm bg-primary/90 rounded-xl p-10 md:p-14 lg:p-16 shadow-2xl border border-primary/30">
             <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-8 arabic-heading-font text-white">
@@ -303,84 +665,13 @@ const About = () => {
             </div>
           </div>
         </div>
-      </section>
-
-
-      {/* Newsletter Modal */}
-      {showNewsletterModal && (
-        <div className="fixed inset-0  z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md mx-4">
-            <div className="p-6">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-2xl font-bold text-gray-900 arabic-heading-font">
-                  {isArabic ? 'اشترك في النشرة الإخبارية' : 'Subscribe to Newsletter'}
-                </h3>
-                <button
-                  onClick={() => setShowNewsletterModal(false)}
-                  className="text-gray-500 hover:text-gray-700"
-                >
-                  <FaTimes className="w-6 h-6" />
-                </button>
-              </div>
-              <form onSubmit={handleNewsletterSubmit}>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder={isArabic ? 'ادخل بريدك الإلكتروني' : 'Enter your email'}
-                  className="w-full p-3 border border-gray-300 rounded-lg mb-4 focus:ring-2 focus:ring-primary focus:border-transparent"
-                  required
-                />
-                <button
-                  type="submit"
-                  className="w-full bg-primary text-white py-3 rounded-lg hover:bg-primary/90 transition-colors duration-300 font-medium"
-                >
-                  {isArabic ? 'اشترك' : 'Subscribe'}
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Contact Modal */}
-      {showContactModal && (
-        <div className="fixed inset-0  z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md mx-4">
-            <div className="p-6">
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="text-2xl font-bold text-gray-900 arabic-heading-font">
-                  {isArabic ? 'تواصل معنا' : 'Contact Us'}
-                </h3>
-                <button
-                  onClick={() => setShowContactModal(false)}
-                  className="text-gray-500 hover:text-gray-700"
-                >
-                  <FaTimes className="w-6 h-6" />
-                </button>
-              </div>
-              <div className="space-y-4">
-                <div className="flex items-center space-x-3">
-                  <FaPhone className="text-primary" />
-                  <span className="text-gray-700">+966 11 123 4567</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <FaEnvelope className="text-primary" />
-                  <span className="text-gray-700">info@coffeemix.sa</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <FaMapMarkerAlt className="text-primary" />
-                  <span className="text-gray-700">
-                    {isArabic ? 'الرياض، المملكة العربية السعودية' : 'Riyadh, Saudi Arabia'}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+      </section> */}
+    {/* </div> */}
+</div>
   )
 }
 
 export default About 
+
+
+

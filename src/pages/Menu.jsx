@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useRTL, useCart } from '../App'
+import HeroSection from './../components/HeroSection'
 
 const Menu = () => {
   const { isArabic } = useRTL()
@@ -294,6 +295,12 @@ const Menu = () => {
   }
 
   return (
+
+  <div className="pt-20 md:pt-24">
+     <HeroSection
+        backgroundImage="/images/bg_3.jpg"
+        title={isArabic ? "القائمه " : " Our Menu"}
+      />
     <div className="pt-16 md:pt-20 relative min-h-screen bg-cover bg-center bg-no-repeat bg-fixed" style={{ backgroundImage: 'url(/images/hhh.jpg)' }}>
       <div className="absolute inset-0 bg-black/60"></div>
 
@@ -389,6 +396,7 @@ const Menu = () => {
         </div>
       </section>
     </div>
+  </div>
   )
 }
 

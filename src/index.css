@@ -4,6 +4,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@100;200;300;400;500;600;700;800;900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&display=swap');
 
+/* @import "tailwindcss"; */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -160,4 +162,124 @@ html, body {
 
 .ken-burns {
   animation: kenBurns 8s linear infinite alternate;
+}
+
+
+
+@keyframes slide-up {
+  0% {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY();
+    opacity: 1;
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 1s ease-out forwards;
+}
+
+
+
+
+
+
+
+@theme {
+  /* ----------- Colors Variables -----------*/
+  --color-primary: #6c7fd8;
+  --color-secondary: rgb(99, 102, 241);
+  --color-accent: rgb(236, 72, 153);
+  --color-dark: rgb(15, 23, 42);
+  --color-white: #ffffff;
+  --color-light: #f8f8fb;
+  --color-b-main: #f8f8fb;
+  --color-b-gray: #d1d5dc;
+  --color-success: rgb(16, 185, 129);
+  --color-warning: rgb(245, 158, 11);
+  --color-danger: rgb(239, 68, 68);
+
+  --color-text-primary: rgb(15, 23, 42);
+  --color-text-secondary: rgb(100, 116, 139);
+
+  /*----------- Font Family Variables -----------*/
+  --font-sans: "Poppins", sans-serif;
+}
+
+
+input:focus,
+input:active,
+select:focus,
+select:active,
+textarea:focus,
+textarea:active,
+option:focus,
+option:active {
+  @apply outline outline-primary
+}
+
+
+
+@layer components {
+  .btn-primary {
+    @apply bg-primary text-sm shadow-[0px_0px_20px_0px_#00000017] flex gap-2 justify-center items-center w-fit px-4 py-3 rounded-lg text-white transition ease-in-out duration-300 relative overflow-hidden z-10 cursor-pointer;
+  }
+
+  .btn-primary>* {
+    z-index: 5;
+  }
+
+  .btn-primary::before {
+    content: "";
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    transform-origin: left bottom;
+    transform: scale(0);
+    background-color: var(--color-dark);
+    transition: 0.4s ease;
+    border-radius: 9999px;
+    z-index: -1;
+  }
+
+  .btn-primary:hover {
+    @apply shadow-[4px_8px_20px_0px_#00000017];
+  }
+
+  .btn-primary:hover::before {
+    transform: scale(1);
+  }
+}
+
+
+@keyframes slideInUp {
+  from {
+    transform: translate3d(0, 300px, 0);
+    opacity: 0;
+  }
+
+  to {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+}
+
+.animate-slideInUp {
+  animation-name: slideInUp;
+  animation-duration: 1000ms;
+  animation-timing-function: ease;
+  animation-delay: 200ms;
+  animation-fill-mode: both;
+}
+
+
+.category_item_details {
+  background-image: linear-gradient(to left, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url("./assets/images/category/banner.jpg");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  height: 350px;
+  width: 100%;
 }
