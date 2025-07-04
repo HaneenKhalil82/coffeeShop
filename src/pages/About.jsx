@@ -445,42 +445,6 @@ useEffect(() => {
      
 
 
-   {/* <div className="flex justify-center gap-40 flex-wrap py-40">
-  {[
-    {
-      image: '/images/choose_icon2.png',
-      line1: '500',
-      line2: 'staff'
-    },
-    {
-      image: '/images/choose_icon2.png',
-      line1: '10,567',
-      line2: 'Happy Customer'
-    },
-    {
-      image: '/images/choose_icon2.png',
-      line1: '85',
-      line2: 'Number of Awards'
-    },
-    {
-      image: '/images/choose_icon2.png',
-      line1: '2',
-      line2: 'Coffe Pranches'
-    }
-  ].map((item, index) => (
-    <div key={index} className="flex flex-col items-center group">
-      <button
-        className="w-24 h-24 border-2 border-[#c49b63] rounded-md transition-transform duration-300 group-hover:rotate-45 flex items-center justify-center"
-      >
-        <img src={item.image} alt={`icon-${index}`} className="w-8 h-8" />
-      </button>
-      <p className="mt-2 text-lg text-[#c49b63] font-semibold">{item.line1}</p>
-      <p className="text-xl text-gray-300">{item.line2}</p>
-    </div>
-  ))}
-</div> */}
-
-
 
 <div className="flex justify-center gap-20 flex-wrap py-40">
   {[

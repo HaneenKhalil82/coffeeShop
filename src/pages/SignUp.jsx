@@ -82,12 +82,12 @@ const SignUp = () => {
       className="min-h-screen flex items-center justify-center bg-cover bg-center"
       style={{ backgroundImage: `url("/images/cover2.png")` }}
     >
-      <div className="animate-slideInUp m-40 mt-30 flex flex-row w-full max-w-5xl bg-[#252525] text-white rounded-2xl shadow-lg overflow-hidden bg-opacity-90">
-        <div className="w-1/2 flex items-center justify-center bg-white">
-          <img src="/images/img10.png" alt="sign up" className="w-full h-full object-contain" />
-        </div>
+      <div className="animate-slideInUp m-4 sm:m-10 md:m-20 lg:m-40 flex flex-col lg:flex-row w-full max-w-5xl bg-[#252525] text-white rounded-2xl shadow-lg overflow-hidden bg-opacity-90">
+      
 
-        <div className="w-1/2 p-5">
+
+        {/* Form section */}
+        <div className="w-full lg:w-1/2 p-5 sm:p-8">
           <div className="text-center mb-3">
             <Link to="/" className="block mb-1">
               <img src="/images/Group.svg" alt="logo" className="h-10 w-60 mx-auto" />
@@ -204,9 +204,20 @@ const SignUp = () => {
             </p>
           </div>
         </div>
+
+        {/* Image section */}
+        <div className="w-full lg:w-1/2 flex items-center justify-center ">
+          <img
+            src="/images/img10.png"
+            alt="sign up"
+            className="w-full h-full object-cover p-4"
+          />
+        </div>
+
       </div>
     </div>
   );
 };
 
 export default SignUp;
+

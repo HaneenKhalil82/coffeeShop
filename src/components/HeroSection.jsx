@@ -8,7 +8,7 @@ const HeroSection = ({
 }) => {
   return (
     <section
-      className="relative bg-cover  bg-fixed h-screen overflow-hidden flex items-center justify-center text-center text-white"
+      className="relative bg-cover  bg-fixed h-screen overflow-hidden flex items-center justify-center text-center text-[#c49b63]"
       style={{
         
         backgroundImage: `url(${backgroundImage})`,

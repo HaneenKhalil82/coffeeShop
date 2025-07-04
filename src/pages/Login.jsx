@@ -64,14 +64,16 @@ const Login = () => {
   };
 
   return (
- <div
-       dir={isArabic ? "rtl" : "ltr"}
-       className="min-h-screen flex items-center justify-center bg-cover bg-center "
-       style={{ backgroundImage: `url("/images/cover2.png")` }}
-     >
-    <div className="animate-slideInUp m-40 mt-30 flex flex-row w-full max-w-4xl bg-[#252525] text-white rounded-2xl shadow-lg overflow-hidden ">
-      <div className="w-1/2 p-8">
-       <div className="text-center mb-8">
+    <div
+      dir={isArabic ? "rtl" : "ltr"}
+      className="min-h-screen flex items-center justify-center bg-cover bg-center"
+      style={{ backgroundImage: `url("/images/cover2.png")` }}
+    >
+      <div className="animate-slideInUp m-4 sm:m-10 md:m-20 lg:m-40 flex flex-col lg:flex-row w-full max-w-4xl bg-[#252525] text-white rounded-2xl shadow-lg overflow-hidden">
+        
+        {/* Form section */}
+        <div className="w-full lg:w-1/2 p-6 sm:p-8">
+          <div className="text-center mb-8">
             <Link to="/" className="block">
               <img
                 src="/images/Group.svg"
@@ -88,88 +90,85 @@ const Login = () => {
             </p>
           </div>
 
-
-        <form
-           onSubmit={handleSubmit(onSubmit)}
+          <form
+            onSubmit={handleSubmit(onSubmit)}
             className="space-y-6"
             dir={isArabic ? "rtl" : "ltr"}
-            >
-               {/* Email Field */}
+          >
+            {/* Email Field */}
             <div>
-             <label className={`block text-sm font-medium mb-2 ${isArabic ? "text-left" : "text-right"} text-gray-300 mb-2`}>
-    
-              {isArabic ? "البريد الإلكتروني"  : "Email"}
-             </label>
-             <div className="relative">
-               <Mail
-               className={`absolute top-1/2 transform -translate-y-1/2 text-gray-400 ${isArabic ? "right-3" : "left-3"}`}
-               size={20}
-              />
-               <input
-                {...register("email")}
+              <label className={`block text-sm font-medium mb-2 ${isArabic ? "text-left" : "text-right"} text-gray-300`}>
+                {isArabic ? "البريد الإلكتروني" : "Email"}
+              </label>
+              <div className="relative">
+                <Mail
+                  className={`absolute top-1/2 transform -translate-y-1/2 text-gray-400 ${isArabic ? "right-3" : "left-3"}`}
+                  size={20}
+                />
+                <input
+                  {...register("email")}
                   type="email"
                   className={`w-full bg-[#3B3737] py-3 rounded-lg ${
-                  isArabic ? "pr-10 pl-4 text-left" : "pl-10 pr-4 text-right"
-                    }`}
-                   placeholder={isArabic ? "أدخل بريدك الإلكتروني" : "Enter your email"}
-                  />
+                    isArabic ? "pr-10 pl-4 text-left" : "pl-10 pr-4 text-right"
+                  }`}
+                  placeholder={isArabic ? "أدخل بريدك الإلكتروني" : "Enter your email"}
+                />
+              </div>
+              {errors.email && (
+                <p className="text-gray-400 text-sm mt-1">{errors.email.message}</p>
+              )}
+            </div>
 
-                 </div>
-                 {errors.email && (
-                 <p className="text-gray-400 text-sm mt-1">{errors.email.message}</p>
-                  )}
-             </div>
+            {/* Password Field */}
+            <div>
+              <label className={`block text-sm font-medium text-gray-300 ${isArabic ? "text-left" : "text-right"} mb-2`}>
+                {isArabic ? "كلمة المرور" : "Password"}
+              </label>
+              <div className="relative">
+                <Lock
+                  className={`absolute top-1/2 transform -translate-y-1/2 text-gray-400 ${isArabic ? "right-3" : "left-3"}`}
+                  size={20}
+                />
+                <input
+                  {...register("password")}
+                  type={showPassword ? "text" : "password"}
+                  className={`w-full bg-[#3B3737] py-3 rounded-lg ${
+                    isArabic ? "pr-10 pl-4 text-left" : "pl-10 pr-4 text-right"
+                  }`}
+                  placeholder={isArabic ? "أدخل كلمة المرور" : "Enter your password"}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className={`absolute top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 ${isArabic ? "left-3" : "right-3"}`}
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
+              {errors.password && (
+                <p className="text-gray-400 text-sm mt-1">{errors.password.message}</p>
+              )}
+            </div>
 
-          {/* Password Field */}
-  <div>
-    <label className={`block text-sm font-medium text-gray-300 ${isArabic ? "text-left" : "text-right"} mb-2`}>
-      {isArabic ? "كلمة المرور" : "Password"}
-    </label>
-    <div className="relative">
-      <Lock
-        className={`absolute top-1/2 transform -translate-y-1/2 text-gray-400 ${isArabic ? "right-3" : "left-3"}`}
-        size={20}
-      />
-     <input
-  {...register("password")}
-  type={showPassword ? "text" : "password"}
-  className={`w-full bg-[#3B3737] py-3 rounded-lg ${
-    isArabic ? "pr-10 pl-4 text-left" : "pl-10 pr-4 text-right"
-  }`}
-  placeholder={isArabic ? "أدخل كلمة المرور" : "Enter your password"}
-/>
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="mx-auto block w-full sm:w-3/4 md:w-2/3 lg:w-1/2 py-3 bg-[#ECEAEA] text-black font-semibold rounded-full transition-all duration-300 transform hover:scale-105"
+            >
+              {isSubmitting
+                ? isArabic
+                  ? "جاري تسجيل الدخول..."
+                  : "Logging in..."
+                : isArabic
+                ? "تسجيل الدخول"
+                : "Login"}
+            </button>
+          </form>
 
-      <button
-        type="button"
-        onClick={() => setShowPassword(!showPassword)}
-        className={`absolute top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 ${isArabic ? "left-3" : "right-3"}`}
-      >
-        {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-      </button>
-    </div>
-    {errors.password && (
-      <p className="text-gray-400 text-sm mt-1">{errors.password.message}</p>
-    )}
-  </div>
-
-  {/* Submit Button */}
-  <button
-    type="submit"
-    disabled={isSubmitting}
-    className="mx-auto block w-1/2 py-3 bg-[#ECEAEA] text-black font-semibold rounded-full transition-all duration-300 transform hover:scale-105"
-  >
-    {isSubmitting
-      ? isArabic
-        ? "جاري تسجيل الدخول..."
-        : "Logging in..."
-      : isArabic
-      ? "تسجيل الدخول"
-      : "Login"}
-  </button>
-</form>
-        <div className="text-center mt-6">
+          <div className="text-center mt-6">
             <p className="text-gray-300">
-              {isArabic ? "ليس لديك حساب؟" : "Don't have an account?"} {" "}
+              {isArabic ? "ليس لديك حساب؟" : "Don't have an account?"}{" "}
               <Link
                 to="/signup"
                 className="text-gray-100 hover:text-gray-600 font-semibold"
@@ -180,11 +179,12 @@ const Login = () => {
           </div>
         </div>
 
-        <div className="w-1/2 flex items-center justify-center bg-white">
+        {/* Image section */}
+        <div className="w-full h-screen lg:w-1/2 flex items-center justify-center ">
           <img
             src="/images/img10.png"
             alt={isArabic ? "صورة تسجيل الدخول" : "Login Illustration"}
-            className="w-full h-full object-contain"
+            className="w-full h-full object-cover p-4"
           />
         </div>
       </div>
@@ -193,3 +193,4 @@ const Login = () => {
 };
 
 export default Login;
+

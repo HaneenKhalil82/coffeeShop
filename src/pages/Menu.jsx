@@ -23,28 +23,28 @@ const Menu = () => {
           name: 'إسبريسو',
           price: 15,
           description: 'قهوة مركزة مع طعم غني وكريمة ذهبية',
-          image: '/images/drink-1.jpg'
+          image: '/images/bg_2.jpg'
         },
         {
           id: 2,
           name: 'كابتشينو',
           price: 20,
           description: 'إسبريسو مع حليب مبخر ورغوة كثيفة',
-          image: '/images/drink-2.jpg'
+          image: '/images/menu-4.jpg'
         },
         {
           id: 3,
           name: 'لاتيه',
           price: 22,
           description: 'قهوة ناعمة مع حليب مبخر وطبقة رغوة خفيفة',
-          image: '/images/drink-3.jpg'
+          image: '/images/menu-3.jpg'
         },
         {
           id: 4,
           name: 'قهوة عربية',
           price: 18,
           description: 'قهوة عربية أصيلة بنكهة الهيل',
-          image: '/images/drink-4.jpg'
+          image: '/images/menu4.jpg'
         },
         {
           id: 5,
@@ -301,8 +301,8 @@ const Menu = () => {
         backgroundImage="/images/bg_3.jpg"
         title={isArabic ? "القائمه " : " Our Menu"}
       />
-    <div className="pt-16 md:pt-20 relative min-h-screen bg-cover bg-center bg-no-repeat bg-fixed" style={{ backgroundImage: 'url(/images/hhh.jpg)' }}>
-      <div className="absolute inset-0 bg-black/60"></div>
+    <div className="pt-16 md:pt-20 relative min-h-screen bg-cover bg-center bg-no-repeat bg-fixed" style={{ backgroundImage: 'url(/images/bg_4.jpg)' }}>
+      <div className="absolute inset-0 "></div>
 
       {/* Menu Categories */}
       <section className="py-8 bg-black/40 backdrop-blur-sm border-b border-gray-700/50 relative">

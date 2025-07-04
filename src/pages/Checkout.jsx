@@ -554,8 +554,8 @@ const Checkout = () => {
             backgroundImage="/images/bg_3.jpg"
             title={isArabic ? " الدفع" : "Checkout"}
           />
-    <div className="pt-16 md:pt-20 relative min-h-screen bg-cover bg-center bg-no-repeat bg-fixed" style={{ backgroundImage: 'url(/images/hhh.jpg)' }}>
-      <div className="absolute inset-0 bg-black/70"></div>
+    <div className="pt-16 md:pt-20 relative min-h-screen bg-cover bg-center bg-no-repeat bg-fixed" style={{ backgroundImage: 'url(/images/bg_4.jpg)' }}>
+      <div className="absolute inset-0"></div>
 
       {/* Toast Notification */}
       {toast && (
