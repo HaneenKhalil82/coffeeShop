@@ -882,8 +882,7 @@ const content = isArabic ? {
                   </div>
                 </div>
 
-Aya k. Moaz, [03/07/2025 18:43]
-{/* Quantity */}
+             {/* Quantity */}
                 <div className="mb-6">
                   <label className="block text-sm font-semibold text-gray-300 mb-3 arabic-body">
                     {content.quantity}
