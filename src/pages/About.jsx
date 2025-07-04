@@ -5,6 +5,91 @@ import HeroSection from './../components/HeroSection'
 const About = () => {
   const { isArabic } = useRTL()
 
+
+  
+ const testimonials = isArabic ? [
+  
+  {
+    quote: "““Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life One day however a small.””",
+    name: "Louise Kelly",
+    role: "Illustrator Designer",
+    image: "/images/person_3.jpg",
+    className: "bg-primary w-[250px] h-[250px] mt-80"
+  },
+  {
+    quote: "“Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life One day however a small line of blind text by the name of Lorem Ipsum decided to leave for the far World of Grammar.”",
+    name: "Louise Kelly",
+    role: "Illustrator Designer",
+    image: "/images/person_2.jpg",
+    className: "bg-primary/90 w-[250px] h-[300px] mt-[270px]"
+  },
+  {
+    quote: "“Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life One day however a small  line of blind text by the name.”",
+    name: "Louise Kelly",
+    role: "Illustrator Designer",
+    image: "/images/rev3.jpg",
+   className: "bg-primary w-[250px] h-[250px] mt-80"
+  },
+  {
+    quote: "“Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life One day however a small  line of blind text by the name.”",
+    name: "Louise Kelly",
+    role: "Illustrator Designer",
+    image: "/images/quote_img.png",
+    className: "bg-primary/90 w-[250px] h-[300px] mt-[270px]"
+  },
+  {
+    quote: "“Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life One day however.”",
+    name: "Louise Kelly",
+    role: "Illustrator Designer",
+    image: "/images/person_4.jpg",
+    className: "bg-primary w-[250px] h-[250px] mt-80"
+    
+  },
+  
+]:[
+  {
+    quote: "“Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life One day however a small.”",
+    name: "Louise Kelly",
+    role: "Illustrator Designer",
+    image: "/images/person_3.jpg",
+   className: "bg-primary w-[250px] h-[250px] mt-80"
+  },
+  {
+    quote: "“Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life One day however a small line of blind text by the name of Lorem Ipsum decided to leave for the far World of Grammar.”",
+    name: "Louise Kelly",
+    role: "Illustrator Designer",
+    image: "/images/person_2.jpg",
+     className: "bg-primary/90 w-[250px] h-[300px] mt-[270px]"
+  },
+  {
+    quote: "“Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life One day however a small  line of blind text by the name. ”",
+    name: "Louise Kelly",
+    role: "Illustrator Designer",
+    image: "/images/rev3.jpg",
+    className: "bg-primary w-[250px] h-[250px] mt-80"
+  },
+  {
+    quote: "“Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life One day however a small  line of blind text by the name. ”",
+    name: "Louise Kelly",
+    role: "Illustrator Designer",
+    image: "/images/quote_img.png",
+    className: "bg-primary/90 w-[250px] h-[300px] mt-[270px]"
+  },
+  {
+    quote: "“Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life One day however.”",
+    name: "Louise Kelly",
+    role: "Illustrator Designer",
+    image: "/images/person_4.jpg",
+   className: "bg-primary w-[250px] h-[250px] mt-80"
+  },
+
+]
+
+
+
+
+
+
   const content = isArabic ? {
     hero: {
       title: 'من نحن',
@@ -144,7 +229,7 @@ const About = () => {
       </div>
 
       {/* Overlay Text Box */}
-      <div className="absolute top-1/2 left-[43%] w-[40%] h-[70%] bg-black/60 text-gray-500 p-4 m-1 rounded-lg backdrop-blur-sm shadow-lg transform -translate-y-1/2">
+      <div className="absolute top-1/2 left-[43%] w-[40%] h-[70%] bg-black/60 text-gray-500 p-3 m-1 rounded-lg backdrop-blur-sm shadow-lg transform -translate-y-1/2">
 
        
         <div class="heading-section ftco-animate fadeInUp ftco-animated ">
@@ -163,6 +248,86 @@ const About = () => {
         </p>
       </div>
     </div>
+    <div className="relative w-full h-screen flex">
+      <div className="w-full h-full">
+        <img
+          src="/images/bg_1.jpg"
+          alt="Left"
+          className="w-full h-full object-cover"
+        />
+      </div>
+       <div className="absolute top-1/4 left-[33%] ">
+
+
+        <div class=" text-center ">
+	       <span className="subheading text-[#c49b63] text-[60px] leading-none" style={{ fontFamily: '"Great Vibes", cursive' }}>Testimony</span>
+	       <h2 className="mb-4 text-white text-[55px] "style={{ fontFamily: '"Josefin Sans", Arial, sans-serif' }}>CUSTOMERS SAYS</h2>
+	      </div>
+       </div>
+      
+        <div className="absolute  bottom-1 left-0 gap-0 w-full flex"> 
+         <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-1">
+        {/* {testimonials.map((t, index) => (
+          <div
+            key={index}
+            className=" bg-primary text-white p-6 rounded-lg shadow-lg flex flex-col justify-between"
+          >
+            <p className="text-sm leading-relaxed italic mb-6">{t.quote}</p>
+            <div className="flex items-center gap-3 mt-auto">
+              <img
+                src={t.image}
+                alt={t.name}
+                className="w-10 h-10 rounded-full object-cover"
+              />
+              <div>
+                <h4 className="text-sm font-semibold">{t.name}</h4>
+                <p className="text-xs opacity-80">{t.role}</p>
+              </div>
+            </div>
+          </div>
+        ))} */}
+
+
+
+        {testimonials.map((t, index) => (
+  <div
+    key={index}
+    className={`${t.className} text-white p-6 rounded-lg shadow-lg flex flex-col justify-between`}>
+    <p className="text-sm leading-relaxed italic mb-6">{t.quote}</p>
+    <div className="flex items-center gap-3 mt-auto">
+      <img
+        src={t.image}
+        alt={t.name}
+        className="w-10 h-10 rounded-full object-cover"
+      />
+      <div>
+        <h4 className="text-sm font-semibold">{t.name}</h4>
+        <p className="text-xs opacity-80">{t.role}</p>
+      </div>
+    </div>
+  </div>
+))}
+         </div>
+       </div>
+
+    
+        
+
+
+       
+       {/* <div className="absolute ">
+        <div className="bg-brimary/70 ">
+
+        </div>
+         
+
+       </div> */}
+       
+
+
+
+    </div>
+
     <div className="pt-16 md:pt-20 relative min-h-screen bg-cover bg-center bg-no-repeat bg-fixed" style={{ backgroundImage: 'url(/images/hhh.jpg)' }}>
       <div className="absolute inset-0 bg-black/70"></div>
 
