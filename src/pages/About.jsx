@@ -1,15 +1,15 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useRTL } from '../App'
 import HeroSection from './../components/HeroSection'
 import { Link } from 'react-router-dom'
-import { useEffect } from 'react';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 
 
-
+import { FaTimes, FaEnvelope, FaPhone, FaMapMarkerAlt, FaCoffee, FaUsers, FaAward, FaHeart, FaChevronDown, FaChevronUp } from 'react-icons/fa'
 
 const About = () => {
+  const [expandedFAQ, setExpandedFAQ] = useState(null);
 
   useEffect(() => {
   AOS.init({ duration: 1000 });
@@ -52,6 +52,40 @@ useEffect(() => {
 
 
   const { isArabic } = useRTL()
+
+  // Define stats object
+  const stats = {
+    customers: 1280,
+    coffees: 15000,
+    years: 6,
+    awards: 12
+  };
+
+  // Define content object for FAQ
+  const content = {
+    faq: {
+      title: isArabic ? 'الأسئلة الشائعة' : 'Frequently Asked Questions',
+      items: [
+        {
+          question: isArabic ? 'ما هي ساعات العمل؟' : 'What are your opening hours?',
+          answer: isArabic ? 'نحن مفتوحون من الساعة 7 صباحاً حتى 11 مساءً جميع أيام الأسبوع.' : 'We are open from 7 AM to 11 PM every day of the week.'
+        },
+        {
+          question: isArabic ? 'هل تقدمون قهوة خالية من الكافيين؟' : 'Do you serve decaf coffee?',
+          answer: isArabic ? 'نعم، نقدم مجموعة متنوعة من القهوة الخالية من الكافيين.' : 'Yes, we offer a variety of decaffeinated coffee options.'
+        },
+        {
+          question: isArabic ? 'هل يمكن حجز طاولة؟' : 'Can I make a reservation?',
+          answer: isArabic ? 'نعم، يمكنكم حجز طاولة عبر الهاتف أو موقعنا الإلكتروني.' : 'Yes, you can make a reservation by phone or through our website.'
+        },
+        {
+          question: isArabic ? 'هل تقدمون خدمة التوصيل؟' : 'Do you offer delivery service?',
+          answer: isArabic ? 'نعم، نقدم خدمة التوصيل المجاني للطلبات التي تزيد عن 50 ريال.' : 'Yes, we offer free delivery for orders over 50 SAR.'
+        }
+      ]
+    }
+  };
+
  const testimonials = isArabic ? [
   
   {
@@ -538,7 +572,70 @@ useEffect(() => {
         </div>
       </section> */}
 
+      {/* Statistics Section */}
+      <section className="section-padding relative z-10">
+        <div className="w-full px-6 sm:px-8 lg:px-12 max-w-7xl mx-auto">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 backdrop-blur-sm  rounded-xl p-8 border-2 border-primary/30">
+            <div className="text-center">
+              <FaUsers className="w-12 h-12 text-primary mx-auto mb-4" />
+              <div className="text-4xl font-bold text-white mb-2">{stats.customers.toLocaleString()}</div>
+              <p className="text-gray-300 arabic-body">{isArabic ? 'عميل سعيد' : 'Happy Customers'}</p>
+            </div>
+            <div className="text-center">
+              <FaCoffee className="w-12 h-12 text-primary mx-auto mb-4" />
+              <div className="text-4xl font-bold text-white mb-2">{stats.coffees.toLocaleString()}</div>
+              <p className="text-gray-300 arabic-body">{isArabic ? 'كوب قهوة' : 'Cups Served'}</p>
+            </div>
+            <div className="text-center">
+              <FaHeart className="w-12 h-12 text-primary mx-auto mb-4" />
+              <div className="text-4xl font-bold text-white mb-2">{stats.years}</div>
+              <p className="text-gray-300 arabic-body">{isArabic ? 'سنوات خبرة' : 'Years Experience'}</p>
+            </div>
+            <div className="text-center">
+              <FaAward className="w-12 h-12 text-primary mx-auto mb-4" />
+              <div className="text-4xl font-bold text-white mb-2">{stats.awards}</div>
+              <p className="text-gray-300 arabic-body">{isArabic ? 'جائزة' : 'Awards Won'}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       
+
+      {/* FAQ Section */}
+      <section className="section-padding relative z-10">
+        <div className="w-full px-6 sm:px-8 lg:px-12 max-w-4xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 arabic-heading-font text-primary">
+              {content.faq.title}
+            </h2>
+          </div>
+          
+          <div className="space-y-4">
+            {content.faq.items.map((item, index) => (
+              <div key={index} className="backdrop-blur-sm  rounded-xl border-2 border-primary/30">
+                <button
+                  className="w-full p-6 text-left flex justify-between items-center hover:bg-primary/10 transition-colors duration-300"
+                  onClick={() => setExpandedFAQ(expandedFAQ === index ? null : index)}
+                >
+                  <h3 className="text-lg font-semibold text-white arabic-heading-font">{item.question}</h3>
+                  {expandedFAQ === index ? (
+                    <FaChevronUp className="text-primary" />
+                  ) : (
+                    <FaChevronDown className="text-primary" />
+                  )}
+                </button>
+                {expandedFAQ === index && (
+                  <div className="px-6 pb-6">
+                    <p className="text-gray-300 arabic-body">{item.answer}</p>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Call to Action */}
       {/* <section className="section-padding relative z-10">
         <div className="w-full px-6 sm:px-8 lg:px-12 max-w-7xl mx-auto text-center">
@@ -552,9 +649,18 @@ useEffect(() => {
                 : 'Discover the world of coffee with us and enjoy a unique experience that combines quality and authenticity'
               }
             </p>
-            <div className="space-x-4 space-x-reverse">
-              <button className="bg-white text-primary px-8 sm:px-10 lg:px-12 py-4 sm:py-5 lg:py-6 rounded-xl hover:bg-gray-100 transition-all duration-300 font-bold shadow-lg hover:shadow-xl transform hover:-translate-y-1 text-base sm:text-lg lg:text-xl">
-                {isArabic ? 'زوروا مقهانا' : 'Visit Our Café'}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <button 
+                onClick={() => setShowContactModal(true)}
+                className="bg-white text-primary px-8 sm:px-10 lg:px-12 py-4 sm:py-5 lg:py-6 rounded-xl hover:bg-gray-100 transition-all duration-300 font-bold shadow-lg hover:shadow-xl transform hover:-translate-y-1 text-base sm:text-lg lg:text-xl"
+              >
+                {isArabic ? 'تواصل معنا' : 'Contact Us'}
+              </button>
+              <button 
+                onClick={() => setShowNewsletterModal(true)}
+                className="bg-transparent border-2 border-white text-white px-8 sm:px-10 lg:px-12 py-4 sm:py-5 lg:py-6 rounded-xl hover:bg-white hover:text-primary transition-all duration-300 font-bold shadow-lg hover:shadow-xl transform hover:-translate-y-1 text-base sm:text-lg lg:text-xl"
+              >
+                {isArabic ? 'اشترك في النشرة' : 'Subscribe Newsletter'}
               </button>
             </div>
           </div>

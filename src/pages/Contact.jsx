@@ -329,7 +329,7 @@ const Contact = () => {
 
       {/* Social Media Section */}
       <section className="py-16 relative z-10">
-        <div className="w-full px-4 md:px-6 lg:px-8 text-center backdrop-blur-sm bg-black/40 rounded-xl mx-auto max-w-4xl p-8 border-2 border-primary/30">
+        <div className="w-full px-4 md:px-6 lg:px-8 text-center backdrop-blur-sm rounded-xl mx-auto max-w-4xl p-8 border-2 border-primary/30">
           <h2 className="text-3xl font-bold mb-4 arabic-heading-font text-primary">
             {content.social.title}
           </h2>
