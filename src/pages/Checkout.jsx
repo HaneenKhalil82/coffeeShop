@@ -551,7 +551,7 @@ const Checkout = () => {
 
     <div className="pt-20 md:pt-24">
          <HeroSection
-            backgroundImage="/images/bg_3.jpg"
+            backgroundImage="/images/bg13.jpeg"
             title={isArabic ? " الدفع" : "Checkout"}
           />
     <div className="pt-16 md:pt-20 relative min-h-screen bg-cover bg-center bg-no-repeat bg-fixed" style={{ backgroundImage: 'url(/images/bg_4.jpg)' }}>

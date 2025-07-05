@@ -2,7 +2,7 @@
 import React from 'react'
 
 const HeroSection = ({
-  backgroundImage = '/images/bg_3.jpg',
+  backgroundImage = '/images/bg13.jpeg',
    overlayOpacity = 'bg-black/30',
   title = '',
 }) => {

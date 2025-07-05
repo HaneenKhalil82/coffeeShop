@@ -773,7 +773,7 @@ const content = isArabic ? {
   return (
   <div className="pt-20 md:pt-24">
      <HeroSection
-        backgroundImage="/images/bg_3.jpg"
+        backgroundImage="/images/bg13.jpeg"
         title={isArabic ? "تفاصيل المنتج" : "Product Details"}
       />
     <div className="pt-1  min-h-screen bg-cover bg-center bg-no-repeat relative" style={{ backgroundImage: 'url(/images/bg_4.jpg)' }}>

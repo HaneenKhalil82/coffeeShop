@@ -54,7 +54,7 @@ useEffect(() => {
       items: [
         {
           question: isArabic ? 'ما هي ساعات العمل؟' : 'What are your opening hours?',
-          answer: isArabic ? 'نحن مفتوحون من الساعة 7 صباحاً حتى 11 مساءً جميع أيام الأسبوع.' : 'We are open from 7 AM to 11 PM every day of the week.'
+          answer: isArabic ? 'نحن نعمل من الساعة 7 صباحاً حتى 11 مساءً جميع أيام الأسبوع.' : 'We are open from 7 AM to 11 PM every day of the week.'
         },
         {
           question: isArabic ? 'هل تقدمون قهوة خالية من الكافيين؟' : 'Do you serve decaf coffee?',
@@ -184,7 +184,7 @@ useEffect(() => {
   return (
   <div className="pt-20 md:pt-24">
      <HeroSection
-        backgroundImage="/images/bg_3.jpg"
+        backgroundImage="/images/bg13.jpeg"
         title={isArabic ? "من نحن" : "About Us"}
       />
 
