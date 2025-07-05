@@ -150,7 +150,7 @@ const Home = () => {
 
   const content = isArabic ? {
     welcome: {
-      title: 'مرحباً بكم في مقهى المزيج',
+      title: 'مرحباً بكم   ',
       description: 'نحن فخورون بتقديم أجود أنواع القهوة المحمصة طازجة يومياً. تجربة فريدة تجمع بين الطعم الأصيل والجودة العالمية.'
     },
 
@@ -162,7 +162,7 @@ const Home = () => {
     }
   } : {
     welcome: {
-      title: 'Welcome to CoffeeBlend',
+      title: 'Welcome ',
       description: 'We are proud to serve the finest coffee beans roasted fresh daily. A unique experience that combines authentic taste with world-class quality.'
     },
 

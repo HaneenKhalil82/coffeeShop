@@ -31,7 +31,7 @@ const Menu = () => {
       { id: 'breakfast', label: 'الإفطار' }
     ],
     sortOptions: [
-      { value: 'name', label: 'الاسم' },
+      { value: 'name', label: 'ترتيب حسب :الاسم' },
       { value: 'price-low', label: 'السعر: من الأقل إلى الأعلى' },
       { value: 'price-high', label: 'السعر: من الأعلى إلى الأقل' },
       { value: 'popular', label: 'الأكثر شعبية' }
@@ -727,7 +727,7 @@ const Menu = () => {
                       
                       <div className="flex justify-between items-center mb-3">
                         <span className="text-2xl font-bold text-primary">
-                          ${item.price}
+                          {item.price}
                         </span>
                         <span className="text-sm text-gray-400">
                           {item.calories} {content.calories}

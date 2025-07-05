@@ -155,11 +155,11 @@ const ProductsSection = () => {
                   {/* Price */}
                   <div className="flex items-center justify-center space-x-2 space-x-reverse">
                     <span className="text-white text-4xl font-bold">
-                      ${product.price}.00
+                      {product.price}.00
                     </span>
                     {product.originalPrice && (
                       <span className="text-gray-400 text-2xl line-through">
-                        ${product.originalPrice}.00
+                        {product.originalPrice}.00
                       </span>
                     )}
                   </div>
