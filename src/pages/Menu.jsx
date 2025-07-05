@@ -304,65 +304,67 @@ const Menu = () => {
     <div className="pt-16 md:pt-20 relative min-h-screen bg-cover bg-center bg-no-repeat bg-fixed" style={{ backgroundImage: 'url(/images/bg_4.jpg)' }}>
       <div className="absolute inset-0 "></div>
 
-      {/* Menu Categories */}
-      <section className="py-8 bg-black/40 backdrop-blur-sm border-b border-gray-700/50 relative">
-        <div className="w-full px-4 md:px-6 lg:px-8">
-          <div className="flex flex-wrap justify-center gap-4">
-            {content.categories.map((category) => (
-              <button
-                key={category.id}
-                onClick={() => setActiveCategory(category.id)}
-                className={`px-6 py-3 rounded-full transition-all duration-300 arabic-body backdrop-blur-sm ${
-                  activeCategory === category.id
-                    ? 'bg-primary text-white shadow-lg'
-                    : 'bg-white/10 text-white hover:bg-white/20 border border-white/20'
-                }`}
-              >
-                {category.label}
-              </button>
-            ))}
-          </div>
-        </div>
-      </section>
+   {/* Menu Categories */}
+  <section className="py-8 backdrop-blur-sm border-gray-700/50 relative">
+   <div className="w-full px-4 md:px-6 lg:px-8">
+    <div className="flex flex-wrap justify-center gap-8">
+      {content.categories.map((category) => (
+        <button
+          key={category.id}
+          onClick={() => setActiveCategory(category.id)}
+          className={`px-6 py-3 transition-all duration-300 arabic-body backdrop-blur-sm border-b-2 border-[#c49b63] 
+            ${
+              activeCategory === category.id
+                ? "bg-[#c49b63] text-[#3B3737]  "
+                : "text-primary  hover:bg-[#c49b63] hover:text-[#3B3737]"
+            }`}
+        >
+          {category.label}
+        </button>
+      ))}
+    </div>
+  </div>
+</section>
+
 
       {/* Menu Items */}
-      <section className="section-padding relative">
-        <div className="w-full px-4 md:px-6 lg:px-8">
+      {/* <section className="section-padding relative w-[90%] m-2 mt-1">
+        <div className="w-full px-4 md:px-6 lg:px-8 ">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {content.menuItems[activeCategory]?.map((item, index) => (
-              <div key={index} className="text-center group">
+              <div key={index} className="text-center group"> */}
                 {/* Clickable Card Content */}
-                <Link to={`/product/${item.id}`} className="block cursor-pointer">
+                {/* <Link to={`/product/${item.id}`} className="block cursor-pointer"> */}
                   {/* Image */}
-                  <div className="relative mb-12 overflow-hidden rounded-lg">
+                  {/* <div className="relative mb-9 overflow-hidden rounded-lg">
                     <img
                       src={item.image}
                       alt={item.name}
-                      className="w-full h-96 object-cover transition-transform duration-300 group-hover:scale-105"
+                      className="w-full h-60 object-cover transition-transform duration-300 group-hover:scale-105"
                     />
-                  </div>
+                  </div> */}
                   
                   {/* Content */}
-                  <div className="space-y-10 pb-6">
+                  {/* <div className="space-y-10 pb-6"> */}
                     {/* Product Name */}
-                    <h3 className="text-white text-3xl font-semibold uppercase tracking-wide arabic-heading-font hover:text-primary transition-colors duration-300">
+                    {/* <h3 className="text-white text-3xl font-semibold uppercase tracking-wide arabic-heading-font hover:text-primary transition-colors duration-300">
                       {item.name}
-                    </h3>
+                    </h3> */}
                     
                     {/* Description */}
-                    <p className="text-gray-300 text-xl leading-relaxed arabic-body px-8">
+                    {/* <p className="text-gray-300 text-xl leading-relaxed arabic-body px-8">
                       {item.description}
-                    </p>
+                    </p> */}
                     
                     {/* Price */}
-                    <div className="text-white text-4xl font-bold py-6">
+                    {/* <div className="text-white text-4xl font-bold py-6">
                       ${item.price}.00
                     </div>
                   </div>
-                </Link>
+                </Link> */}
                 
                 {/* Add to Cart Button - Outside the Link */}
-                <button 
+                {/* <button 
                   onClick={(e) => {
                     e.preventDefault()
                     e.stopPropagation()
@@ -376,7 +378,61 @@ const Menu = () => {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
+
+
+
+      <section className="section-padding relative w-[90%] justify-center mx-auto mt-[-60px]">
+  <div className="w-full px-4 md:px-6 lg:px-8">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6  gap-y-14">
+      {content.menuItems[activeCategory]?.map((item, index) => (
+        <div key={index} className="text-center group">
+          <Link to={`/product/${item.id}`} className="block cursor-pointer">
+            {/* Image */}
+            <div className="relative mb-3 overflow-hidden rounded-lg">
+              <img
+                src={item.image}
+                alt={item.name}
+                className="w-full h-60 object-cover transition-transform duration-300 group-hover:scale-105"
+              />
+            </div>
+
+            {/* Content */}
+            <div className="space-y-6 pb-4 mb-1">
+              {/* Product Name */}
+              <h3 className="text-white text-xl font-semibold uppercase tracking-wide arabic-heading-font hover:text-primary transition-colors duration-300">
+                {item.name}
+              </h3>
+
+              {/* Description */}
+              <p className="text-gray-400 text-sm leading-relaxed arabic-body px-2">
+                {item.description}
+              </p>
+
+              {/* Price */}
+              <div className="text-white text-xl  mt-0">
+                ${item.price}.00
+              </div>
+            </div>
+          </Link>
+
+          {/* Add to Cart Button */}
+          <button 
+            onClick={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+              handleAddToCart(item)
+            }}
+            className="border-2 border-primary text-primary px-3 py-2 text-sm font-medium uppercase tracking-wide hover:bg-primary hover:text-white transition-all duration-300 rounded-sm backdrop-blur-sm"
+          >
+            {content.addToCartButton}
+          </button>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
 
       {/* Call to Action */}
       <section className="py-16 bg-black/40 backdrop-blur-sm relative">
