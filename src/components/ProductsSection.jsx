@@ -107,8 +107,8 @@ const ProductsSection = () => {
   }
 
   return (
-    <section className="section-padding bg-cover bg-center bg-no-repeat relative" style={{ backgroundImage: 'url(/images/hhh.jpg)' }}>
-      <div className="absolute inset-0 bg-gray-900/70"></div>
+    <section className="section-padding bg-cover bg-center bg-no-repeat relative" style={{ backgroundImage: 'url(/images/bg_4.jpg)' }}>
+      <div className="absolute inset-0"></div>
       <div className="w-full px-4 md:px-6 lg:px-8 relative z-10">
         {/* Section Header */}
         <div className="text-center mb-16">

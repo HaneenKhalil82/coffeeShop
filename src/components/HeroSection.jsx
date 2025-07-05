@@ -2,13 +2,13 @@
 import React from 'react'
 
 const HeroSection = ({
-  backgroundImage = '/images/bg_3.jpg',
+  backgroundImage = '/images/bg13.jpeg',
    overlayOpacity = 'bg-black/30',
   title = '',
 }) => {
   return (
     <section
-      className="relative bg-cover  bg-fixed h-screen overflow-hidden flex items-center justify-center text-center text-white"
+      className="relative bg-cover  bg-fixed h-screen overflow-hidden flex items-center justify-center text-center text-[#c49b63]"
       style={{
         
         backgroundImage: `url(${backgroundImage})`,

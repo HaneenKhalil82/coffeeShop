@@ -129,7 +129,7 @@ const Home = () => {
       ]
     },
     {
-      image: '/images/hhh.jpg',
+      image: '/images/bg_4.jpg',
       subtitle: 'Complete Experience',
       title: 'From Coffee to Delicious Desserts',
       description: 'Wide selection of hot and cold beverages with the most delicious desserts and pastries',
@@ -187,8 +187,8 @@ const Home = () => {
       />
 
       {/* Welcome Section */}
-      <section className="py-16 bg-cover bg-center bg-no-repeat relative" style={{ backgroundImage: 'url(/images/hhh.jpg)' }}>
-        <div className="absolute inset-0 bg-gray-900/70"></div>
+      <section className="py-16 bg-cover bg-center bg-no-repeat relative" style={{ backgroundImage: 'url(/images/bg_4.jpg)' }}>
+        <div className="absolute inset-0 "></div>
         <div className="w-full px-4 md:px-6 lg:px-8 relative z-10">
           <div className="text-center">
             <h2 className="text-3xl font-bold mb-8 arabic-heading-font text-primary">
@@ -207,8 +207,8 @@ const Home = () => {
       <ProductsSection />
 
       {/* About Preview Section */}
-      <section className="section-padding bg-cover bg-center bg-no-repeat relative" style={{ backgroundImage: 'url(/images/hhh.jpg)' }}>
-        <div className="absolute inset-0 bg-gray-900/70"></div>
+      <section className="section-padding bg-cover bg-center bg-no-repeat relative" style={{ backgroundImage: 'url(/images/bg_4.jpg)' }}>
+        <div className="absolute inset-0 "></div>
         <div className="w-full px-4 md:px-6 lg:px-8 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="rounded-lg overflow-hidden">
