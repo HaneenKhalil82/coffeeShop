@@ -75,37 +75,37 @@ useEffect(() => {
  const testimonials = isArabic ? [
   
   {
-    quote: "““Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life One day however a small.””",
-    name: "Louise Kelly",
-    role: "Illustrator Designer",
-    image: "/images/person_3.jpg",
+    quote: "“يقدم المقهى مجموعة متنوعة من المشروبات الساخنة والباردة، بما في ذلك القهوة بأنواعها، والشاي، والعصائر، والمشروبات الغازية. كما يقدم وجبات خفيفة، بالإضافة إلى الحلويات اللذيذة..”",
+    name: "Yasein Mohamed",
+    role: " Designer",
+    image: "/images/rev1.jpg",
     className: "bg-primary w-[250px] h-[250px] mt-80"
   },
   {
-    quote: "“Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life One day however a small line of blind text by the name of Lorem Ipsum decided to leave for the far World of Grammar.”",
-    name: "Louise Kelly",
+    quote: "“جودة القهوة ممتازة، ويتم تحضيرها بعناية فائقة. المكونات المستخدمة طازجة وعالية الجودة,تعتبر الأسعار معقولة ومناسبة للقيمة التي يقدمها المقهى.تجربتي بدأت مع اللاتيه بالفانيليا، وكان رائعًا! المذاق متوازن والقهوة محمصة بشكل ممتاز.”",
+    name: "Hamza Mahmoud",
     role: "Illustrator Designer",
-    image: "/images/person_2.jpg",
+    image: "/images/rev2.jpg",
     className: "bg-primary/90 w-[250px] h-[300px] mt-[270px]"
   },
   {
-    quote: "“Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life One day however a small  line of blind text by the name.”",
-    name: "Louise Kelly",
-    role: "Illustrator Designer",
+    quote: "“الخدمة سريعة وودودة، والعاملون مدربون جيدًا ويتعاملون مع الزبائن بلطف واحترافية.لديهم تنوّع كبير في المشروبات الساخنة والباردة، مع خيارات نباتية أيضًا.”",
+    name: "Tena Goreg",
+    role: " Designer",
     image: "/images/rev3.jpg",
    className: "bg-primary w-[250px] h-[250px] mt-80"
   },
   {
-    quote: "“Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life One day however a small  line of blind text by the name.”",
-    name: "Louise Kelly",
-    role: "Illustrator Designer",
+    quote: "“يتميز المقهى بجو مريح وهادئ، مما يجعله مكانًا مثاليًا للاسترخاء والاجتماع مع الأصدقاء أو لقضاء بعض الوقت بمفردك.الخدمة ممتازة، الموظفون بشوشين وسريعين في تلبية الطلبات. ما فيش تأخير، والمكان بيحترم الخصوصية، سواء جاي تشتغل أو تقابل أصدقاء.”",
+    name: "Abdallah Mohameed",
+    role: " Designer",
     image: "/images/quote_img.png",
     className: "bg-primary/90 w-[250px] h-[300px] mt-[270px]"
   },
   {
-    quote: "“Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life One day however.”",
-    name: "Louise Kelly",
-    role: "Illustrator Designer",
+    quote: "“بمجرد دخولك إلى الكافيه، تستقبلك رائحة البن الطازج والموسيقى الهادئة التي تُضفي أجواءً من الاسترخاء. التصميم الداخلي أنيق جدًا، الإضاءة دافئة، والمكان نظيف ومنظم.”",
+    name: "Mohamed Ali",
+    role: "Designer",
     image: "/images/person_4.jpg",
     className: "bg-primary w-[250px] h-[250px] mt-80"
     
@@ -180,6 +180,19 @@ useEffect(() => {
         paragraph:
           'Our journey began in 2018 with a simple dream: to serve the best coffee in the region. We started with a deep passion for coffee and a belief that a good cup of coffee can change someone\'s day.We carefully select our coffee beans from the finest farms around the world. Every coffee bean goes through a rigorous inspection process to ensure high quality. We roast our coffee daily to guarantee fresh taste and aromatic fragrance.Our café is not just a place to serve coffee, but a small community that brings together coffee lovers and those who appreciate peaceful atmospheres. We believe in the importance of creating a safe and comfortable space where people can relax, work, and connect.'
       }
+
+
+
+
+
+
+
+
+
+
+
+
+      
  
   return (
   <div className="pt-20 md:pt-24">

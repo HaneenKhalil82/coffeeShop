@@ -781,7 +781,7 @@ const content = isArabic ? {
       <div className="w-md px-4 md:px-6 lg:px-8 section-padding relative z-10 mt-0">
         
         {/* Breadcrumb */}
-        <nav className="mb-8">
+        {/* <nav className="mb-8">
           <div className="flex items-center space-x-2 space-x-reverse text-white">
             <Link to="/" className="hover:text-primary transition-colors arabic-body">
               {content.breadcrumb.home}
@@ -793,7 +793,7 @@ const content = isArabic ? {
             <span>/</span>
             <span className="text-primary arabic-body">{content.breadcrumb.product}</span>
           </div>
-        </nav>
+        </nav> */}
 
         {/* Product Details - All in One Block */}
         <div className="rounded-lg shadow-lg overflow-hidden max-w-7xl mx-auto bg-cover bg-center bg-no-repeat relative" >
