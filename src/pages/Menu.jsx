@@ -567,7 +567,7 @@ const Menu = () => {
   }, [showToast])
 
   return (
-    <div className="pt-20 md:pt-24">
+    <div className="pt-20 md:pt-24 ">
       <HeroSection
         backgroundImage="/images/bg13.jpeg"
         title={content.title}
@@ -576,7 +576,160 @@ const Menu = () => {
       <div className="relative min-h-screen bg-cover bg-center bg-no-repeat bg-fixed" style={{ backgroundImage: 'url(/images/bg_4.jpg)' }}>
         <div className="absolute inset-0 "></div>
         
-        {/* Toast Notification */}
+       
+    {/* Static Menu Section Like Image */}
+     <section className={` relative  z-10 ${isArabic ? 'text-left' : 'text-right'}`}>
+     <div className="max-w-6xl mx-auto px-4 md:px-6 lg:px-8  rounded-2xl p-8 shadow-lg">
+       <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+      
+      {/* Starters */}
+      <div>
+        <h2 className="text-2xl font-bold text-white mb-6">{isArabic ? 'المقبلات' : 'STARTER'}</h2>
+        {[
+          { name: isArabic ? 'ماكريل كورنيش' : 'Cornish - Mackerel', price: 20, image: '/images/dish-6.jpg' },
+          { name: isArabic ? 'شريحة لحم مشوية' : 'Roasted Steak', price: 29, image: '/images/dish-5.jpg' },
+          { name: isArabic ? 'شوربة موسمية' : 'Seasonal Soup', price: 20, image: '/images/dish-3.jpg' },
+          { name: isArabic ? 'كاري الدجاج' : 'Chicken Curry', price: 20, image: '/images/dish-2.jpg' },
+        ].map((item, index) => (
+       <div
+        key={index}
+       className={`flex items-center justify-between gap-4 py-4 ${isArabic ? 'flex-row text-left' : 'flex-row-reverse text-right'}`}>
+       {/* الصورة */}
+         <img
+       src={item.image}
+       alt={item.name}
+      className="w-16 h-16 object-cover rounded-full border border-gray-500"
+       />
+
+  {/* النص */}
+  <div className="flex-1 px-2">
+    <h4 className="text-white font-medium">{item.name}</h4>
+    <p className="text-gray-400 text-sm">
+      {isArabic
+        ? 'نهر صغير يُدعى دودن يمر بجوار المكان ويمدهم بالمستلزمات'
+        : 'A small river named Duden flows by their place and supplies'}
+    </p>
+  </div>
+
+     {/* السعر */}
+    <div className="text-white font-semibold min-w-[60px] text-center">
+    ${item.price.toFixed(2)}
+     </div>
+   </div>
+
+        ))}
+        
+      </div>
+
+      {/* Main Dishes */}
+      <div>
+        <h2 className="text-2xl font-bold text-white mb-6">{isArabic ? 'الأطباق الرئيسية' : 'MAIN DISH'}</h2>
+        {[
+          { name: isArabic ? 'سلمون البحر' : 'Sea Trout', price: 49.91, image: '/images/dish-7.jpg' },
+          { name: isArabic ? 'لحم بقري مشوي' : 'Roasted Beef', price: 20, image: '/images/dish-2.jpg' },
+          { name: isArabic ? 'دجاج مقلي بالزبدة' : 'Butter Fried Chicken', price: 20, image: '/images/dish-1.jpg' },
+          { name: isArabic ? 'فيليه دجاج' : 'Chicken Filet', price: 20, image: '/images/dish-3.jpg' },
+        ].map((item, index) => (
+          <div key={index} 
+           className={`flex items-center justify-between gap-4 py-4 ${isArabic ? 'flex-row text-left' : 'flex-row-reverse text-right'}`}>
+          
+            <img
+              src={item.image}
+              alt={item.name}
+              className="w-16 h-16 object-cover rounded-full border border-gray-500"
+            />
+            <div className="flex-1">
+              <h4 className="text-white font-medium">{item.name}</h4>
+              <p className="text-gray-400 text-sm">
+                {isArabic ? 'نهر صغير يُدعى دودن يمر بجوار المكان ويمدهم بالمستلزمات' : 'A small river named Duden flows by their place and supplies'}
+              </p>
+            </div>
+            <div className="text-white font-semibold">${item.price.toFixed(2)}</div>
+          </div>
+        ))}
+        </div>
+
+      </div>
+     </div>
+    </section>
+
+
+     <section className={`py-1 relative mb-5 z-10 ${isArabic ? 'text-left' : 'text-right'}`}>
+     <div className="max-w-6xl mx-auto px-4 md:px-6 lg:px-8  rounded-2xl p-8 shadow-lg">
+       <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+      
+      {/* Starters */}
+      <div>
+        <h2 className="text-2xl font-bold text-white mb-6">{isArabic ? 'المقبلات' : 'STARTER'}</h2>
+        {[
+          { name: isArabic ? 'ماكريل كورنيش' : 'Cornish - Mackerel', price: 20, image: '/images/dish-6.jpg' },
+          { name: isArabic ? 'شريحة لحم مشوية' : 'Roasted Steak', price: 29, image: '/images/dish-5.jpg' },
+          { name: isArabic ? 'شوربة موسمية' : 'Seasonal Soup', price: 20, image: '/images/dish-3.jpg' },
+          { name: isArabic ? 'كاري الدجاج' : 'Chicken Curry', price: 20, image: '/images/dish-2.jpg' },
+        ].map((item, index) => (
+       <div
+        key={index}
+       className={`flex items-center justify-between gap-4 py-4 ${isArabic ? 'flex-row text-left' : 'flex-row-reverse text-right'}`}>
+       {/* الصورة */}
+         <img
+       src={item.image}
+       alt={item.name}
+      className="w-16 h-16 object-cover rounded-full border border-gray-500"
+       />
+
+  {/* النص */}
+  <div className="flex-1 px-2">
+    <h4 className="text-white font-medium">{item.name}</h4>
+    <p className="text-gray-400 text-sm">
+      {isArabic
+        ? 'نهر صغير يُدعى دودن يمر بجوار المكان ويمدهم بالمستلزمات'
+        : 'A small river named Duden flows by their place and supplies'}
+    </p>
+  </div>
+
+     {/* السعر */}
+    <div className="text-white font-semibold min-w-[60px] text-center">
+    ${item.price.toFixed(2)}
+     </div>
+   </div>
+
+        ))}
+        
+      </div>
+
+      {/* Main Dishes */}
+      <div>
+        <h2 className="text-2xl font-bold text-white mb-6">{isArabic ? 'الأطباق الرئيسية' : 'MAIN DISH'}</h2>
+        {[
+          { name: isArabic ? 'سلمون البحر' : 'Sea Trout', price: 49.91, image: '/images/dish-7.jpg' },
+          { name: isArabic ? 'لحم بقري مشوي' : 'Roasted Beef', price: 20, image: '/images/dish-2.jpg' },
+          { name: isArabic ? 'دجاج مقلي بالزبدة' : 'Butter Fried Chicken', price: 20, image: '/images/dish-1.jpg' },
+          { name: isArabic ? 'فيليه دجاج' : 'Chicken Filet', price: 20, image: '/images/dish-3.jpg' },
+        ].map((item, index) => (
+          <div key={index} 
+           className={`flex items-center justify-between gap-4 py-4 ${isArabic ? 'flex-row text-left' : 'flex-row-reverse text-right'}`}>
+          
+            <img
+              src={item.image}
+              alt={item.name}
+              className="w-16 h-16 object-cover rounded-full border border-gray-500"
+            />
+            <div className="flex-1">
+              <h4 className="text-white font-medium">{item.name}</h4>
+              <p className="text-gray-400 text-sm">
+                {isArabic ? 'نهر صغير يُدعى دودن يمر بجوار المكان ويمدهم بالمستلزمات' : 'A small river named Duden flows by their place and supplies'}
+              </p>
+            </div>
+            <div className="text-white font-semibold">${item.price.toFixed(2)}</div>
+          </div>
+        ))}
+      </div>
+
+    </div>
+  </div>
+</section>
+
+ {/* Toast Notification */}
         {showToast && (
           <div className="fixed top-24 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-bounce">
             {toastMessage}
@@ -592,11 +745,12 @@ const Menu = () => {
                 <div className="relative">
                   <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                   <input
+                    
                     type="text"
                     placeholder={content.search}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent"
+                    className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-800 focus:ring-2 focus:ring-primary focus:border-transparent bg-[#3B3737] "
                   />
                 </div>
 
@@ -606,7 +760,7 @@ const Menu = () => {
                   <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent appearance-none"
+                    className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-800 focus:ring-2 focus:ring-primary focus:border-transparent appearance-none bg-[#3B3737] text-gray-400"
                   >
                     {content.sortOptions.map(option => (
                       <option key={option.value} value={option.value}>
@@ -649,6 +803,8 @@ const Menu = () => {
           </div>
         </section>
 
+
+
         {/* Category Tabs */}
         <section className="py-4 relative z-10">
           <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
@@ -669,6 +825,7 @@ const Menu = () => {
             </div>
           </div>
         </section>
+
 
         {/* Menu Items Grid */}
         <section className="py-8 relative z-10">
