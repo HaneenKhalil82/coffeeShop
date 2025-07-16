@@ -249,7 +249,7 @@ const Contact = () => {
                     value={formData.name}
                     onChange={handleInputChange}
                     placeholder={content.form.placeholders.name}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors duration-300 arabic-body"
+                    className="w-full px-4 py-3 border border-gray-800 rounded-lg  transition-colors duration-300 arabic-body bg-[#3B3737]"
                     required
                   />
                 </div>
@@ -265,7 +265,7 @@ const Contact = () => {
                       value={formData.email}
                       onChange={handleInputChange}
                       placeholder={content.form.placeholders.email}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors duration-300 arabic-body"
+                      className="w-full px-4 py-3 border border-gray-800 rounded-lg  transition-colors duration-300 arabic-body bg-[#3B3737]"
                       required
                     />
                   </div>
@@ -280,7 +280,7 @@ const Contact = () => {
                       value={formData.phone}
                       onChange={handleInputChange}
                       placeholder={content.form.placeholders.phone}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors duration-300 arabic-body"
+                      className="w-full px-4 py-3 border border-gray-800 rounded-lg  transition-colors duration-300 arabic-body bg-[#3B3737]"
                     />
                   </div>
                 </div>
@@ -295,7 +295,7 @@ const Contact = () => {
                     value={formData.subject}
                     onChange={handleInputChange}
                     placeholder={content.form.placeholders.subject}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors duration-300 arabic-body"
+                    className="w-full px-4 py-3 border border-gray-800 rounded-lg  transition-colors duration-300 arabic-body bg-[#3B3737]"
                     required
                   />
                 </div>
@@ -310,7 +310,7 @@ const Contact = () => {
                     onChange={handleInputChange}
                     placeholder={content.form.placeholders.message}
                     rows={5}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors duration-300 arabic-body resize-none"
+                    className="w-full px-4 py-3 border border-gray-800 rounded-lg  transition-colors duration-300 arabic-body bg-[#3B3737]"
                     required
                   />
                 </div>

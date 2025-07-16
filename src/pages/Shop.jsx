@@ -1,43 +1,14 @@
-// import React from 'react'
-// import { useRTL } from '../App'
-// import HeroSection from './../components/HeroSection'
-// // import Menu from './../pages/Menu'
-
-
-// const Shop = () => {
-
-//   const { isArabic } = useRTL()
-
-
-
-//   return (
-  
-//  <div >
-//          <HeroSection 
-//               backgroundImage="/images/cart1.jpg"
-//              title={isArabic ? "المتجر " : "Shop"}
-//          />
-
-
-        
-//  </div>
-//   )
-// }
-
-// export default Shop 
-
-
-
-
-
-
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { FaSearch, FaFilter, FaSort, FaStar, FaPlus, FaMinus, FaTimes, FaShoppingCart } from 'react-icons/fa'
 import { useRTL, useCart } from '../App'
 import HeroSection from './../components/HeroSection'
+import { useAuth } from '../contexts/AuthContext'
+import { useNavigate } from 'react-router-dom'
 
 const Shop = () => {
+  const { user } = useAuth()
+  const navigate = useNavigate()
   const { isArabic } = useRTL()
   const { addToCart } = useCart()
   const [activeCategory, setActiveCategory] = useState('all')
@@ -557,19 +528,39 @@ const Shop = () => {
     }
   })
 
+  // const handleAddToCart = (item, quantity = 1) => {
+  //   setLoading(true)
+  //   setTimeout(() => {
+  //     for (let i = 0; i < quantity; i++) {
+  //       addToCart(item)
+  //     }
+  //     setToastMessage(isArabic ? `تم إضافة ${item.name} إلى السلة` : `${item.name} added to cart`)
+  //     setShowToast(true)
+  //     setLoading(false)
+  //     setShowItemModal(false)
+  //     setItemQuantity(1)
+  //   }, 500)
+  // }
+
   const handleAddToCart = (item, quantity = 1) => {
-    setLoading(true)
-    setTimeout(() => {
-      for (let i = 0; i < quantity; i++) {
-        addToCart(item)
-      }
-      setToastMessage(isArabic ? `تم إضافة ${item.name} إلى السلة` : `${item.name} added to cart`)
-      setShowToast(true)
-      setLoading(false)
-      setShowItemModal(false)
-      setItemQuantity(1)
-    }, 500)
+  if (!user) {
+    navigate('/login')
+    return
   }
+
+  setLoading(true)
+  setTimeout(() => {
+    for (let i = 0; i < quantity; i++) {
+      addToCart(item)
+    }
+    setToastMessage(isArabic ? `تم إضافة ${item.name} إلى السلة` : `${item.name} added to cart`)
+    setShowToast(true)
+    setLoading(false)
+    setShowItemModal(false)
+    setItemQuantity(1)
+  }, 500)
+}
+
 
   const openItemModal = (item) => {
     setSelectedItem(item)

@@ -3,8 +3,15 @@ import { Link } from 'react-router-dom'
 import { FaSearch, FaFilter, FaSort, FaStar, FaPlus, FaMinus, FaTimes, FaShoppingCart } from 'react-icons/fa'
 import { useRTL, useCart } from '../App'
 import HeroSection from './../components/HeroSection'
+import { useAuth } from '../contexts/AuthContext'
+import { useNavigate } from 'react-router-dom'
+
+
 
 const Menu = () => {
+  const { isAuthenticated } = useAuth()
+  const navigate = useNavigate()
+
   const { isArabic } = useRTL()
   const { addToCart } = useCart()
   const [activeCategory, setActiveCategory] = useState('all')
@@ -524,25 +531,46 @@ const Menu = () => {
     }
   })
 
+  // const handleAddToCart = (item, quantity = 1) => {
+  //   setLoading(true)
+  //   setTimeout(() => {
+  //     for (let i = 0; i < quantity; i++) {
+  //       addToCart(item)
+  //     }
+  //     setToastMessage(isArabic ? `تم إضافة ${item.name} إلى السلة` : `${item.name} added to cart`)
+  //     setShowToast(true)
+  //     setLoading(false)
+  //     setShowItemModal(false)
+  //     setItemQuantity(1)
+  //   }, 500)
+  // }
+
+
   const handleAddToCart = (item, quantity = 1) => {
-    setLoading(true)
-    setTimeout(() => {
-      for (let i = 0; i < quantity; i++) {
-        addToCart(item)
-      }
-      setToastMessage(isArabic ? `تم إضافة ${item.name} إلى السلة` : `${item.name} added to cart`)
-      setShowToast(true)
-      setLoading(false)
-      setShowItemModal(false)
-      setItemQuantity(1)
-    }, 500)
+  if (!isAuthenticated) {
+    navigate("/login")
+    return
   }
 
-  const openItemModal = (item) => {
-    setSelectedItem(item)
-    setShowItemModal(true)
+  setLoading(true)
+  setTimeout(() => {
+    for (let i = 0; i < quantity; i++) {
+      addToCart(item)
+    }
+    setToastMessage(isArabic ? `تم إضافة ${item.name} إلى السلة` : `${item.name} added to cart`)
+    setShowToast(true)
+    setLoading(false)
+    setShowItemModal(false)
     setItemQuantity(1)
-  }
+  }, 500)
+}
+
+
+  // const openItemModal = (item) => {
+  //   setSelectedItem(item)
+  //   setShowItemModal(true)
+  //   setItemQuantity(1)
+  // }
 
   const closeItemModal = () => {
     setShowItemModal(false)
@@ -900,12 +928,12 @@ const Menu = () => {
                           <FaShoppingCart className="w-4 h-4 mr-2" />
                           {content.addToCart}
                         </button>
-                        <button
+                        {/* <button
                           onClick={() => openItemModal(item)}
                           className="px-4 py-2 border-2 border-primary text-white rounded-lg hover:bg-primary hover:text-white transition-colors duration-300"
                         >
                           <FaPlus className="w-4 h-4" />
-                        </button>
+                        </button> */}
                       </div>
                     </div>
                   </div>

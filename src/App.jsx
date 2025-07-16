@@ -7,13 +7,13 @@ import Menu from './pages/Menu'
 import About from './pages/About'
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
-// import { useAuth } from "./contexts/AuthContext";
 import Shop from './pages/Shop'
 import Contact from './pages/Contact'
 import Cart from './pages/Cart'
 import Checkout from './pages/Checkout'
 import ProductSingle from './pages/ProductSingle'
 import './App.css'
+import RequireAuth from "./contexts/RequireAuth";
 
 // RTL Context
 const RTLContext = createContext()
@@ -132,6 +132,7 @@ function App() {
 
             <main>
               <Routes>
+                
                 <Route path="/" element={<Home />} />
                 <Route path= '/login' element= {<Login /> }/>
                 <Route path= "/SignUp" element={<SignUp /> }/>
@@ -140,8 +141,17 @@ function App() {
                 <Route path="/shop" element={<Shop />} />
                 <Route path="/product/:id" element={<ProductSingle />} />
                 <Route path="/contact" element={<Contact />} />
-                <Route path="/cart" element={<Cart />} />
-                <Route path="/checkout" element={<Checkout />} />
+                <Route path="/cart" element={ 
+                  <RequireAuth>
+                  <Cart />
+                  </RequireAuth>
+                  } />
+                <Route path="/checkout" element={  
+                 <RequireAuth>
+                 <Checkout />
+                </RequireAuth>
+                 } />
+                
               </Routes>
             </main>
             <Footer />

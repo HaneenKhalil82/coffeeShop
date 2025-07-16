@@ -4,6 +4,9 @@ import { FaPlus, FaMinus, FaTrash, FaShoppingBag, FaArrowLeft, FaArrowRight, FaT
 import { useCart, useRTL } from '../App'
 import HeroSection from './../components/HeroSection'
 
+
+
+
 // Toast Notification Component
 const Toast = ({ message, type, onClose }) => {
   useEffect(() => {
