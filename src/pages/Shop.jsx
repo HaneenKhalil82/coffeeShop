@@ -5,6 +5,9 @@ import { useRTL, useCart } from '../App'
 import HeroSection from './../components/HeroSection'
 import { useAuth } from '../contexts/AuthContext'
 import { useNavigate } from 'react-router-dom'
+// import { allProducts } from '../contexts/productData';
+
+
 
 const Shop = () => {
   const { user } = useAuth()
@@ -21,6 +24,7 @@ const Shop = () => {
   const [loading, setLoading] = useState(false)
   const [showToast, setShowToast] = useState(false)
   const [toastMessage, setToastMessage] = useState('')
+  // const product = allProducts.find((item) => item.id === parseInt(id)) || allProducts[0];
 
   const content = isArabic ? {
     title: 'قائمة الطعام',
@@ -528,19 +532,6 @@ const Shop = () => {
     }
   })
 
-  // const handleAddToCart = (item, quantity = 1) => {
-  //   setLoading(true)
-  //   setTimeout(() => {
-  //     for (let i = 0; i < quantity; i++) {
-  //       addToCart(item)
-  //     }
-  //     setToastMessage(isArabic ? `تم إضافة ${item.name} إلى السلة` : `${item.name} added to cart`)
-  //     setShowToast(true)
-  //     setLoading(false)
-  //     setShowItemModal(false)
-  //     setItemQuantity(1)
-  //   }, 500)
-  // }
 
   const handleAddToCart = (item, quantity = 1) => {
   if (!user) {
@@ -562,11 +553,11 @@ const Shop = () => {
 }
 
 
-  const openItemModal = (item) => {
-    setSelectedItem(item)
-    setShowItemModal(true)
-    setItemQuantity(1)
-  }
+  // const openItemModal = (item) => {
+  //   setSelectedItem(item)
+  //   setShowItemModal(true)
+  //   setItemQuantity(1)
+  // }
 
   const closeItemModal = () => {
     setShowItemModal(false)
@@ -697,7 +688,7 @@ const Shop = () => {
         </section>
 
 
-        {/* Menu Items Grid */}
+         {/* Menu Items Grid */}
         <section className="py-8 relative z-10">
           <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
             {sortedItems.length === 0 ? (
@@ -721,6 +712,7 @@ const Shop = () => {
                     className="border-2 border-primary backdrop-blur-sm rounded-xl overflow-hidden hover:border-primary/80 transition-all duration-300 group"
                   >
                     <div className="relative">
+                     <Link to={`/product/${item.id}`}>
                       <img
                         src={item.image}
                         alt={item.name}
@@ -728,7 +720,10 @@ const Shop = () => {
                         onError={(e) => {
                           e.target.src = '/images/menu1.jpg'
                         }}
-                      />
+                       />
+                       </Link>
+
+                    
                       {item.popular && (
                         <div className="absolute top-2 right-2 bg-primary text-white px-2 py-1 rounded-full text-xs font-medium flex items-center">
                           <FaStar className="w-3 h-3 mr-1" />
@@ -739,9 +734,11 @@ const Shop = () => {
                     
                     <div className="p-4">
                       <div className="flex justify-between items-start mb-2">
-                        <h3 className="text-lg font-semibold text-white group-hover:text-primary transition-colors duration-300">
-                          {item.name}
-                        </h3>
+                        <Link to={`/product/${item.id}`} className="text-lg font-semibold text-white group-hover:text-primary transition-colors duration-300">
+                           {isArabic ? item.name_ar : item.name_en}
+                        </Link>
+
+
                         <div className="flex items-center text-yellow-400">
                           <FaStar className="w-4 h-4 mr-1" />
                           <span className="text-sm text-gray-300">{item.rating}</span>
@@ -770,12 +767,12 @@ const Shop = () => {
                           <FaShoppingCart className="w-4 h-4 mr-2" />
                           {content.addToCart}
                         </button>
-                        <button
+                        {/* <button
                           onClick={() => openItemModal(item)}
                           className="px-4 py-2 border-2 border-primary text-white rounded-lg hover:bg-primary hover:text-white transition-colors duration-300"
                         >
                           <FaPlus className="w-4 h-4" />
-                        </button>
+                        </button> */}
                       </div>
                     </div>
                   </div>
@@ -897,3 +894,6 @@ const Shop = () => {
 }
 
 export default Shop 
+
+
+

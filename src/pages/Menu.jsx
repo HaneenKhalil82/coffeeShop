@@ -7,8 +7,6 @@ import { useAuth } from '../contexts/AuthContext'
 import { useNavigate } from 'react-router-dom'
 
 
-
-
 const Menu = () => {
   const { isAuthenticated } = useAuth()
   const navigate = useNavigate()
@@ -25,6 +23,7 @@ const Menu = () => {
   const [loading, setLoading] = useState(false)
   const [showToast, setShowToast] = useState(false)
   const [toastMessage, setToastMessage] = useState('')
+
 
   const content = isArabic ? {
     title: 'قائمة الطعام',
@@ -923,12 +922,7 @@ const Menu = () => {
                           <FaShoppingCart className="w-4 h-4 mr-2" />
                           {content.addToCart}
                         </button>
-                        {/* <button
-                          onClick={() => openItemModal(item)}
-                          className="px-4 py-2 border-2 border-primary text-white rounded-lg hover:bg-primary hover:text-white transition-colors duration-300"
-                        >
-                          <FaPlus className="w-4 h-4" />
-                        </button> */}
+                
                       </div>
                     </div>
                   </div>

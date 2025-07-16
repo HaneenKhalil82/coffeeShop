@@ -4,8 +4,8 @@ export const allProducts = [
   // Coffee Category
   {
     id: 1,
-      name_ar: 'إسبريسو',
-      name_en: 'Espresso',
+    name_ar: 'إسبريسو',
+    name_en: 'Espresso',
     price: 15,
     category: 'coffee',
     description: 'Rich concentrated coffee with golden crema',

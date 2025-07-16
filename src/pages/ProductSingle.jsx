@@ -443,16 +443,7 @@ const content = isArabic ? {
                     <FaShoppingCart className="w-5 h-5" />
                     <span>{content.addToCart}</span>
                   </button>
-                  {/* <button
-                    onClick={() => setIsFavorite(!isFavorite)}
-                    className={`px-4 py-3 rounded-lg border-2 transition-colors ${
-                      isFavorite
-                        ? 'border-red-500 bg-red-500 text-white'
-                        : 'border-gray-300 hover:border-red-500 hover:text-red-500'
-                    }`}
-                  >
-                    <FaHeart className="w-5 h-5" />
-                  </button> */}
+                 
                 </div>
               </div>
             </div>
@@ -461,18 +452,18 @@ const content = isArabic ? {
           </div>
 
           {/* Description and Features - Inside the same block */}
-          {/* <div className="border-t border-white/30 p-7 relative z-10">
+           {/* <div className="border-t border-white/30 p-7 relative z-10">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               
               {/* Description */}
-              {/* <div>
+               {/* <div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-6 arabic-heading-font">
                   {content.description}
                 </h3>
                 <p className="text-gray-800 leading-relaxed arabic-body text-lg">
                   {product.description}
                 </p>
-              </div>  */}
+              </div>   */}
 
               {/* Features */}
               {/* <div>
@@ -500,233 +491,3 @@ const content = isArabic ? {
 export default ProductSingle
 
 
-
-
-// import React, { useState } from 'react';
-// import { useParams, Link } from 'react-router-dom';
-// import { FaStar, FaHeart, FaShoppingCart, FaMinus, FaPlus } from 'react-icons/fa';
-// import { useRTL, useCart } from '../App';
-// import HeroSection from './../components/HeroSection';
-// import { useAuth } from "../contexts/AuthContext";
-// import { useNavigate } from "react-router-dom";
-// import  allProducts from '../contexts/productData';
-
-// const ProductSingle = () => {
-//   const { user } = useAuth();
-//   const navigate = useNavigate();
-//   const { id } = useParams();
-//   const { isArabic } = useRTL();
-//   const { addToCart } = useCart();
-//   const [quantity, setQuantity] = useState(1);
-//   const [selectedSize, setSelectedSize] = useState('medium');
-
-//   // const productData = isArabic ? productsArabic : productsEnglish;
-//   const product = allProducts.find((item) => item.id === parseInt(id)) || allProducts[0];
-
-//   const content = isArabic ? {
-//     breadcrumb: {
-//       home: 'الرئيسية',
-//       shop: 'المتجر',
-//       product: 'تفاصيل المنتج'
-//     },
-//     category: 'التصنيف:',
-//     rating: 'التقييم:',
-//     reviews: 'مراجعة',
-//     price: 'السعر:',
-//     size: 'الحجم:',
-//     quantity: 'الكمية:',
-//     addToCart: 'أضف إلى السلة',
-//     addToFavorites: 'أضف إلى المفضلة',
-//     description: 'الوصف',
-//     features: 'المميزات',
-//     relatedProducts: 'منتجات ذات صلة',
-//     inStock: 'متوفر',
-//     outOfStock: 'غير متوفر',
-//     currency: 'ريال'
-//   } : {
-//     breadcrumb: {
-//       home: 'Home',
-//       shop: 'Shop',
-//       product: 'Product Details'
-//     },
-//     category: 'Category:',
-//     rating: 'Rating:',
-//     reviews: 'reviews',
-//     price: 'Price:',
-//     size: 'Size:',
-//     quantity: 'Quantity:',
-//     addToCart: 'Add to Cart',
-//     addToFavorites: 'Add to Favorites',
-//     description: 'Description',
-//     features: 'Features',
-//     relatedProducts: 'Related Products',
-//     inStock: 'In Stock',
-//     outOfStock: 'Out of Stock',
-//     currency: 'SAR'
-//   };
-
-//   const handleQuantityChange = (type) => {
-//     if (type === 'increase') {
-//       setQuantity(prev => prev + 1);
-//     } else if (type === 'decrease' && quantity > 1) {
-//       setQuantity(prev => prev - 1);
-//     }
-//   };
-
-//   const handleAddToCart = () => {
-//     if (!user) {
-//       navigate("/login");
-//       return;
-//     }
-
-//     const selectedSizeData = product.sizes.find(size =>
-//       size.name === selectedSize
-//     );
-
-//     addToCart({
-//       ...product,
-//       quantity,
-//       selectedSize,
-//       price: selectedSizeData ? selectedSizeData.price : product.price
-//     });
-//   };
-
-//   const getCurrentPrice = () => {
-//     const selectedSizeData = product.sizes.find(size => 
-//       size.name === selectedSize
-//     );
-//     return selectedSizeData ? selectedSizeData.price : product.price;
-//   };
-
-//   return (
-//     <div className="pt-20 md:pt-24">
-//       <HeroSection
-//         backgroundImage="/images/bg13.jpeg"
-//         title={isArabic ? "تفاصيل المنتج" : "Product Details"}
-//       />
-//       <div className="pt-1  min-h-screen bg-cover bg-center bg-no-repeat relative" style={{ backgroundImage: 'url(/images/bg_4.jpg)' }}>
-//         <div className="absolute inset-0  "></div>
-//         <div className="w-md px-4 md:px-6 lg:px-8 section-padding relative z-10 mt-0">
-//           <div className="rounded-lg shadow-lg overflow-hidden max-w-7xl mx-auto bg-cover bg-center bg-no-repeat relative" >
-//             <div className="absolute inset-0 "></div>
-//             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 p-7 relative z-10">
-//               <div className="space-y-4">
-//                 <div className="aspect-square  rounded-sm overflow-hidden ">
-//                   <img 
-//                     src={product.image} 
-//                     alt={product.name}
-//                     className="w-full h-90 object-cover"
-//                   />
-//                 </div>
-//               </div>
-
-//               <div >
-//                 <div className="mb-6">
-//                   <p className="text-sm text-gray-300 mb-2 arabic-body">
-//                     {content.category} {product.category}
-//                   </p>
-//                   <h1 className="text-4xl font-bold text-gray-300 mb-4 arabic-heading-font">
-//                     {product.name}
-//                   </h1>
-//                   <div className="flex items-center mb-4 space-x-2 space-x-reverse">
-//                     <div className="flex items-center">
-//                       {[...Array(5)].map((_, i) => (
-//                         <FaStar 
-//                           key={i} 
-//                           className={`w-5 h-5 ${i < Math.floor(product.rating) ? 'text-yellow-700' : 'text-gray-300'}`} 
-//                         />
-//                       ))}
-//                     </div>
-//                     <span className="text-sm text-gray-300 arabic-body">
-//                       {product.rating} ({product.reviews} {content.reviews})
-//                     </span>
-//                   </div>
-
-//                   <div className="flex items-center mb-6 space-x-4 space-x-reverse">
-//                     <span className="text-3xl font-bold text-primary arabic-heading-font">
-//                       {getCurrentPrice()} {content.currency}
-//                     </span>
-//                     {product.originalPrice && (
-//                       <span className="text-xl text-gray-300 line-through arabic-heading-font">
-//                         {product.originalPrice} {content.currency}
-//                       </span>
-//                     )}
-//                   </div>
-
-//                   <div className="mb-6">
-//                     <span className={`inline-block px-3 py-1 rounded-lg text-sm font-semibold ${
-//                       product.inStock 
-//                         ? 'bg-green-100 text-green-800' 
-//                         : 'bg-red-100 text-red-800'
-//                     }`}>
-//                       {product.inStock ? content.inStock : content.outOfStock}
-//                     </span>
-//                   </div>
-
-//                   <div className="mb-6">
-//                     <label className="block text-sm font-semibold text-gray-300 mb-3 arabic-body">
-//                       {content.size}
-//                     </label>
-//                     <div className="flex space-x-3 space-x-reverse">
-//                       {product.sizes.map((size) => (
-//                         <button
-//                           key={size.name}
-//                           onClick={() => setSelectedSize(size.name)}
-//                           className={`px-4 py-2 rounded border-2 border-primary/70  text-gray-300 transition-colors arabic-body ${
-//                             selectedSize === size.name
-//                               ? 'border-primary bg-primary/70 text-white'
-//                               : 'border-gray-300 hover:border-primary'
-//                           }`}
-//                         >
-//                           {isArabic ? size.arabicName : size.name} ({size.price} {content.currency})
-//                         </button>
-//                       ))}
-//                     </div>
-//                   </div>
-
-//                   <div className="mb-6">
-//                     <label className="block text-sm font-semibold text-gray-300 mb-3 arabic-body">
-//                       {content.quantity}
-//                     </label>
-//                     <div className="flex items-center space-x-3 space-x-reverse">
-//                       <button
-//                         onClick={() => handleQuantityChange('decrease')}
-//                         className="w-14 h-10 border-2 border-primary/70 hover:bg-primary/70 text-primary flex items-center justify-center  transition-colors"
-//                       >
-//                         <FaMinus className="w-3 h-3" />
-//                       </button>
-//                       <span className="w-16 h-10 text-center border-2 text-primary border-primary/70 font-semibold text-lg">
-//                         {quantity}
-//                       </span>
-//                       <button
-//                         onClick={() => handleQuantityChange('increase')}
-//                         className="w-14 h-10 border-2 border-primary/70 hover:bg-primary/70 text-primary flex items-center justify-center  transition-colors"
-//                       >
-//                         <FaPlus className="w-3 h-3" />
-//                       </button>
-//                     </div>
-//                   </div>
-
-//                   <div className="flex space-x-4 space-x-reverse mb-6">
-//                     <button
-//                       onClick={handleAddToCart}
-//                       disabled={!product.inStock}
-//                       className="flex-1 bg-primary/70 hover:bg-primary/90 text-gray-300 px-6 py-3 rounded-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 space-x-reverse arabic-body"
-//                     >
-//                       <FaShoppingCart className="w-5 h-5" />
-//                       <span>{content.addToCart}</span>
-//                     </button>
-//                   </div>
-
-//                 </div>
-//               </div>
-
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default ProductSingle;
