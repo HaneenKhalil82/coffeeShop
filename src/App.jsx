@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Navbar from './components/Navbar'
-// import HeroSlider from './components/HeroSlider'
 import Footer from './components/Footer'
 import Home from './pages/Home'
 import Menu from './pages/Menu'
@@ -9,9 +8,6 @@ import About from './pages/About'
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
 // import { useAuth } from "./contexts/AuthContext";
-
-
-
 import Shop from './pages/Shop'
 import Contact from './pages/Contact'
 import Cart from './pages/Cart'
@@ -141,8 +137,6 @@ function App() {
                 <Route path= "/SignUp" element={<SignUp /> }/>
                 <Route path="/menu" element={<Menu />} />
                 <Route path="/about" element={<About />} />
-      
-        
                 <Route path="/shop" element={<Shop />} />
                 <Route path="/product/:id" element={<ProductSingle />} />
                 <Route path="/contact" element={<Contact />} />
@@ -161,3 +155,4 @@ function App() {
 }
 
 export default App
+

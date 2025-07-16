@@ -603,8 +603,9 @@ const Shop = () => {
     <div className="pt-20 md:pt-24">
       <HeroSection
         backgroundImage="/images/bg13.jpeg"
-        title={content.title}
+        title={isArabic ? " المتجر" : "Shop "}
       />
+
       
       <div className="relative min-h-screen bg-cover bg-center bg-no-repeat bg-fixed" style={{ backgroundImage: 'url(/images/bg_4.jpg)' }}>
         <div className="absolute inset-0 "></div>
