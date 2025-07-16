@@ -8,7 +8,6 @@ const Footer = () => {
   const { isArabic } = useRTL()
 
   const content = isArabic ? {
-    companyName: 'مقهى المزيج',
     companyDescription: 'اكتشفوا عالم القهوة معنا واستمتعوا بتجربة فريدة تجمع بين الجودة والأصالة',
     quickLinks: {
       title: 'روابط سريعة',
@@ -27,7 +26,7 @@ const Footer = () => {
       phone: '+966 11 123 4567',
       email: 'info@coffeemix.sa'
     },
-    copyright: `حقوق الطبع والنشر ©${currentYear} جميع الحقوق محفوظة | هذا القالب مصنوع ب من قبل مقهى المزيج`,
+    copyright: `حقوق الطبع والنشر ©${currentYear} جميع الحقوق محفوظة`,
     links: {
       privacy: 'سياسة الخصوصية',
       terms: 'شروط الخدمة'

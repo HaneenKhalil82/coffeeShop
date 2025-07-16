@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { FaSearch, FaFilter, FaSort, FaStar, FaPlus, FaMinus, FaTimes, FaShoppingCart } from 'react-icons/fa'
 import { useRTL, useCart } from '../App'
 import HeroSection from './../components/HeroSection'
+import { useMenuData } from '../hooks/useMenuData'
 
 const Menu = () => {
   const { isArabic } = useRTL()
@@ -14,22 +15,50 @@ const Menu = () => {
   const [selectedItem, setSelectedItem] = useState(null)
   const [showItemModal, setShowItemModal] = useState(false)
   const [itemQuantity, setItemQuantity] = useState(1)
-  const [loading, setLoading] = useState(false)
   const [showToast, setShowToast] = useState(false)
   const [toastMessage, setToastMessage] = useState('')
+  const [loading, setLoading] = useState(false) // For cart operations
+  
+  // Use the custom hook for API data
+  const { 
+    products: apiProducts, 
+    categories: apiCategories, 
+    filterAndSortProducts
+  } = useMenuData()
+
+  // Create dynamic categories from API data
+  const getDynamicCategories = () => {
+    const defaultCategories = isArabic ? [
+      { id: 'all', label: 'الكل' },
+      { id: 'coffee', label: 'القهوة' },
+      { id: 'drinks', label: 'المشروبات' },
+      { id: 'desserts', label: 'الحلويات' },
+      { id: 'breakfast', label: 'الإفطار' }
+    ] : [
+      { id: 'all', label: 'All' },
+      { id: 'coffee', label: 'Coffee' },
+      { id: 'drinks', label: 'Drinks' },
+      { id: 'desserts', label: 'Desserts' },
+      { id: 'breakfast', label: 'Breakfast' }
+    ]
+
+    if (apiCategories.length > 0) {
+      const apiCategoriesFormatted = apiCategories.map(cat => ({
+        id: cat.id || cat.name?.toLowerCase(),
+        label: isArabic ? (cat.name_ar || cat.name) : cat.name
+      }))
+      return [{ id: 'all', label: isArabic ? 'الكل' : 'All' }, ...apiCategoriesFormatted]
+    }
+    
+    return defaultCategories
+  }
 
   const content = isArabic ? {
     title: 'قائمة الطعام',
     search: 'البحث في القائمة...',
     sortBy: 'ترتيب حسب',
     priceRange: 'نطاق السعر',
-    categories: [
-      { id: 'all', label: 'الكل' },
-      { id: 'coffee', label: 'القهوة' },
-      { id: 'drinks', label: 'المشروبات' },
-      { id: 'desserts', label: 'الحلويات' },
-      { id: 'breakfast', label: 'الإفطار' }
-    ],
+    categories: getDynamicCategories(),
     sortOptions: [
       { value: 'name', label: 'ترتيب حسب :الاسم' },
       { value: 'price-low', label: 'السعر: من الأقل إلى الأعلى' },
@@ -264,13 +293,7 @@ const Menu = () => {
     search: 'Search menu...',
     sortBy: 'Sort by',
     priceRange: 'Price Range',
-    categories: [
-      { id: 'all', label: 'All' },
-      { id: 'coffee', label: 'Coffee' },
-      { id: 'drinks', label: 'Drinks' },
-      { id: 'desserts', label: 'Desserts' },
-      { id: 'breakfast', label: 'Breakfast' }
-    ],
+    categories: getDynamicCategories(),
     sortOptions: [
       { value: 'name', label: 'Name' },
       { value: 'price-low', label: 'Price: Low to High' },
@@ -502,27 +525,20 @@ const Menu = () => {
     helpText: 'Can\'t find what you\'re looking for? Contact us and we\'ll help you!'
   }
 
-  // Filter and sort menu items
-  const filteredItems = content.menuItems.filter(item => {
+  // Use API data or fallback to hardcoded data
+  const menuItems = apiProducts.length > 0 ? apiProducts : (content.menuItems || [])
+  
+  // Filter and sort menu items using API or local data
+  const filteredItems = filterAndSortProducts(menuItems, {
+    searchTerm,
+    priceRange,
+    sortBy
+  }).filter(item => {
     const matchesCategory = activeCategory === 'all' || item.category === activeCategory
-    const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                         item.description.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesPrice = item.price >= priceRange[0] && item.price <= priceRange[1]
-    return matchesCategory && matchesSearch && matchesPrice
+    return matchesCategory
   })
 
-  const sortedItems = [...filteredItems].sort((a, b) => {
-    switch (sortBy) {
-      case 'price-low':
-        return a.price - b.price
-      case 'price-high':
-        return b.price - a.price
-      case 'popular':
-        return b.popular - a.popular || b.rating - a.rating
-      default:
-        return a.name.localeCompare(b.name)
-    }
-  })
+  const sortedItems = filteredItems
 
   const handleAddToCart = (item, quantity = 1) => {
     setLoading(true)
@@ -577,157 +593,6 @@ const Menu = () => {
         <div className="absolute inset-0 "></div>
         
        
-    {/* Static Menu Section Like Image */}
-     <section className={` relative  z-10 ${isArabic ? 'text-left' : 'text-right'}`}>
-     <div className="max-w-6xl mx-auto px-4 md:px-6 lg:px-8  rounded-2xl p-8 shadow-lg">
-       <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-      
-      {/* Starters */}
-      <div>
-        <h2 className="text-2xl font-bold text-white mb-6">{isArabic ? 'المقبلات' : 'STARTER'}</h2>
-        {[
-          { name: isArabic ? 'ماكريل كورنيش' : 'Cornish - Mackerel', price: 20, image: '/images/dish-6.jpg' },
-          { name: isArabic ? 'شريحة لحم مشوية' : 'Roasted Steak', price: 29, image: '/images/dish-5.jpg' },
-          { name: isArabic ? 'شوربة موسمية' : 'Seasonal Soup', price: 20, image: '/images/dish-3.jpg' },
-          { name: isArabic ? 'كاري الدجاج' : 'Chicken Curry', price: 20, image: '/images/dish-2.jpg' },
-        ].map((item, index) => (
-       <div
-        key={index}
-       className={`flex items-center justify-between gap-4 py-4 ${isArabic ? 'flex-row text-left' : 'flex-row-reverse text-right'}`}>
-       {/* الصورة */}
-         <img
-       src={item.image}
-       alt={item.name}
-      className="w-16 h-16 object-cover rounded-full border border-gray-500"
-       />
-
-  {/* النص */}
-  <div className="flex-1 px-2">
-    <h4 className="text-white font-medium">{item.name}</h4>
-    <p className="text-gray-400 text-sm">
-      {isArabic
-        ? 'نهر صغير يُدعى دودن يمر بجوار المكان ويمدهم بالمستلزمات'
-        : 'A small river named Duden flows by their place and supplies'}
-    </p>
-  </div>
-
-     {/* السعر */}
-    <div className="text-white font-semibold min-w-[60px] text-center">
-    ${item.price.toFixed(2)}
-     </div>
-   </div>
-
-        ))}
-        
-      </div>
-
-      {/* Main Dishes */}
-      <div>
-        <h2 className="text-2xl font-bold text-white mb-6">{isArabic ? 'الأطباق الرئيسية' : 'MAIN DISH'}</h2>
-        {[
-          { name: isArabic ? 'سلمون البحر' : 'Sea Trout', price: 49.91, image: '/images/dish-7.jpg' },
-          { name: isArabic ? 'لحم بقري مشوي' : 'Roasted Beef', price: 20, image: '/images/dish-2.jpg' },
-          { name: isArabic ? 'دجاج مقلي بالزبدة' : 'Butter Fried Chicken', price: 20, image: '/images/dish-1.jpg' },
-          { name: isArabic ? 'فيليه دجاج' : 'Chicken Filet', price: 20, image: '/images/dish-3.jpg' },
-        ].map((item, index) => (
-          <div key={index} 
-           className={`flex items-center justify-between gap-4 py-4 ${isArabic ? 'flex-row text-left' : 'flex-row-reverse text-right'}`}>
-          
-            <img
-              src={item.image}
-              alt={item.name}
-              className="w-16 h-16 object-cover rounded-full border border-gray-500"
-            />
-            <div className="flex-1">
-              <h4 className="text-white font-medium">{item.name}</h4>
-              <p className="text-gray-400 text-sm">
-                {isArabic ? 'نهر صغير يُدعى دودن يمر بجوار المكان ويمدهم بالمستلزمات' : 'A small river named Duden flows by their place and supplies'}
-              </p>
-            </div>
-            <div className="text-white font-semibold">${item.price.toFixed(2)}</div>
-          </div>
-        ))}
-        </div>
-
-      </div>
-     </div>
-    </section>
-
-
-     <section className={`py-1 relative mb-5 z-10 ${isArabic ? 'text-left' : 'text-right'}`}>
-     <div className="max-w-6xl mx-auto px-4 md:px-6 lg:px-8  rounded-2xl p-8 shadow-lg">
-       <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-      
-      {/* Starters */}
-      <div>
-        <h2 className="text-2xl font-bold text-white mb-6">{isArabic ? 'المقبلات' : 'STARTER'}</h2>
-        {[
-          { name: isArabic ? 'ماكريل كورنيش' : 'Cornish - Mackerel', price: 20, image: '/images/dish-6.jpg' },
-          { name: isArabic ? 'شريحة لحم مشوية' : 'Roasted Steak', price: 29, image: '/images/dish-5.jpg' },
-          { name: isArabic ? 'شوربة موسمية' : 'Seasonal Soup', price: 20, image: '/images/dish-3.jpg' },
-          { name: isArabic ? 'كاري الدجاج' : 'Chicken Curry', price: 20, image: '/images/dish-2.jpg' },
-        ].map((item, index) => (
-       <div
-        key={index}
-       className={`flex items-center justify-between gap-4 py-4 ${isArabic ? 'flex-row text-left' : 'flex-row-reverse text-right'}`}>
-       {/* الصورة */}
-         <img
-       src={item.image}
-       alt={item.name}
-      className="w-16 h-16 object-cover rounded-full border border-gray-500"
-       />
-
-  {/* النص */}
-  <div className="flex-1 px-2">
-    <h4 className="text-white font-medium">{item.name}</h4>
-    <p className="text-gray-400 text-sm">
-      {isArabic
-        ? 'نهر صغير يُدعى دودن يمر بجوار المكان ويمدهم بالمستلزمات'
-        : 'A small river named Duden flows by their place and supplies'}
-    </p>
-  </div>
-
-     {/* السعر */}
-    <div className="text-white font-semibold min-w-[60px] text-center">
-    ${item.price.toFixed(2)}
-     </div>
-   </div>
-
-        ))}
-        
-      </div>
-
-      {/* Main Dishes */}
-      <div>
-        <h2 className="text-2xl font-bold text-white mb-6">{isArabic ? 'الأطباق الرئيسية' : 'MAIN DISH'}</h2>
-        {[
-          { name: isArabic ? 'سلمون البحر' : 'Sea Trout', price: 49.91, image: '/images/dish-7.jpg' },
-          { name: isArabic ? 'لحم بقري مشوي' : 'Roasted Beef', price: 20, image: '/images/dish-2.jpg' },
-          { name: isArabic ? 'دجاج مقلي بالزبدة' : 'Butter Fried Chicken', price: 20, image: '/images/dish-1.jpg' },
-          { name: isArabic ? 'فيليه دجاج' : 'Chicken Filet', price: 20, image: '/images/dish-3.jpg' },
-        ].map((item, index) => (
-          <div key={index} 
-           className={`flex items-center justify-between gap-4 py-4 ${isArabic ? 'flex-row text-left' : 'flex-row-reverse text-right'}`}>
-          
-            <img
-              src={item.image}
-              alt={item.name}
-              className="w-16 h-16 object-cover rounded-full border border-gray-500"
-            />
-            <div className="flex-1">
-              <h4 className="text-white font-medium">{item.name}</h4>
-              <p className="text-gray-400 text-sm">
-                {isArabic ? 'نهر صغير يُدعى دودن يمر بجوار المكان ويمدهم بالمستلزمات' : 'A small river named Duden flows by their place and supplies'}
-              </p>
-            </div>
-            <div className="text-white font-semibold">${item.price.toFixed(2)}</div>
-          </div>
-        ))}
-      </div>
-
-    </div>
-  </div>
-</section>
 
  {/* Toast Notification */}
         {showToast && (

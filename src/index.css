@@ -13,13 +13,10 @@
 @layer base {
   html {
     scroll-behavior: smooth;
-    direction: rtl;
   }
   
   body {
     font-family: 'Poppins', 'Noto Sans Arabic', sans-serif;
-    direction: rtl;
-    text-align: right;
     line-height: 1.6;
     background-image: url('/images/hhh.jpg');
     background-size: cover;
@@ -38,10 +35,6 @@
     backdrop-filter: blur(1px);
     z-index: -1;
     pointer-events: none;
-  }
-  
-  * {
-    direction: rtl;
   }
 }
 
@@ -71,43 +64,166 @@
   }
 }
 
-/* RTL Support - Default for Arabic */
-html, body {
+/* RTL Support - Conditional based on dir attribute */
+html[dir="rtl"], html[dir="rtl"] body {
   direction: rtl;
 }
 
-.text-left {
+html[dir="ltr"], html[dir="ltr"] body {
+  direction: ltr;
+}
+
+/* Text alignment based on direction */
+html[dir="rtl"] .text-left {
   text-align: right;
 }
 
-.text-right {
+html[dir="rtl"] .text-right {
   text-align: left;
 }
 
-.ml-auto {
+html[dir="ltr"] .text-left {
+  text-align: left;
+}
+
+html[dir="ltr"] .text-right {
+  text-align: right;
+}
+
+/* Margin adjustments based on direction */
+html[dir="rtl"] .ml-auto {
   margin-left: 0;
   margin-right: auto;
 }
 
-.mr-auto {
+html[dir="rtl"] .mr-auto {
   margin-right: 0;
   margin-left: auto;
 }
 
-/* Additional RTL adjustments */
-.flex-row-reverse {
+html[dir="ltr"] .ml-auto {
+  margin-left: auto;
+  margin-right: 0;
+}
+
+html[dir="ltr"] .mr-auto {
+  margin-right: auto;
+  margin-left: 0;
+}
+
+/* Flex direction adjustments */
+html[dir="rtl"] .flex-row-reverse {
   flex-direction: row-reverse;
+}
+
+html[dir="ltr"] .flex-row-reverse {
+  flex-direction: row;
+}
+
+/* Space adjustments for RTL/LTR */
+html[dir="rtl"] .space-x-reverse > * + * {
+  margin-right: var(--tw-space-x-reverse);
+  margin-left: calc(var(--tw-space-x-reverse) * -1);
+}
+
+html[dir="ltr"] .space-x-reverse > * + * {
+  margin-left: var(--tw-space-x-reverse);
+  margin-right: calc(var(--tw-space-x-reverse) * -1);
 }
 
 /* Custom Arabic styles */
 .arabic-text {
   font-family: 'Noto Sans Arabic', sans-serif;
+}
+
+html[dir="rtl"] .arabic-text {
   direction: rtl;
   text-align: right;
 }
 
+html[dir="ltr"] .arabic-text {
+  direction: ltr;
+  text-align: left;
+}
+
 .arabic-heading-font {
   font-family: 'Amiri', serif;
+}
+
+/* English text styles */
+.english-text {
+  font-family: 'Poppins', sans-serif;
+  direction: ltr;
+  text-align: left;
+}
+
+/* App container styles */
+.rtl {
+  direction: rtl;
+}
+
+.ltr {
+  direction: ltr;
+}
+
+/* Utility classes for proper text alignment */
+.text-start {
+  text-align: start;
+}
+
+.text-end {
+  text-align: end;
+}
+
+/* Responsive text alignment */
+html[dir="rtl"] .rtl-text-right {
+  text-align: right;
+}
+
+html[dir="ltr"] .rtl-text-right {
+  text-align: left;
+}
+
+html[dir="rtl"] .rtl-text-left {
+  text-align: left;
+}
+
+html[dir="ltr"] .rtl-text-left {
+  text-align: right;
+}
+
+/* Flex utilities for RTL/LTR */
+.flex-dir-row {
+  flex-direction: row;
+}
+
+html[dir="rtl"] .flex-dir-row {
+  flex-direction: row-reverse;
+}
+
+html[dir="ltr"] .flex-dir-row {
+  flex-direction: row;
+}
+
+/* Padding and margin utilities */
+html[dir="rtl"] .px-start {
+  padding-left: 0;
+  padding-right: var(--tw-space-x-reverse, 1rem);
+}
+
+html[dir="ltr"] .px-start {
+  padding-left: var(--tw-space-x-reverse, 1rem);
+  padding-right: 0;
+}
+
+html[dir="rtl"] .px-end {
+  padding-left: var(--tw-space-x-reverse, 1rem);
+  padding-right: 0;
+}
+
+html[dir="ltr"] .px-end {
+  padding-left: 0;
+  padding-right: var(--tw-space-x-reverse, 1rem);
 }
 
 /* Hero Slider Animations */
