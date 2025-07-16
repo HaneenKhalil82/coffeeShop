@@ -144,9 +144,7 @@ const Navbar = () => {
             <Link to="/shop" className="block px-4 py-2 text-gray-400 hover:text-light">
               {isArabic ? 'المتجر' : 'Shop'}
             </Link>
-            <Link to="/productsingle" className="block px-4 py-2 text-gray-400 hover:text-light">
-              {isArabic ? 'منتج واحد' : 'Single Product'}
-            </Link>
+           
             <Link to="/checkout" className="block px-4 py-2 text-gray-400 hover:text-light">
               {isArabic ? 'الدفع' : 'Checkout'}
             </Link>

@@ -8,10 +8,11 @@ import { useNavigate } from 'react-router-dom'
 
 
 
+
 const Menu = () => {
   const { isAuthenticated } = useAuth()
   const navigate = useNavigate()
-
+ 
   const { isArabic } = useRTL()
   const { addToCart } = useCart()
   const [activeCategory, setActiveCategory] = useState('all')
@@ -531,19 +532,7 @@ const Menu = () => {
     }
   })
 
-  // const handleAddToCart = (item, quantity = 1) => {
-  //   setLoading(true)
-  //   setTimeout(() => {
-  //     for (let i = 0; i < quantity; i++) {
-  //       addToCart(item)
-  //     }
-  //     setToastMessage(isArabic ? `تم إضافة ${item.name} إلى السلة` : `${item.name} added to cart`)
-  //     setShowToast(true)
-  //     setLoading(false)
-  //     setShowItemModal(false)
-  //     setItemQuantity(1)
-  //   }, 500)
-  // }
+
 
 
   const handleAddToCart = (item, quantity = 1) => {
@@ -879,6 +868,7 @@ const Menu = () => {
                     className="border-2 border-primary backdrop-blur-sm rounded-xl overflow-hidden hover:border-primary/80 transition-all duration-300 group"
                   >
                     <div className="relative">
+                     <Link to={`/product/${item.id}`}>
                       <img
                         src={item.image}
                         alt={item.name}
@@ -886,7 +876,10 @@ const Menu = () => {
                         onError={(e) => {
                           e.target.src = '/images/menu1.jpg'
                         }}
-                      />
+                       />
+                       </Link>
+
+                    
                       {item.popular && (
                         <div className="absolute top-2 right-2 bg-primary text-white px-2 py-1 rounded-full text-xs font-medium flex items-center">
                           <FaStar className="w-3 h-3 mr-1" />
@@ -897,9 +890,11 @@ const Menu = () => {
                     
                     <div className="p-4">
                       <div className="flex justify-between items-start mb-2">
-                        <h3 className="text-lg font-semibold text-white group-hover:text-primary transition-colors duration-300">
-                          {item.name}
-                        </h3>
+                        <Link to={`/product/${item.id}`} className="text-lg font-semibold text-white group-hover:text-primary transition-colors duration-300">
+                           {item.name}
+                        </Link>
+
+
                         <div className="flex items-center text-yellow-400">
                           <FaStar className="w-4 h-4 mr-1" />
                           <span className="text-sm text-gray-300">{item.rating}</span>
