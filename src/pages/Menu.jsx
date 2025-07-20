@@ -642,14 +642,14 @@ const Menu = () => {
                     <input
                       type="range"
                       min="0"
-                      max="100"
+                      max="1000"
                       value={priceRange[1]}
                       onChange={(e) => setPriceRange([0, parseInt(e.target.value)])}
                       className="w-full"
                     />
                     <div className="flex justify-between text-sm text-gray-300 mt-1">
-                      <span>$0</span>
-                      <span>${priceRange[1]}</span>
+                      <span>0 EGP</span>
+                      <span>{priceRange[1]} EGP</span>
                     </div>
                   </div>
                 </div>

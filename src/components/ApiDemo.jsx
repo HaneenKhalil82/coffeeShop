@@ -51,7 +51,7 @@ const ApiDemo = () => {
       <div className="mb-6 p-4 bg-gray-100 rounded-lg">
         <h3 className="text-lg font-semibold mb-2">Current API Configuration:</h3>
         <p className="text-sm">
-          <strong>Base URL:</strong> {import.meta.env.VITE_API_BASE_URL || 'https://api.coffee.test/api'}
+          <strong>Base URL:</strong> {import.meta.env.VITE_API_BASE_URL || 'https://api-coffee.m-zedan.com/api'}
         </p>
         <p className="text-sm text-blue-600 mt-2">
           💡 To change the API domain, update VITE_API_BASE_URL in your .env file or modify src/config/api.config.js

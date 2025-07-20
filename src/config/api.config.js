@@ -3,7 +3,7 @@
 
 const config = {
   // Production API
-  API_BASE_URL: import.meta.env.VITE_API_BASE_URL || 'https://api.coffee.test/api',
+  API_BASE_URL: import.meta.env.VITE_API_BASE_URL || 'https://api-coffee.m-zedan.com/api',
   
   // Alternative environments (uncomment as needed)
   // API_BASE_URL: 'http://localhost:8000/api',  // Local development
