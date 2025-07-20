@@ -22,9 +22,10 @@ const Footer = () => {
 
     contact: {
       title: 'هل لديكم أسئلة؟',
-      address: 'شارع الملك فهد، حي العليا، الرياض، المملكة العربية السعودية',
-      phone: '+966 11 123 4567',
-      email: 'info@coffeemix.sa'
+      address: 'الفرع الأول : مصر -بني سويف-الأباصيري ',
+      address2: 'الفرع الثاني : مصر -بني سويف-شارع عبد السلام عارف',
+      phone: '+2011 112 007 610',
+      email: 'blalra77ma@gmail.com  '
     },
     copyright: `حقوق الطبع والنشر ©${currentYear} جميع الحقوق محفوظة`,
     links: {
@@ -124,7 +125,13 @@ const Footer = () => {
               <div className="flex items-start space-x-3 space-x-reverse">
                 <FaMapMarkerAlt className="w-5 h-5 text-primary mt-1 flex-shrink-0" />
                 <span className="text-gray-300 arabic-body">
-                  {content.contact.address}
+                  {content.contact.address} 
+                </span>
+              </div>
+              <div className="flex items-start space-x-3 space-x-reverse">
+                <FaMapMarkerAlt className="w-5 h-5 text-primary mt-1 flex-shrink-0" />
+                <span className="text-gray-300 arabic-body">
+                  {content.contact.address2} 
                 </span>
               </div>
               <div className="flex items-center space-x-3 space-x-reverse">

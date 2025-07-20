@@ -719,7 +719,7 @@ const content = isArabic ? {
     relatedProducts: 'منتجات ذات صلة',
     inStock: 'متوفر',
     outOfStock: 'غير متوفر',
-    currency: 'ريال'
+    currency: 'جنيه مصري'
   } : {
     breadcrumb: {
       home: 'Home',
@@ -739,7 +739,7 @@ const content = isArabic ? {
     relatedProducts: 'Related Products',
     inStock: 'In Stock',
     outOfStock: 'Out of Stock',
-    currency: 'SAR'
+    currency: 'EGP'
   }
 
   const handleQuantityChange = (type) => {
