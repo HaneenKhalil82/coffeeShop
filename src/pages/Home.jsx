@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useRTL } from '../App'
 import HeroSlider from '../components/HeroSlider'
 import ProductsSection from '../components/ProductsSection'
+import Header from '../components/common/Header'
 
 const Home = () => {
   const { isArabic } = useRTL()
@@ -185,7 +186,7 @@ const Home = () => {
         showArrows={false}
         showDots={false}
       />
-
+      <Header/>
       {/* Welcome Section */}
       <section className="py-16 bg-cover bg-center bg-no-repeat relative" style={{ backgroundImage: 'url(/images/bg_4.jpg)' }}>
         <div className="absolute inset-0 "></div>
@@ -200,8 +201,6 @@ const Home = () => {
           </div>
         </div>
       </section>
-
-
 
       {/* Products Section */}
       <ProductsSection />

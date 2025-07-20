@@ -33,7 +33,7 @@ const ProductsSection = () => {
         name: 'لاتيه بالفانيليا',
         price: 60,
         originalPrice: 80,
-        image: '/images/vanilla.webp',
+        image: '/images/double.jpg',
         description: 'لاتيه طازج مع نكهة الفانيليا الطبيعية'
       },
       {
@@ -41,7 +41,7 @@ const ProductsSection = () => {
         name: 'إسبريسو مركز',
         price: 50,
         originalPrice: null,
-        image: '/images/double.jpg',
+        image: '/images/vanilla.webp',
         description: 'إسبريسو إيطالي قوي ومركز'
       }
     ]
@@ -72,7 +72,7 @@ const ProductsSection = () => {
         name: 'Vanilla Latte',
         price: 8,
         originalPrice: 9,
-        image: '/images/vanilla.webp',
+        image: '/images/double.jpg',
         description: 'Fresh latte with natural vanilla flavor'
       },
       {
@@ -80,7 +80,7 @@ const ProductsSection = () => {
         name: 'Concentrated Espresso',
         price: 5,
         originalPrice: null,
-        image: '/images/double.jpg',
+        image: '/images/vanilla.webp',
         description: 'Strong and concentrated Italian espresso'
       }
     ]
@@ -120,66 +120,72 @@ const ProductsSection = () => {
           </h2>
         </div>
 
-        {/* Products Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-          {content.products.map((product) => (
-            <div key={product.id} className="text-center group">
-              {/* Clickable Card Content */}
-              <Link to={`/product/${product.id}`} className="block cursor-pointer">
-                {/* Product Image */}
-                <div className="relative mb-12 overflow-hidden rounded-lg">
-                  <img 
-                    src={product.image} 
-                    alt={product.name}
-                    className="w-full h-96 object-cover transition-transform duration-300 group-hover:scale-105"
-                  />
-                  {product.originalPrice && (
-                    <div className="absolute top-4 right-4 bg-primary text-white px-2 py-1 rounded text-sm font-semibold">
-                      {isArabic ? 'خصم' : 'Sale'}
-                    </div>
-                  )}
-                </div>
-
-                {/* Product Info */}
-                <div className="space-y-10 pb-6">
-                  {/* Product Name */}
-                  <h3 className="text-white text-3xl font-semibold uppercase tracking-wide arabic-heading-font hover:text-primary transition-colors duration-300">
-                    {product.name}
-                  </h3>
-                  
-                  {/* Description */}
-                  <p className="text-gray-300 text-xl leading-relaxed arabic-body px-8">
-                    {product.description}
-                  </p>
-                  
-                  {/* Price */}
-                  <div className="flex items-center justify-center space-x-2 space-x-reverse">
-                    <span className="text-white text-4xl font-bold">
-                      ${product.price}.00
-                    </span>
-                    {product.originalPrice && (
-                      <span className="text-gray-400 text-2xl line-through">
-                        ${product.originalPrice}.00
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </Link>
-              
-              {/* Add to Cart Button - Outside the Link */}
-              <button 
-                onClick={(e) => {
-                  e.preventDefault()
-                  e.stopPropagation()
-                  handleAddToCart(product)
-                }}
-                className="border-2 border-primary text-primary px-12 py-5 text-lg font-medium uppercase tracking-wide hover:bg-primary hover:text-white transition-all duration-300 rounded-sm backdrop-blur-sm"
-              >
-                {content.addToCart}
-              </button>
-            </div>
-          ))}
+{/* Products Grid */}
+<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-16">
+  {content.products.map((product) => (
+    <div
+      key={product.id}
+      className="bg-black/20 backdrop-blur-sm border border-primary/30 rounded-xl overflow-hidden shadow-lg group transition-all duration-300 hover:shadow-xl"
+    >
+      {/* Clickable Card */}
+      <Link to={`/product/${product.id}`} className="block">
+        {/* Image Section */}
+        <div className="relative overflow-hidden">
+          <img
+            src={product.image}
+            alt={product.name}
+            className="w-full h-80 object-cover group-hover:scale-105 transition-transform duration-500"
+          />
+          {product.originalPrice && (
+            <span className="absolute top-4 right-4 bg-primary text-white px-3 py-1 rounded-full text-sm font-semibold shadow-lg">
+              {isArabic ? 'خصم' : 'SALE'}
+            </span>
+          )}
         </div>
+
+        {/* Product Info */}
+        <div className=" text-center space-y-2">
+          {/* Name */}
+          <h3 className="text-2xl font-semibold text-white group-hover:text-primary transition-colors duration-300 arabic-heading-font uppercase">
+            {product.name}
+          </h3>
+
+          {/* Description */}
+          <p className="text-gray-300 text-base leading-relaxed arabic-body min-h-[40px]">
+            {product.description}
+          </p>
+
+          {/* Price */}
+          <div className="flex justify-center items-center gap-2 rtl:flex-row-reverse">
+            <span className="text-3xl  text-primary">
+              ${product.price}.00
+            </span>
+            {product.originalPrice && (
+              <span className="text-lg text-gray-400 line-through">
+                ${product.originalPrice}.00
+              </span>
+            )}
+          </div>
+        </div>
+      </Link>
+
+      {/* Add to Cart */}
+      <div className="px-6 pb-6">
+        <button
+          onClick={(e) => {
+            e.preventDefault()
+            e.stopPropagation()
+            handleAddToCart(product)
+          }}
+          className="w-full bg-transparent border border-primary text-primary py-3 rounded-lg font-medium hover:bg-primary hover:text-white transition-all duration-300"
+        >
+          {content.addToCart}
+        </button>
+      </div>
+    </div>
+  ))}
+</div>
+
 
         {/* View All Button */}
         <div className="text-center">
