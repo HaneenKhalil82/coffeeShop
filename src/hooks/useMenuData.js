@@ -19,8 +19,18 @@ export const useMenuData = () => {
         getCategories()
       ]);
 
-      setProducts(Array.isArray(productsResponse.data) ? productsResponse.data : []);
-      setCategories(Array.isArray(categoriesResponse.data) ? categoriesResponse.data : []);
+      console.log('Products API Response:', productsResponse);
+      console.log('Categories API Response:', categoriesResponse);
+
+      // Handle the API response structure properly
+      const productsData = productsResponse.data?.data || productsResponse.data || [];
+      const categoriesData = categoriesResponse.data?.data || categoriesResponse.data || [];
+
+      console.log('Extracted products data:', productsData);
+      console.log('Extracted categories data:', categoriesData);
+
+      setProducts(Array.isArray(productsData) ? productsData : []);
+      setCategories(Array.isArray(categoriesData) ? categoriesData : []);
     } catch (err) {
       console.error('Error fetching menu data:', err);
       setError(err.message || 'Failed to fetch menu data');
@@ -124,18 +134,50 @@ export const useMenuData = () => {
       return null;
     }
     
+    console.log('Transforming product:', apiProduct);
+    
+    // Handle image URL properly
+    const getImageUrl = (product) => {
+      if (product.image) {
+        // If image URL starts with http/https, use it as is
+        if (product.image.startsWith('http')) {
+          return product.image;
+        }
+        // If it's a relative path, assume it's from the API domain
+        return `http://api-coffee.m-zedan.com${product.image}`;
+      }
+      
+      // Fallback images based on category or random
+      const fallbackImages = [
+        '/images/menu-1.jpg',
+        '/images/menu-2.jpg', 
+        '/images/menu-3.jpg',
+        '/images/menu1.jpg',
+        '/images/menu2.jpg',
+        '/images/menu3.jpg',
+        '/images/arabic coffee.jpg',
+        '/images/vanilla.webp'
+      ];
+      
+      return fallbackImages[Math.floor(Math.random() * fallbackImages.length)];
+    };
+    
     return {
       id: apiProduct.id || Math.random(),
       name: apiProduct.name || 'Unknown Product',
-      price: apiProduct.price || 0,
-      category: apiProduct.category?.name || 'other',
-      description: apiProduct.description || '',
-      image: apiProduct.image || '/images/menu-1.jpg', // fallback image
-      popular: apiProduct.is_popular || false,
-      rating: apiProduct.rating || 4.0,
-      ingredients: Array.isArray(apiProduct.ingredients) ? apiProduct.ingredients : [],
-      calories: apiProduct.calories || 0,
-      stock: apiProduct.stock || 0
+      price: parseFloat(apiProduct.price) || 0,
+      category: apiProduct.category_id || 'other', // Use category_id for filtering
+      categoryName: apiProduct.category?.name || 'Other', // Keep category name for display
+      description: apiProduct.description || `Delicious ${apiProduct.name || 'item'} made with the finest ingredients.`,
+      image: getImageUrl(apiProduct),
+      popular: apiProduct.is_popular || Math.random() > 0.7, // Random popular if not specified
+      rating: apiProduct.rating || (4.0 + Math.random() * 1), // Random rating between 4-5
+      ingredients: Array.isArray(apiProduct.ingredients) ? apiProduct.ingredients : ['Premium ingredients'],
+      calories: apiProduct.calories || Math.floor(Math.random() * 200) + 50, // Random calories if not provided
+      stock: parseFloat(apiProduct.stock) || 0,
+      barcode: apiProduct.barcode || '',
+      acceptFloat: apiProduct.accept_float || false,
+      type: apiProduct.type || 'unit'
     };
   };
 

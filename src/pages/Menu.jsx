@@ -45,10 +45,12 @@ const Menu = () => {
     ]
 
     if (apiCategories.length > 0) {
+      console.log('API Categories:', apiCategories);
       const apiCategoriesFormatted = apiCategories.map(cat => ({
-        id: cat.id || cat.name?.toLowerCase(),
+        id: cat.id?.toString() || cat.name?.toLowerCase(),
         label: isArabic ? (cat.name_ar || cat.name) : cat.name
       }))
+      console.log('Formatted Categories:', apiCategoriesFormatted);
       return [{ id: 'all', label: isArabic ? 'الكل' : 'All' }, ...apiCategoriesFormatted]
     }
     
@@ -117,6 +119,7 @@ const Menu = () => {
 
   // Use only API data - no static fallback
   const menuItems = apiProducts || []
+  console.log('Menu Items from API:', menuItems);
   
   // Filter and sort menu items using API data only
   const filteredItems = filterAndSortProducts(menuItems, {
@@ -124,9 +127,15 @@ const Menu = () => {
     priceRange,
     sortBy
   }).filter(item => {
-    const matchesCategory = activeCategory === 'all' || item.category === activeCategory
+    console.log('Filtering item:', item, 'Active category:', activeCategory);
+    const matchesCategory = activeCategory === 'all' || 
+                           item.category?.toString() === activeCategory?.toString() ||
+                           item.categoryName?.toLowerCase().includes(activeCategory?.toLowerCase())
+    console.log('Category match result:', matchesCategory);
     return matchesCategory
   })
+
+  console.log('Filtered Items:', filteredItems);
 
   const sortedItems = filteredItems
 
