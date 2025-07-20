@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { FaSearch, FaFilter, FaSort, FaStar, FaPlus, FaMinus, FaTimes, FaShoppingCart } from 'react-icons/fa'
+import { FaSearch, FaFilter, FaSort, FaPlus, FaMinus, FaTimes, FaShoppingCart, FaStar } from 'react-icons/fa'
 import { useRTL, useCart } from '../App'
 import HeroSection from './../components/HeroSection'
 import { useMenuData } from '../hooks/useMenuData'
@@ -73,7 +73,6 @@ const Menu = () => {
     quantity: 'الكمية',
     ingredients: 'المكونات',
     calories: 'سعرات حرارية',
-    rating: 'التقييم',
     popular: 'شائع',
     noItems: 'لا توجد عناصر',
     noItemsMessage: 'لم يتم العثور على عناصر. تحقق من الاتصال بالإنترنت أو حاول مرة أخرى.',
@@ -85,7 +84,8 @@ const Menu = () => {
     clearFilters: 'مسح المرشحات',
     contactUs: 'اتصل بنا',
     helpText: 'لا تجد ما تبحث عنه؟ اتصل بنا وسنساعدك!',
-    addedToCart: 'تم إضافته إلى السلة'
+    addedToCart: 'تم إضافته إلى السلة',
+    currency: 'EGP'
   } : {
     title: 'Our Menu',
     search: 'Search menu...',
@@ -101,8 +101,6 @@ const Menu = () => {
     addToCart: 'Add to Cart',
     quantity: 'Quantity',
     ingredients: 'Ingredients',
-    calories: 'Calories',
-    rating: 'Rating',
     popular: 'Popular',
     noItems: 'No Items',
     noItemsMessage: 'No items found. Please check your internet connection or try again.',
@@ -114,7 +112,8 @@ const Menu = () => {
     clearFilters: 'Clear Filters',
     contactUs: 'Contact Us',
     helpText: 'Can\'t find what you\'re looking for? Contact us and we\'ll help you!',
-    addedToCart: 'Added to Cart'
+    addedToCart: 'Added to Cart',
+    currency: 'EGP'
   }
 
   // Use only API data - no static fallback
@@ -153,7 +152,8 @@ const Menu = () => {
     }, 500)
   }
 
-  const openItemModal = (item) => {
+  // Handle card click to show modal instead of navigation
+  const handleCardClick = (item) => {
     setSelectedItem(item)
     setShowItemModal(true)
     setItemQuantity(1)
@@ -169,7 +169,7 @@ const Menu = () => {
     setActiveCategory('all')
     setSearchTerm('')
     setSortBy('name')
-    setPriceRange([0, 100])
+    setPriceRange([0, 2000])
   }
 
   useEffect(() => {
@@ -182,82 +182,103 @@ const Menu = () => {
   }, [showToast])
 
   return (
-    <div className="min-h-screen bg-white" dir={isArabic ? 'rtl' : 'ltr'}>
-      <HeroSection 
-        title={content.title}
-        backgroundImage="/images/bg13.jpeg"
-      />
-      
-      <div className="container mx-auto px-4 py-16">
+    <div 
+      className="min-h-screen" 
+      dir={isArabic ? 'rtl' : 'ltr'}
+      style={{
+        backgroundImage: 'url(/images/bg_4.jpg)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backgroundAttachment: 'fixed'
+      }}
+    >
+      {/* Dark overlay for better content readability */}
+      <div className="min-h-screen">
+        <HeroSection 
+          title={content.title}
+          backgroundImage="/images/bg13.jpeg"
+        />
+        
+        <div className="container mx-auto px-4 py-16">
         {/* Search and Filter Section */}
-        <div className="mb-12">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {/* Search */}
-            <div className="relative">
-              <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-              <input
-                type="text"
-                placeholder={content.search}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border-2 border-primary/20 rounded-lg focus:border-primary focus:outline-none"
-              />
-            </div>
+        <div className="mb-16">
+          <div className="max-w-6xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {/* Search */}
+              <div className="relative group">
+                <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-primary transition-colors" />
+                <input
+                  type="text"
+                  placeholder={content.search}
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:border-primary focus:outline-none bg-white shadow-sm hover:shadow-md transition-all duration-300 text-gray-800 placeholder-gray-500"
+                />
+              </div>
 
-            {/* Sort */}
-            <div className="relative">
-              <FaSort className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border-2 border-primary/20 rounded-lg focus:border-primary focus:outline-none appearance-none"
+              {/* Sort */}
+              <div className="relative group">
+                <FaSort className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-primary transition-colors pointer-events-none z-10" />
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="w-full pl-12 pr-8 py-4 border-2 border-gray-200 rounded-xl focus:border-primary focus:outline-none appearance-none bg-white shadow-sm hover:shadow-md transition-all duration-300 text-gray-800 cursor-pointer"
+                >
+                  {content.sortOptions.map(option => (
+                    <option key={option.value} value={option.value}>{option.label}</option>
+                  ))}
+                </select>
+                <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                  <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
+
+              {/* Price Range */}
+              <div className="flex items-center space-x-3 bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 border-2 border-gray-200">
+                <span className="text-sm font-semibold text-gray-700 whitespace-nowrap">{content.priceRange}:</span>
+                <input
+                  type="range"
+                  min="0"
+                  max="2000"
+                  value={priceRange[1]}
+                  onChange={(e) => setPriceRange([0, parseInt(e.target.value)])}
+                  className="flex-1 accent-primary"
+                />
+                <span className="text-sm font-bold text-primary whitespace-nowrap">{priceRange[1]}</span>
+              </div>
+
+              {/* Clear Filters */}
+              <button
+                onClick={clearFilters}
+                className="px-6 py-4 bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 rounded-xl hover:from-gray-200 hover:to-gray-300 transition-all duration-300 font-semibold shadow-sm hover:shadow-md transform hover:scale-105"
               >
-                {content.sortOptions.map(option => (
-                  <option key={option.value} value={option.value}>{option.label}</option>
-                ))}
-              </select>
+                {content.clearFilters}
+              </button>
             </div>
-
-            {/* Price Range */}
-            <div className="flex items-center space-x-2">
-              <span className="text-sm font-medium">{content.priceRange}:</span>
-              <input
-                type="range"
-                min="0"
-                max="100"
-                value={priceRange[1]}
-                onChange={(e) => setPriceRange([0, parseInt(e.target.value)])}
-                className="flex-1"
-              />
-              <span className="text-sm">${priceRange[1]}</span>
-            </div>
-
-            {/* Clear Filters */}
-            <button
-              onClick={clearFilters}
-              className="px-4 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-            >
-              {content.clearFilters}
-            </button>
           </div>
         </div>
 
         {/* Categories */}
-        <div className="mb-8">
-          <div className="flex flex-wrap gap-4 justify-center">
-            {content.categories.map(category => (
-              <button
-                key={category.id}
-                onClick={() => setActiveCategory(category.id)}
-                className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 ${
-                  activeCategory === category.id
-                    ? 'bg-primary text-white shadow-lg'
-                    : 'bg-white text-gray-600 border-2 border-primary hover:bg-primary hover:text-white'
-                }`}
-              >
-                {category.label}
-              </button>
-            ))}
+        <div className="mb-12">
+          <div className="max-w-5xl mx-auto">
+            <div className="flex flex-wrap gap-4 justify-center">
+              {content.categories.map(category => (
+                <button
+                  key={category.id}
+                  onClick={() => setActiveCategory(category.id)}
+                  className={`px-8 py-4 rounded-full font-bold transition-all duration-500 transform hover:scale-110 shadow-lg ${
+                    activeCategory === category.id
+                      ? 'bg-gradient-to-r from-primary to-amber-600 text-white shadow-xl scale-105'
+                      : 'bg-white text-gray-700 border-2 border-gray-200 hover:border-primary hover:text-primary hover:shadow-xl'
+                  }`}
+                >
+                  {category.label}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -343,109 +364,146 @@ const Menu = () => {
 
         {/* Menu Items Grid */}
         {!apiLoading && !apiError && sortedItems.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            {sortedItems.map(item => (
-              <div key={item.id} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
-                <div className="relative">
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                    className="w-full h-48 object-cover"
-                    onError={(e) => {
-                      e.target.src = '/images/menu-1.jpg'
-                    }}
-                  />
-                  {item.popular && (
-                    <span className="absolute top-4 left-4 bg-primary text-white px-3 py-1 rounded-full text-sm font-semibold">
-                      {content.popular}
-                    </span>
-                  )}
-                  <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1">
-                    <div className="flex items-center">
-                      <FaStar className="w-4 h-4 text-yellow-400 mr-1" />
-                      <span className="text-sm font-semibold">{item.rating}</span>
+          <div className="max-w-7xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+              {sortedItems.map(item => (
+                <div 
+                  key={item.id} 
+                  className="group bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:scale-105 border border-gray-100 cursor-pointer"
+                  onClick={() => handleCardClick(item)}
+                >
+                  <div className="relative overflow-hidden">
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="w-full h-56 object-cover transition-transform duration-700 group-hover:scale-110"
+                      onError={(e) => {
+                        e.target.src = '/images/menu-1.jpg'
+                      }}
+                    />
+                    {/* Gradient Overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    
+                    {item.popular && (
+                      <div className="absolute top-4 left-4">
+                        <span className="bg-gradient-to-r from-red-500 to-pink-500 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg animate-pulse">
+                          ⭐ {content.popular}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="p-6">
+                    <div className="flex items-start justify-between mb-3">
+                      <h3 className="text-xl font-bold text-gray-800 group-hover:text-primary transition-colors duration-300 leading-tight">{item.name}</h3>
+                      <div className="ml-2">
+                        <span className="text-2xl font-black bg-gradient-to-r from-primary to-amber-600 bg-clip-text text-transparent">
+                          {item.price} {content.currency}
+                        </span>
+                      </div>
+                    </div>
+                    
+                    {/* Action Buttons */}
+                    <div className="flex gap-3 mt-4">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleAddToCart(item);
+                        }}
+                        disabled={loading}
+                        className="flex-1 bg-gradient-to-r from-primary to-amber-600 text-white py-3 rounded-xl hover:from-amber-600 hover:to-primary transition-all duration-300 flex items-center justify-center disabled:opacity-50 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105"
+                      >
+                        <FaShoppingCart className="w-4 h-4 mr-2" />
+                        {content.addToCart}
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleCardClick(item);
+                        }}
+                        className="px-4 py-3 border-2 border-primary text-primary rounded-xl hover:bg-primary hover:text-white transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105"
+                      >
+                        <FaPlus className="w-4 h-4" />
+                      </button>
                     </div>
                   </div>
-                </div>
-                
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-gray-800 mb-2">{item.name}</h3>
-                  <p className="text-gray-600 text-sm mb-4 line-clamp-2">{item.description}</p>
                   
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-2xl font-bold text-primary">${item.price}</span>
-                    <span className="text-sm text-gray-500">
-                      {item.calories} {content.calories}
-                    </span>
-                  </div>
-                  
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => handleAddToCart(item)}
-                      disabled={loading}
-                      className="flex-1 bg-primary text-white py-2 rounded-lg hover:bg-primary/90 transition-colors duration-300 flex items-center justify-center disabled:opacity-50"
-                    >
-                      <FaShoppingCart className="w-4 h-4 mr-2" />
-                      {content.addToCart}
-                    </button>
-                    <button
-                      onClick={() => openItemModal(item)}
-                      className="px-4 py-2 border-2 border-primary text-primary rounded-lg hover:bg-primary hover:text-white transition-colors duration-300"
-                    >
-                      <FaPlus className="w-4 h-4" />
-                    </button>
-                  </div>
+                  {/* Bottom Accent */}
+                  <div className="h-1 bg-gradient-to-r from-primary via-amber-500 to-primary transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         )}
 
         {/* Item Details Modal */}
         {showItemModal && selectedItem && (
           <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
-            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={closeItemModal}></div>
-            <div className="relative bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={closeItemModal}></div>
+            <div className="relative bg-white rounded-2xl max-w-lg w-full max-h-[85vh] overflow-y-auto shadow-2xl transform transition-all duration-300 scale-100">
               <button
                 onClick={closeItemModal}
-                className="absolute top-4 right-4 z-10 bg-white/90 backdrop-blur-sm rounded-full p-2 hover:bg-white transition-colors"
+                className="absolute top-4 right-4 z-10 bg-white/90 backdrop-blur-sm rounded-full p-2 hover:bg-white transition-colors shadow-lg hover:shadow-xl transform hover:scale-110"
               >
-                <FaTimes className="w-5 h-5 text-gray-600" />
+                <FaTimes className="w-4 h-4 text-gray-600" />
               </button>
               
-              <img
-                src={selectedItem.image}
-                alt={selectedItem.name}
-                className="w-full h-64 object-cover rounded-t-2xl"
-              />
+              <div className="relative">
+                <img
+                  src={selectedItem.image}
+                  alt={selectedItem.name}
+                  className="w-full h-48 object-cover rounded-t-2xl"
+                  onError={(e) => {
+                    e.target.src = '/images/menu-1.jpg'
+                  }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent rounded-t-2xl"></div>
+                {selectedItem.popular && (
+                  <div className="absolute top-4 left-4">
+                    <span className="bg-gradient-to-r from-red-500 to-pink-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg animate-pulse">
+                      ⭐ {content.popular}
+                    </span>
+                  </div>
+                )}
+              </div>
               
-              <div className="p-8">
+              <div className="p-6">
                 <div className="flex items-start justify-between mb-4">
                   <div>
-                    <h2 className="text-3xl font-bold text-gray-800 mb-2">{selectedItem.name}</h2>
+                    <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-2">{selectedItem.name}</h2>
                     <div className="flex items-center mb-2">
                       <div className="flex items-center mr-4">
-                        <FaStar className="w-5 h-5 text-yellow-400 mr-1" />
-                        <span className="font-semibold">{selectedItem.rating}</span>
+                        <div className="flex">
+                          {[...Array(5)].map((_, i) => (
+                            <FaStar key={i} className="w-4 h-4 text-yellow-400" />
+                          ))}
+                        </div>
+                        <span className="ml-2 text-gray-600 font-medium text-sm">{selectedItem.rating || '5.0'}</span>
                       </div>
-                      {selectedItem.popular && (
-                        <span className="bg-primary text-white px-3 py-1 rounded-full text-sm font-semibold">
-                          {content.popular}
-                        </span>
-                      )}
                     </div>
                   </div>
-                  <span className="text-3xl font-bold text-primary">${selectedItem.price}</span>
+                  <div className="text-right">
+                    <span className="text-2xl font-black bg-gradient-to-r from-primary to-amber-600 bg-clip-text text-transparent">
+                      {selectedItem.price} {content.currency}
+                    </span>
+                  </div>
                 </div>
                 
-                <p className="text-gray-600 mb-6 leading-relaxed">{selectedItem.description}</p>
+                <div className="bg-gray-50 rounded-xl p-4 mb-4">
+                  <p className="text-gray-700 leading-relaxed text-sm">
+                    {selectedItem.description || (isArabic ? 'منتج مميز من تشكيلتنا الفاخرة مصنوع بأجود المكونات' : 'Premium product from our exclusive collection made with the finest ingredients')}
+                  </p>
+                </div>
                 
                 {selectedItem.ingredients && selectedItem.ingredients.length > 0 && (
-                  <div className="mb-6">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-3">{content.ingredients}:</h3>
+                  <div className="mb-4">
+                    <h3 className="text-lg font-bold text-gray-800 mb-3 flex items-center">
+                      <span className="w-2 h-2 bg-primary rounded-full mr-2"></span>
+                      {content.ingredients}
+                    </h3>
                     <div className="flex flex-wrap gap-2">
                       {selectedItem.ingredients.map((ingredient, index) => (
-                        <span key={index} className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">
+                        <span key={index} className="bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 px-3 py-1 rounded-full text-xs font-medium shadow-sm hover:shadow-md transition-shadow">
                           {ingredient}
                         </span>
                       ))}
@@ -453,40 +511,35 @@ const Menu = () => {
                   </div>
                 )}
                 
-                <div className="flex items-center justify-between mb-6">
-                  <span className="text-sm text-gray-500">
-                    {selectedItem.calories} {content.calories}
-                  </span>
-                </div>
-                
-                <div className="flex items-center gap-4 mb-6">
-                  <span className="font-semibold text-gray-800">{content.quantity}:</span>
-                  <div className="flex items-center border-2 border-gray-200 rounded-lg">
+                <div className="flex items-center gap-4 mb-6 p-3 bg-amber-50 rounded-xl">
+                  <span className="font-bold text-gray-800">{content.quantity}:</span>
+                  <div className="flex items-center bg-white border-2 border-gray-200 rounded-lg shadow-sm">
                     <button
                       onClick={() => setItemQuantity(Math.max(1, itemQuantity - 1))}
-                      className="p-2 hover:bg-gray-100 transition-colors"
+                      className="p-2 hover:bg-gray-100 transition-colors rounded-l-lg"
                     >
-                      <FaMinus className="w-4 h-4" />
+                      <FaMinus className="w-3 h-3 text-gray-600" />
                     </button>
-                    <span className="px-4 py-2 font-semibold">{itemQuantity}</span>
+                    <span className="px-4 py-2 font-bold bg-gray-50">{itemQuantity}</span>
                     <button
                       onClick={() => setItemQuantity(itemQuantity + 1)}
-                      className="p-2 hover:bg-gray-100 transition-colors"
+                      className="p-2 hover:bg-gray-100 transition-colors rounded-r-lg"
                     >
-                      <FaPlus className="w-4 h-4" />
+                      <FaPlus className="w-3 h-3 text-gray-600" />
                     </button>
                   </div>
-                  <span className="text-xl font-bold text-primary">
-                    ${(selectedItem.price * itemQuantity).toFixed(2)}
+                  <span className="text-lg font-black bg-gradient-to-r from-primary to-amber-600 bg-clip-text text-transparent">
+                    {(selectedItem.price * itemQuantity).toFixed(2)} {content.currency}
                   </span>
                 </div>
                 
                 <button
                   onClick={() => handleAddToCart(selectedItem, itemQuantity)}
                   disabled={loading}
-                  className="w-full bg-primary text-white py-4 rounded-xl text-lg font-semibold hover:bg-primary/90 transition-colors duration-300 disabled:opacity-50"
+                  className="w-full bg-gradient-to-r from-primary to-amber-600 text-white py-3 rounded-xl text-lg font-bold hover:from-amber-600 hover:to-primary transition-all duration-300 disabled:opacity-50 shadow-xl hover:shadow-2xl transform hover:scale-105 flex items-center justify-center"
                 >
-                  {loading ? content.loading : `${content.addToCart} - $${(selectedItem.price * itemQuantity).toFixed(2)}`}
+                  <FaShoppingCart className="w-4 h-4 mr-2" />
+                  {loading ? content.loading : `${content.addToCart} - ${(selectedItem.price * itemQuantity).toFixed(2)} ${content.currency}`}
                 </button>
               </div>
             </div>
@@ -495,13 +548,19 @@ const Menu = () => {
 
         {/* Toast Notification */}
         {showToast && (
-          <div className="fixed bottom-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-fade-in">
+          <div className="fixed bottom-6 right-6 bg-gradient-to-r from-green-500 to-emerald-600 text-white px-8 py-4 rounded-2xl shadow-2xl z-50 animate-bounce transform transition-all duration-500 border border-green-400">
             <div className="flex items-center">
-              <FaShoppingCart className="w-5 h-5 mr-2" />
-              {toastMessage}
+              <div className="bg-white/20 rounded-full p-2 mr-3">
+                <FaShoppingCart className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="font-bold text-lg">{toastMessage}</p>
+                <p className="text-green-100 text-sm">Successfully added to cart!</p>
+              </div>
             </div>
           </div>
         )}
+      </div>
       </div>
     </div>
   )

@@ -138,28 +138,8 @@ export const useMenuData = () => {
     
     // Handle image URL properly
     const getImageUrl = (product) => {
-      if (product.image) {
-        // If image URL starts with http/https, use it as is
-        if (product.image.startsWith('http')) {
-          return product.image;
-        }
-        // If it's a relative path, assume it's from the API domain
-        return `http://api-coffee.m-zedan.com${product.image}`;
-      }
-      
-      // Fallback images based on category or random
-      const fallbackImages = [
-        '/images/menu-1.jpg',
-        '/images/menu-2.jpg', 
-        '/images/menu-3.jpg',
-        '/images/menu1.jpg',
-        '/images/menu2.jpg',
-        '/images/menu3.jpg',
-        '/images/arabic coffee.jpg',
-        '/images/vanilla.webp'
-      ];
-      
-      return fallbackImages[Math.floor(Math.random() * fallbackImages.length)];
+      // Use random.jpeg for all products
+      return '/images/random.png';
     };
     
     return {
