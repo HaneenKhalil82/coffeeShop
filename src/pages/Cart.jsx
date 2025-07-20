@@ -349,7 +349,7 @@ const Cart = () => {
                     {itemToRemove.name}
                   </p>
                   <p className="text-sm text-gray-600 arabic-body">
-                    ${itemToRemove.price}
+                    EGP {itemToRemove.price}
                   </p>
                 </div>
               </div>
@@ -498,7 +498,7 @@ const Cart = () => {
                   {/* Cart Items */}
                   <div className="divide-y divide-gray-600">
                     {cartItems.map((item) => (
-                      <div key={item.id} className="px-4 md:px-8 lg:px-14 py-6 md:py-10 lg:py-14 relative group border-2 border-primary/30">
+                      <div key={item.id} className="px-4 md:px-8 lg:px-14 py-6 md:py-10 lg:py-14 relative group border-2 border-primary">
                         {/* Remove Button */}
                         <button
                           onClick={() => handleRemoveItem(item.id)}
@@ -539,7 +539,7 @@ const Cart = () => {
                           
                           <div className="flex justify-between items-center">
                             <div className="text-white font-bold text-base">
-                              ${typeof item.price === 'number' ? item.price.toFixed(2) : '0.00'}
+                              EGP {typeof item.price === 'number' ? item.price.toFixed(2) : '0.00'}
                             </div>
                             
                             <div className="flex items-center space-x-2 space-x-reverse bg-white/10 rounded-lg p-1">
@@ -570,7 +570,7 @@ const Cart = () => {
                             </div>
                             
                             <div className="text-white font-bold text-base">
-                              ${((item.price || 0) * (item.quantity || 0)).toFixed(2)}
+                              EGP {((item.price || 0) * (item.quantity || 0)).toFixed(2)}
                             </div>
                           </div>
                         </div>
@@ -607,7 +607,7 @@ const Cart = () => {
                           {/* Price */}
                           <div className="col-span-2 text-center">
                             <span className="text-white font-bold text-base md:text-lg lg:text-xl">
-                              ${typeof item.price === 'number' ? item.price.toFixed(2) : '0.00'}
+                              EGP {typeof item.price === 'number' ? item.price.toFixed(2) : '0.00'}
                             </span>
                           </div>
 
@@ -644,7 +644,7 @@ const Cart = () => {
                           {/* Total */}
                           <div className="col-span-2 text-center">
                             <span className="text-white font-bold text-base md:text-lg lg:text-xl">
-                              ${((item.price || 0) * (item.quantity || 0)).toFixed(2)}
+                              EGP {((item.price || 0) * (item.quantity || 0)).toFixed(2)}
                             </span>
                           </div>
                         </div>
@@ -676,7 +676,7 @@ const Cart = () => {
                     <div className="flex justify-between items-center text-gray-300">
                       <span className="arabic-body text-sm md:text-base lg:text-lg">{content.summary.subtotal}</span>
                       <span className="font-bold text-white text-sm md:text-base lg:text-lg">
-                        ${subtotal.toFixed(2)}
+                        EGP {subtotal.toFixed(2)}
                       </span>
                     </div>
                     
@@ -685,7 +685,7 @@ const Cart = () => {
                         {content.summary.tax}
                       </span>
                       <span className="font-bold text-white text-sm md:text-base lg:text-lg">
-                        ${tax.toFixed(2)}
+                        EGP {tax.toFixed(2)}
                       </span>
                     </div>
                     
@@ -699,7 +699,7 @@ const Cart = () => {
                         )}
                       </div>
                       <span className="font-bold text-white text-sm md:text-base lg:text-lg">
-                        {deliveryFee === 0 ? (isArabic ? 'مجاني' : 'Free') : `$${deliveryFee.toFixed(2)}`}
+                        {deliveryFee === 0 ? (isArabic ? 'مجاني' : 'Free') : `EGP ${deliveryFee.toFixed(2)}`}
                       </span>
                     </div>
 
@@ -707,7 +707,7 @@ const Cart = () => {
                       <div className="flex justify-between items-center text-gray-300">
                         <span className="arabic-body text-sm md:text-base lg:text-lg">{content.summary.discount}</span>
                         <span className="font-bold text-green-400 text-sm md:text-base lg:text-lg">
-                          -${discount.toFixed(2)}
+                          -EGP {discount.toFixed(2)}
                         </span>
                       </div>
                     )}
@@ -716,7 +716,7 @@ const Cart = () => {
                       <div className="flex justify-between items-center text-base md:text-lg lg:text-xl font-bold">
                         <span className="arabic-heading-font text-white">TOTAL</span>
                         <span className="text-white">
-                          ${finalTotal.toFixed(2)}
+                          EGP {finalTotal.toFixed(2)}
                         </span>
                       </div>
                     </div>

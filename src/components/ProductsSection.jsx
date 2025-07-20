@@ -152,45 +152,40 @@ const ProductsSection = () => {
         {/* Products Grid */}
         {!apiLoading && !apiError && randomProducts.length > 0 && (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
               {randomProducts.map((product) => (
                 <div 
                   key={product.id} 
-                  className="text-center group cursor-pointer"
+                  className="text-center group cursor-pointer border-2 border-primary rounded-lg p-3 hover:transition-all duration-300"
                   onClick={() => handleCardClick(product)}
                 >
                   {/* Product Image */}
-                  <div className="relative mb-12 overflow-hidden rounded-lg">
+                  <div className="relative mb-6 overflow-hidden rounded-lg">
                     <img 
                       src={product.image} 
                       alt={product.name}
-                      className="w-full h-96 object-cover transition-transform duration-300 group-hover:scale-105"
+                      className="w-full h-56 object-cover transition-transform duration-300 group-hover:scale-105"
                       onError={(e) => {
                         e.target.src = '/images/menu-1.jpg'
                       }}
                     />
                     {product.popular && (
-                      <div className="absolute top-4 right-4 bg-gradient-to-r from-red-500 to-pink-500 text-white px-3 py-1 rounded-full text-sm font-bold">
+                      <div className="absolute top-3 right-3 bg-gradient-to-r from-red-500 to-pink-500 text-white px-2 py-1 rounded-full text-xs font-bold">
                         {isArabic ? '⭐ شائع' : '⭐ Popular'}
                       </div>
                     )}
                   </div>
 
                   {/* Product Info */}
-                  <div className="space-y-10 pb-6">
+                  <div className="space-y-4 pb-4">
                     {/* Product Name */}
-                    <h3 className="text-white text-3xl font-semibold uppercase tracking-wide arabic-heading-font hover:text-primary transition-colors duration-300">
+                    <h3 className="text-white text-xl font-semibold uppercase tracking-wide arabic-heading-font hover:text-primary transition-colors duration-300">
                       {product.name}
                     </h3>
                     
-                    {/* Description */}
-                    <p className="text-gray-300 text-xl leading-relaxed arabic-body px-8">
-                      {product.description || (isArabic ? 'منتج مميز من تشكيلتنا الفاخرة' : 'Premium product from our exclusive collection')}
-                    </p>
-                    
                     {/* Price */}
                     <div className="flex items-center justify-center space-x-2 space-x-reverse">
-                      <span className="text-white text-4xl font-bold">
+                      <span className="text-white text-2xl font-bold">
                         {product.price} {content.currency}
                       </span>
                     </div>
@@ -203,7 +198,7 @@ const ProductsSection = () => {
                       e.stopPropagation()
                       handleAddToCart(product)
                     }}
-                    className="border-2 border-primary text-primary px-12 py-5 text-lg font-medium uppercase tracking-wide hover:bg-primary hover:text-white transition-all duration-300 rounded-sm backdrop-blur-sm"
+                    className="border-2 border-primary text-primary px-6 py-3 text-sm font-medium uppercase tracking-wide hover:bg-primary hover:text-white transition-all duration-300 rounded-sm backdrop-blur-sm"
                   >
                     {content.addToCart}
                   </button>
@@ -274,16 +269,6 @@ const ProductsSection = () => {
               <div className="flex items-start justify-between mb-4">
                 <div>
                   <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-2">{selectedProduct.name}</h2>
-                  <div className="flex items-center mb-2">
-                    <div className="flex items-center mr-4">
-                      <div className="flex">
-                        {[...Array(5)].map((_, i) => (
-                          <FaStar key={i} className="w-4 h-4 text-yellow-400" />
-                        ))}
-                      </div>
-                      <span className="ml-2 text-gray-600 font-medium text-sm">5.0</span>
-                    </div>
-                  </div>
                 </div>
                 <div className="text-right">
                   <span className="text-2xl font-black bg-gradient-to-r from-primary to-amber-600 bg-clip-text text-transparent">
@@ -298,21 +283,7 @@ const ProductsSection = () => {
                 </p>
               </div>
               
-              {selectedProduct.ingredients && selectedProduct.ingredients.length > 0 && (
-                <div className="mb-4">
-                  <h3 className="text-lg font-bold text-gray-800 mb-3 flex items-center">
-                    <span className="w-2 h-2 bg-primary rounded-full mr-2"></span>
-                    {content.ingredients}
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedProduct.ingredients.map((ingredient, index) => (
-                      <span key={index} className="bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 px-3 py-1 rounded-full text-xs font-medium shadow-sm hover:shadow-md transition-shadow">
-                        {ingredient}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
+
               
               <div className="flex items-center gap-4 mb-6 p-3 bg-amber-50 rounded-xl">
                 <span className="font-bold text-gray-800">{content.quantity}:</span>

@@ -369,7 +369,7 @@ const Menu = () => {
               {sortedItems.map(item => (
                 <div 
                   key={item.id} 
-                  className="group bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:scale-105 border border-gray-100 cursor-pointer"
+                  className="group bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:scale-105 border-2 border-primary cursor-pointer"
                   onClick={() => handleCardClick(item)}
                 >
                   <div className="relative overflow-hidden">
@@ -471,16 +471,6 @@ const Menu = () => {
                 <div className="flex items-start justify-between mb-4">
                   <div>
                     <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-2">{selectedItem.name}</h2>
-                    <div className="flex items-center mb-2">
-                      <div className="flex items-center mr-4">
-                        <div className="flex">
-                          {[...Array(5)].map((_, i) => (
-                            <FaStar key={i} className="w-4 h-4 text-yellow-400" />
-                          ))}
-                        </div>
-                        <span className="ml-2 text-gray-600 font-medium text-sm">{selectedItem.rating || '5.0'}</span>
-                      </div>
-                    </div>
                   </div>
                   <div className="text-right">
                     <span className="text-2xl font-black bg-gradient-to-r from-primary to-amber-600 bg-clip-text text-transparent">
@@ -495,21 +485,7 @@ const Menu = () => {
                   </p>
                 </div>
                 
-                {selectedItem.ingredients && selectedItem.ingredients.length > 0 && (
-                  <div className="mb-4">
-                    <h3 className="text-lg font-bold text-gray-800 mb-3 flex items-center">
-                      <span className="w-2 h-2 bg-primary rounded-full mr-2"></span>
-                      {content.ingredients}
-                    </h3>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedItem.ingredients.map((ingredient, index) => (
-                        <span key={index} className="bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 px-3 py-1 rounded-full text-xs font-medium shadow-sm hover:shadow-md transition-shadow">
-                          {ingredient}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
+
                 
                 <div className="flex items-center gap-4 mb-6 p-3 bg-amber-50 rounded-xl">
                   <span className="font-bold text-gray-800">{content.quantity}:</span>

@@ -1055,11 +1055,11 @@ const Checkout = () => {
                       <div className="flex-grow">
                         <h4 className="font-medium arabic-heading-font text-sm text-white">{item.name}</h4>
                         <p className="text-sm text-gray-300">
-                          {item.quantity} × ${item.price.toFixed(2)}
+                          {item.quantity} × {item.price.toFixed(2)} EGP
                         </p>
                       </div>
                       <span className="font-semibold text-white text-sm">
-                        ${(item.price * item.quantity).toFixed(2)}
+                        {(item.price * item.quantity).toFixed(2)} EGP
                       </span>
                     </div>
                   ))}
@@ -1069,31 +1069,31 @@ const Checkout = () => {
                 <div className="space-y-3 border-t border-white/20 pt-4">
                   <div className="flex justify-between items-center text-gray-300">
                     <span className="arabic-body text-sm sm:text-base">{content.orderSummary.subtotal}</span>
-                    <span className="text-white text-sm sm:text-base">${subtotal.toFixed(2)}</span>
+                    <span className="text-white text-sm sm:text-base">{subtotal.toFixed(2)} EGP</span>
                   </div>
                   
                   <div className="flex justify-between items-center text-gray-300">
                     <span className="arabic-body text-sm sm:text-base">{content.orderSummary.tax}</span>
-                    <span className="text-white text-sm sm:text-base">${tax.toFixed(2)}</span>
+                    <span className="text-white text-sm sm:text-base">{tax.toFixed(2)} EGP</span>
                   </div>
                   
                   <div className="flex justify-between items-center text-gray-300">
                     <span className="arabic-body text-sm sm:text-base">{content.orderSummary.delivery}</span>
                     <span className="text-white text-sm sm:text-base">
-                      {deliveryFee === 0 ? (isArabic ? 'مجاني' : 'Free') : `$${deliveryFee.toFixed(2)}`}
+                      {deliveryFee === 0 ? (isArabic ? 'مجاني' : 'Free') : `${deliveryFee.toFixed(2)} EGP`}
                     </span>
                   </div>
                   
                   {discount > 0 && (
                     <div className="flex justify-between items-center text-gray-300">
                       <span className="arabic-body text-sm sm:text-base">{content.orderSummary.discount}</span>
-                      <span className="text-green-400 text-sm sm:text-base">-${discount.toFixed(2)}</span>
+                      <span className="text-green-400 text-sm sm:text-base">-{discount.toFixed(2)} EGP</span>
                     </div>
                   )}
                   
                   <div className="flex justify-between items-center text-base sm:text-lg font-bold border-t border-white/20 pt-3">
                     <span className="arabic-heading-font text-white">TOTAL</span>
-                    <span className="text-white">${total.toFixed(2)}</span>
+                    <span className="text-white">{total.toFixed(2)} EGP</span>
                   </div>
                 </div>
               </div>
@@ -1125,7 +1125,7 @@ const Checkout = () => {
                     {content.orderConfirmModal.orderTotal}:
                   </span>
                   <span className="text-xl font-bold text-primary">
-                    ${total.toFixed(2)}
+                    {total.toFixed(2)} EGP
                   </span>
                 </div>
                 <div className="text-sm text-gray-500 mt-2 arabic-body">
