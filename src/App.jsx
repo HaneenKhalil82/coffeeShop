@@ -17,6 +17,15 @@ import Contact from './pages/Contact'
 import Cart from './pages/Cart'
 import Checkout from './pages/Checkout'
 import ProductSingle from './pages/ProductSingle'
+
+// Chat Components
+import { ChatProvider } from './contexts/ChatContext'
+import ChatButton from './components/ChatButton'
+import ChatWindow from './components/ChatWindow'
+
+// Toast Components
+import { ToastProvider } from './contexts/ToastContext'
+
 import './App.css'
 
 // RTL Context
@@ -133,6 +142,13 @@ function App() {
            
             <Navbar />
             
+        <ToastProvider>
+          <ChatProvider>
+          <Router>
+            <div className={`App arabic-text ${isRTL ? 'rtl' : 'ltr'}`}>
+             
+              <Navbar />
+              
 
             <main>
               <Routes>
@@ -155,6 +171,32 @@ function App() {
         </Router>
         
       
+              <main>
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path= '/login' element= {<Login /> }/>
+                  <Route path= "/SignUp" element={<SignUp /> }/>
+                  <Route path="/menu" element={<Menu />} />
+                  <Route path="/about" element={<About />} />
+        
+          
+                  <Route path="/shop" element={<Shop />} />
+                  <Route path="/product/:id" element={<ProductSingle />} />
+                  <Route path="/contact" element={<Contact />} />
+                  <Route path="/cart" element={<Cart />} />
+                  <Route path="/checkout" element={<Checkout />} />
+                </Routes>
+              </main>
+              
+              <Footer />
+              
+              {/* Chat Components - Available on all pages */}
+              <ChatButton />
+              <ChatWindow />
+            </div>
+          </Router>
+        </ChatProvider>
+        </ToastProvider>
       </CartContext.Provider>
     </RTLContext.Provider>
   )
