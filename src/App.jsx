@@ -10,13 +10,17 @@ import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
 // import { useAuth } from "./contexts/AuthContext";
 
-
-
 import Shop from './pages/Shop'
 import Contact from './pages/Contact'
 import Cart from './pages/Cart'
 import Checkout from './pages/Checkout'
 import ProductSingle from './pages/ProductSingle'
+
+// Chat Components
+import { ChatProvider } from './contexts/ChatContext'
+import ChatButton from './components/ChatButton'
+import ChatWindow from './components/ChatWindow'
+
 import './App.css'
 
 // RTL Context
@@ -63,6 +67,15 @@ function App() {
       }
     }
   }, [])
+
+  // Save cart to localStorage whenever cart changes
+  useEffect(() => {
+    if (cartItems.length > 0) {
+      localStorage.setItem('coffee-cart', JSON.stringify(cartItems))
+    } else {
+      localStorage.removeItem('coffee-cart')
+    }
+  }, [cartItems])
 
   // Set RTL as default on app load
   useEffect(() => {
@@ -126,35 +139,38 @@ function App() {
         cartTotal,
         cartItemsCount
       }}>
-        
-       
-        <Router>
-          <div className={`App arabic-text ${isRTL ? 'rtl' : 'ltr'}`}>
-           
-            <Navbar />
-            
+        <ChatProvider>
+          <Router>
+            <div className={`App arabic-text ${isRTL ? 'rtl' : 'ltr'}`}>
+             
+              <Navbar />
+              
 
-            <main>
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path= '/login' element= {<Login /> }/>
-                <Route path= "/SignUp" element={<SignUp /> }/>
-                <Route path="/menu" element={<Menu />} />
-                <Route path="/about" element={<About />} />
-      
+              <main>
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path= '/login' element= {<Login /> }/>
+                  <Route path= "/SignUp" element={<SignUp /> }/>
+                  <Route path="/menu" element={<Menu />} />
+                  <Route path="/about" element={<About />} />
         
-                <Route path="/shop" element={<Shop />} />
-                <Route path="/product/:id" element={<ProductSingle />} />
-                <Route path="/contact" element={<Contact />} />
-                <Route path="/cart" element={<Cart />} />
-                <Route path="/checkout" element={<Checkout />} />
-              </Routes>
-            </main>
-            <Footer />
-          </div>
-        </Router>
-        
-      
+          
+                  <Route path="/shop" element={<Shop />} />
+                  <Route path="/product/:id" element={<ProductSingle />} />
+                  <Route path="/contact" element={<Contact />} />
+                  <Route path="/cart" element={<Cart />} />
+                  <Route path="/checkout" element={<Checkout />} />
+                </Routes>
+              </main>
+              
+              <Footer />
+              
+              {/* Chat Components - Available on all pages */}
+              <ChatButton />
+              <ChatWindow />
+            </div>
+          </Router>
+        </ChatProvider>
       </CartContext.Provider>
     </RTLContext.Provider>
   )
