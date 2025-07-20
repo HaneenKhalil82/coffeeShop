@@ -41,14 +41,12 @@ const Navbar = () => {
         { path: '/', label: 'الرئيسية' },
         { path: '/menu', label: 'المنتجات' },
         { path: '/about', label: 'من نحن' },
-        { path: '/shop', label: ' المتجر' },
         { path: '/contact', label: 'اتصل بنا' },
       ]
     : [
         { path: '/', label: 'Home' },
         { path: '/menu', label: 'Menu' },
         { path: '/about', label: 'About' },
-        { path: '/shop', label: 'Shop' },
         { path: '/contact', label: 'Contact' },
       ]
 
@@ -139,22 +137,7 @@ const Navbar = () => {
           )}
         </button>
 
-        {isShopOpen && (
-          <div className={`absolute top-full ${isArabic ? 'right-0 text-left' : 'left-0 text-right'} mt-2 bg-[#120f0f] text-white shadow-lg rounded-lg py-2 w-48 transition-all duration-300 z-50`}>
-            <Link to="/shop" className="block px-4 py-2 text-gray-400 hover:text-light">
-              {isArabic ? 'المتجر' : 'Shop'}
-            </Link>
-            <Link to="/product" className="block px-4 py-2 text-gray-400 hover:text-light">
-              {isArabic ? 'منتج واحد' : 'Single Product'}
-            </Link>
-            <Link to="/cart" className="block px-4 py-2 text-gray-400 hover:text-light">
-              {isArabic ? 'السلة' : 'Cart'}
-            </Link>
-            <Link to="/checkout" className="block px-4 py-2 text-gray-400 hover:text-light">
-              {isArabic ? 'الدفع' : 'Checkout'}
-            </Link>
-          </div>
-        )}
+        
       </div>
     )
   } else {

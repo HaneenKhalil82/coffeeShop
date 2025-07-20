@@ -23,15 +23,16 @@ const Contact = () => {
       title: 'معلومات التواصل',
       address: {
         title: 'العنوان',
-        value: 'شارع الملك فهد، حي العليا، الرياض 12345، المملكة العربية السعودية'
+        value: 'الفرع الأول : مصر -بني سويف-الأباصيري ',
+        value2: 'الفرع الثاني : مصر -بني سويف-شارع عبد السلام عارف'
       },
       phone: {
         title: 'الهاتف',
-        value: '+966 11 123 4567'
+        value: '+2011 112 007 610'
       },
       email: {
         title: 'البريد الإلكتروني',
-        value: 'info@coffeemix.sa'
+        value: 'blalra77ma@gmail.com'
       },
       hours: {
         title: 'ساعات العمل',
@@ -72,15 +73,16 @@ const Contact = () => {
       title: 'Contact Information',
       address: {
         title: 'Address',
-        value: 'King Fahd Road, Al Olaya District, Riyadh 12345, Saudi Arabia'
+        value: 'Branch 1: Egypt - Beni Suef - Abasiri',
+        value2: 'Branch 2: Egypt - Beni Suef - Abd El Salam Arafa'
       },
       phone: {
         title: 'Phone',
-        value: '+966 11 123 4567'
+        value: '+2011 112 007 610'
       },
       email: {
         title: 'Email',
-        value: 'info@coffeemix.sa'
+        value: 'blalra77ma@gmail.com'
       },
       hours: {
         title: 'Opening Hours',
@@ -180,9 +182,12 @@ const Contact = () => {
                   </h3>
                   <p className="text-gray-300 text-xl arabic-body">
                     {content.info.address.value}
+                    <br />
+                    {content.info.address.value2}
                   </p>
                 </div>
               </div>
+             
 
               {/* Phone */}
               <div className="flex items-center space-x-4 space-x-reverse">
