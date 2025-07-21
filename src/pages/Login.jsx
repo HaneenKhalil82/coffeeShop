@@ -46,11 +46,10 @@ const Login = () => {
     if (result.success) {
       toast.success(isArabic ? "تم تسجيل الدخول بنجاح" : "Login successful", {
         position: "top-right",
-        autoClose: 3000,
+        autoClose: 2000,
       });
-      setTimeout(() => {
-        navigate("/");
-      }, 1000);
+      // Immediately redirect to home page after successful login
+      navigate("/", { replace: true });
     } else {
       toast.error(
         result.error ||
@@ -75,11 +74,7 @@ const Login = () => {
         <div className="w-full lg:w-1/2 p-6 sm:p-8">
           <div className="text-center mb-8">
             <Link to="/" className="block">
-              <img
-                src="/images/Group.svg"
-                alt="لوجو"
-                className="h-10 w-90 mx-auto"
-              />
+              
             </Link>
 
             <p className="text-3xl text-gray-300">

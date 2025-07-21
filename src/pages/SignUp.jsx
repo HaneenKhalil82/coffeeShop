@@ -10,18 +10,18 @@ import { useRTL } from "../App";
 const signUpSchema = z.object({
   name: z
     .string()
-    .min(4, "الاسم يجب أن يحتوي على 4 حروف على الأقل")
+    .min(4, "Name must be at least 4 characters long")
     .refine((val) => /^[\u0600-\u06FF\sA-Za-z]+$/.test(val), {
-      message: "الاسم يجب أن يحتوي على حروف ومسافات فقط",
+      message: "Name should contain only letters and spaces",
     })
     .refine((val) => val.trim().split(" ").length >= 2, {
-      message: "الاسم يجب أن يحتوي على كلمتين على الأقل",
+      message: "Name should contain at least two words",
     }),
   email: z
     .string()
-    .min(6, "البريد الإلكتروني قصير جدًا")
-    .max(50, "البريد الإلكتروني طويل جدًا")
-    .email("من فضلك أدخل بريد إلكتروني صحيح"),
+    .min(6, "Email is too short")
+    .max(50, "Email is too long")
+    .email("Please enter a valid email address"),
   phone: z
     .string()
     .refine((val) => {
@@ -30,14 +30,20 @@ const signUpSchema = z.object({
       const isInternational = /^\+?[1-9]\d{7,14}$/.test(val);
       return onlyDigits && (isEgyptian || isInternational);
     }, {
-      message: "الرجاء إدخال رقم هاتف صحيح بدون حروف أو رموز خاصة",
+      message: "Please enter a valid phone number without letters or special characters",
     }),
   password: z
     .string()
-    .min(6, "كلمة المرور يجب أن تكون على الأقل 6 أحرف")
+    .min(6, "Password must be at least 6 characters long")
     .refine((val) => /[a-zA-Z]/.test(val) && /\d/.test(val), {
-      message: "كلمة المرور يجب أن تحتوي على حروف وأرقام",
+      message: "Password must contain both letters and numbers",
     }),
+  password_confirmation: z
+    .string()
+    .min(6, "Password confirmation is required")
+}).refine((data) => data.password === data.password_confirmation, {
+  message: "Passwords don't match",
+  path: ["password_confirmation"],
 });
 
 const SignUp = () => {
@@ -58,19 +64,30 @@ const SignUp = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate("/products");
+      navigate("/", { replace: true });
     }
   }, [isAuthenticated, navigate]);
 
   const onSubmit = async (data) => {
     setSignUpError("");
     setSignUpSuccess(false);
-    const result = await registerUser(data.name, data.email, data.password);
+    
+    // Pass the complete data object to register function
+    const result = await registerUser(data);
+    
     if (result.success) {
       setSignUpSuccess(true);
-      setTimeout(() => {
-        navigate("/login");
-      }, 2000);
+      
+      // Check if user was auto-logged in after registration
+      if (result.data?.access_token || result.data?.token) {
+        // User is auto-logged in, useEffect will handle redirect to home
+        // No need to manually navigate here
+      } else {
+        // User needs to login manually, redirect to login page
+        setTimeout(() => {
+          navigate("/login", { replace: true });
+        }, 1500);
+      }
     } else {
       setSignUpError(result.error);
     }
@@ -90,7 +107,6 @@ const SignUp = () => {
         <div className="w-full lg:w-1/2 p-5 sm:p-8">
           <div className="text-center mb-3">
             <Link to="/" className="block mb-1">
-              <img src="/images/Group.svg" alt="logo" className="h-10 w-60 mx-auto" />
             </Link>
             <p className="text-3xl text-gray-300 font-bold">
               {isArabic ? "إنشاء حساب" : "Create Account"}
@@ -106,7 +122,7 @@ const SignUp = () => {
 
             {signUpSuccess && (
               <div className="bg-green-100 border border-green-300 text-green-700 px-4 py-3 rounded-lg">
-                {isArabic ? "تم إنشاء الحساب بنجاح!" : "Account created successfully!"}
+                {isArabic ? "تم إنشاء الحساب بنجاح! جاري توجيهك..." : "Account created successfully! Redirecting..."}
               </div>
             )}
 
@@ -183,6 +199,23 @@ const SignUp = () => {
                 </button>
               </div>
               {errors.password && <p className="text-gray-400 text-sm mt-1">{errors.password.message}</p>}
+            </div>
+
+            {/* Confirm Password */}
+            <div>
+              <label className={`block text-sm font-medium text-gray-300 ${isArabic ? "text-left" : "text-right"} mb-2`}>
+                {isArabic ? "تأكيد كلمة المرور" : "Confirm Password"}
+              </label>
+              <div className="relative">
+                <Lock className={`absolute top-1/2 transform -translate-y-1/2 text-gray-400 ${isArabic ? "right-3" : "left-3"}`} size={20} />
+                <input
+                  {...register("password_confirmation")}
+                  type={showPassword ? "text" : "password"}
+                  className={`w-full bg-[#3B3737] py-3 px-12 rounded-lg ${isArabic ? "text-left" : "text-right"}`}
+                  placeholder={isArabic ? "أعد إدخال كلمة المرور" : "Confirm your password"}
+                />
+              </div>
+              {errors.password_confirmation && <p className="text-gray-400 text-sm mt-1">{errors.password_confirmation.message}</p>}
             </div>
 
             {/* Submit Button */}

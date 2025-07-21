@@ -1,0 +1,1070 @@
+{
+	"info": {
+		"_postman_id": "coffee-api-v2",
+		"name": "Coffee Shop API v2.0",
+		"description": "Complete API collection for Coffee Shop Management System with Public User APIs and Address-Delivery Relationship",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "🔐 Public User Authentication",
+			"item": [
+				{
+					"name": "Register User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"John Doe\",\n    \"email\": \"john@example.com\",\n    \"mobile\": \"+1234567890\",\n    \"password\": \"password123\",\n    \"password_confirmation\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/register",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "register"]
+						}
+					}
+				},
+				{
+					"name": "Login User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"john@example.com\",\n    \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/login",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "login"]
+						}
+					}
+				},
+				{
+					"name": "Get Profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{public_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/auth/profile",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "profile"]
+						}
+					}
+				},
+				{
+					"name": "Update Profile",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{public_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"John Updated\",\n    \"mobile\": \"+1234567891\",\n    \"profile_image\": \"https://example.com/image.jpg\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/profile",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "profile"]
+						}
+					}
+				},
+				{
+					"name": "Change Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{public_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"current_password\": \"password123\",\n    \"password\": \"newpassword123\",\n    \"password_confirmation\": \"newpassword123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/change-password",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "change-password"]
+						}
+					}
+				},
+				{
+					"name": "Refresh Token",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{public_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/auth/refresh",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "refresh"]
+						}
+					}
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{public_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/auth/logout",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "logout"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "📍 Address Management",
+			"item": [
+				{
+					"name": "Get User Addresses",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{public_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/user/addresses",
+							"host": ["{{base_url}}"],
+							"path": ["api", "user", "addresses"]
+						}
+					}
+				},
+				{
+					"name": "Add New Address",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{public_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Home\",\n    \"address\": \"123 Main Street\",\n    \"building_number\": \"A1\",\n    \"apartment_number\": \"101\",\n    \"floor\": \"1st Floor\",\n    \"additional_notes\": \"Near the park\",\n    \"delivery_location_id\": 1,\n    \"is_default\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/user/addresses",
+							"host": ["{{base_url}}"],
+							"path": ["api", "user", "addresses"]
+						}
+					}
+				},
+				{
+					"name": "Update Address",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{public_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Work\",\n    \"address\": \"456 Business Ave\",\n    \"building_number\": \"B2\",\n    \"apartment_number\": \"202\",\n    \"floor\": \"2nd Floor\",\n    \"additional_notes\": \"Office building\",\n    \"delivery_location_id\": 2,\n    \"is_default\": false\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/user/addresses/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "user", "addresses", "1"]
+						}
+					}
+				},
+				{
+					"name": "Delete Address",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{public_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/user/addresses/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "user", "addresses", "1"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "❤️ Favorites Management",
+			"item": [
+				{
+					"name": "Get User Favorites",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{public_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/user/favorites",
+							"host": ["{{base_url}}"],
+							"path": ["api", "user", "favorites"]
+						}
+					}
+				},
+				{
+					"name": "Add to Favorites",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{public_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"product_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/user/favorites",
+							"host": ["{{base_url}}"],
+							"path": ["api", "user", "favorites"]
+						}
+					}
+				},
+				{
+					"name": "Remove from Favorites",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{public_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/user/favorites/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "user", "favorites", "1"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "🛒 Order Management",
+			"item": [
+				{
+					"name": "Get User Orders",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{public_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/user/orders",
+							"host": ["{{base_url}}"],
+							"path": ["api", "user", "orders"]
+						}
+					}
+				},
+				{
+					"name": "Get Order Details",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{public_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/user/orders/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "user", "orders", "1"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "🚚 Order Placement & Delivery",
+			"item": [
+				{
+					"name": "Get Delivery Locations",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/delivery-locations",
+							"host": ["{{base_url}}"],
+							"path": ["api", "delivery-locations"]
+						}
+					}
+				},
+				{
+					"name": "Get Delivery Fee for Address",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{public_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"user_address_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/get-delivery-fee",
+							"host": ["{{base_url}}"],
+							"path": ["api", "get-delivery-fee"]
+						}
+					}
+				},
+				{
+					"name": "Validate Promo Code",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"code\": \"WELCOME10\",\n    \"order_amount\": 50.00\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/validate-promo-code",
+							"host": ["{{base_url}}"],
+							"path": ["api", "validate-promo-code"]
+						}
+					}
+				},
+				{
+					"name": "Place Order - Delivery",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{public_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"branch_id\": 1,\n    \"order_type\": \"delivery\",\n    \"payment_method\": \"cash_on_delivery\",\n    \"user_address_id\": 1,\n    \"promo_code\": \"WELCOME10\",\n    \"scheduled_delivery_time\": \"2024-01-15 18:00:00\",\n    \"delivery_notes\": \"Please call before delivery\",\n    \"customer_notes\": \"Extra hot coffee\",\n    \"loyalty_points_used\": 50,\n    \"items\": [\n        {\n            \"product_id\": 1,\n            \"quantity\": 2,\n            \"notes\": \"Extra hot\"\n        },\n        {\n            \"product_id\": 2,\n            \"quantity\": 1,\n            \"notes\": \"No sugar\"\n        }\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/orders",
+							"host": ["{{base_url}}"],
+							"path": ["api", "orders"]
+						}
+					}
+				},
+				{
+					"name": "Place Order - Takeaway",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{public_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"branch_id\": 1,\n    \"order_type\": \"takeaway\",\n    \"payment_method\": \"cash_on_delivery\",\n    \"customer_notes\": \"Extra hot coffee\",\n    \"loyalty_points_used\": 25,\n    \"items\": [\n        {\n            \"product_id\": 1,\n            \"quantity\": 1,\n            \"notes\": \"Extra hot\"\n        }\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/orders",
+							"host": ["{{base_url}}"],
+							"path": ["api", "orders"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "🛍️ Public Products",
+			"item": [
+				{
+					"name": "Get Active Products",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/products",
+							"host": ["{{base_url}}"],
+							"path": ["api", "products"]
+						}
+					}
+				},
+				{
+					"name": "Get Categories",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/categories",
+							"host": ["{{base_url}}"],
+							"path": ["api", "categories"]
+						}
+					}
+				},
+				{
+					"name": "Get Active Branches",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/branches",
+							"host": ["{{base_url}}"],
+							"path": ["api", "branches"]
+						}
+					}
+				},
+				{
+					"name": "Search Products",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/products/search?q=coffee",
+							"host": ["{{base_url}}"],
+							"path": ["api", "products", "search"],
+							"query": [
+								{
+									"key": "q",
+									"value": "coffee"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Product Details",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/products/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "products", "1"]
+						}
+					}
+				},
+				{
+					"name": "Get Products by Category",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/categories/1/products",
+							"host": ["{{base_url}}"],
+							"path": ["api", "categories", "1", "products"]
+						}
+					}
+				},
+				{
+					"name": "Get Products by Branch",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/branches/1/products",
+							"host": ["{{base_url}}"],
+							"path": ["api", "branches", "1", "products"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "👨‍💼 Admin Authentication",
+			"item": [
+				{
+					"name": "Admin Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"admin@coffee.com\",\n    \"password\": \"password\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/admin/auth/login",
+							"host": ["{{base_url}}"],
+							"path": ["api", "admin", "auth", "login"]
+						}
+					}
+				},
+				{
+					"name": "Admin Logout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/admin/auth/logout",
+							"host": ["{{base_url}}"],
+							"path": ["api", "admin", "auth", "logout"]
+						}
+					}
+				},
+				{
+					"name": "Admin Profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/admin/auth/profile",
+							"host": ["{{base_url}}"],
+							"path": ["api", "admin", "auth", "profile"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "🎫 Admin Promo Codes",
+			"item": [
+				{
+					"name": "Get All Promo Codes",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/admin/promo-codes",
+							"host": ["{{base_url}}"],
+							"path": ["api", "admin", "promo-codes"]
+						}
+					}
+				},
+				{
+					"name": "Create Promo Code - Percentage",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"code\": \"SUMMER20\",\n    \"name\": \"Summer Discount\",\n    \"description\": \"20% off for summer season\",\n    \"type\": \"percentage\",\n    \"value\": 20,\n    \"minimum_order_amount\": 25.00,\n    \"max_uses\": 100,\n    \"valid_from\": \"2024-06-01\",\n    \"valid_until\": \"2024-08-31\",\n    \"is_active\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/admin/promo-codes",
+							"host": ["{{base_url}}"],
+							"path": ["api", "admin", "promo-codes"]
+						}
+					}
+				},
+				{
+					"name": "Create Promo Code - Fixed Amount",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"code\": \"SAVE10\",\n    \"name\": \"Save $10\",\n    \"description\": \"$10 off on orders above $50\",\n    \"type\": \"fixed\",\n    \"value\": 10.00,\n    \"minimum_order_amount\": 50.00,\n    \"max_uses\": 50,\n    \"valid_from\": \"2024-01-01\",\n    \"valid_until\": \"2024-12-31\",\n    \"is_active\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/admin/promo-codes",
+							"host": ["{{base_url}}"],
+							"path": ["api", "admin", "promo-codes"]
+						}
+					}
+				},
+				{
+					"name": "Get Promo Code Details",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/admin/promo-codes/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "admin", "promo-codes", "1"]
+						}
+					}
+				},
+				{
+					"name": "Update Promo Code",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Updated Summer Discount\",\n    \"description\": \"Updated description\",\n    \"value\": 25,\n    \"minimum_order_amount\": 30.00\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/admin/promo-codes/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "admin", "promo-codes", "1"]
+						}
+					}
+				},
+				{
+					"name": "Delete Promo Code",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/admin/promo-codes/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "admin", "promo-codes", "1"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "📍 Admin Delivery Locations",
+			"item": [
+				{
+					"name": "Get All Delivery Locations",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/admin/delivery-locations",
+							"host": ["{{base_url}}"],
+							"path": ["api", "admin", "delivery-locations"]
+						}
+					}
+				},
+				{
+					"name": "Create Delivery Location",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"New Area\",\n    \"description\": \"Recently added delivery area\",\n    \"delivery_fee\": 12.00,\n    \"is_active\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/admin/delivery-locations",
+							"host": ["{{base_url}}"],
+							"path": ["api", "admin", "delivery-locations"]
+						}
+					}
+				},
+				{
+					"name": "Get Delivery Location Details",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/admin/delivery-locations/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "admin", "delivery-locations", "1"]
+						}
+					}
+				},
+				{
+					"name": "Update Delivery Location",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Updated Area Name\",\n    \"description\": \"Updated description\",\n    \"delivery_fee\": 15.00\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/admin/delivery-locations/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "admin", "delivery-locations", "1"]
+						}
+					}
+				},
+				{
+					"name": "Delete Delivery Location",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/admin/delivery-locations/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "admin", "delivery-locations", "1"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "📋 Admin Order Management",
+			"item": [
+				{
+					"name": "Get All Orders",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/admin/orders",
+							"host": ["{{base_url}}"],
+							"path": ["api", "admin", "orders"]
+						}
+					}
+				},
+				{
+					"name": "Get Online Orders Only",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/admin/orders/online",
+							"host": ["{{base_url}}"],
+							"path": ["api", "admin", "orders", "online"]
+						}
+					}
+				},
+				{
+					"name": "Get Order Details",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/admin/orders/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "admin", "orders", "1"]
+						}
+					}
+				},
+				{
+					"name": "Update Order Status - Confirmed",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"confirmed\",\n    \"notes\": \"Order confirmed and being prepared\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/admin/orders/1/status",
+							"host": ["{{base_url}}"],
+							"path": ["api", "admin", "orders", "1", "status"]
+						}
+					}
+				},
+				{
+					"name": "Update Order Status - Preparing",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"preparing\",\n    \"notes\": \"Order is being prepared\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/admin/orders/1/status",
+							"host": ["{{base_url}}"],
+							"path": ["api", "admin", "orders", "1", "status"]
+						}
+					}
+				},
+				{
+					"name": "Update Order Status - Out for Delivery",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"out_for_delivery\",\n    \"notes\": \"Order is out for delivery\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/admin/orders/1/status",
+							"host": ["{{base_url}}"],
+							"path": ["api", "admin", "orders", "1", "status"]
+						}
+					}
+				},
+				{
+					"name": "Update Order Status - Completed",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"completed\",\n    \"notes\": \"Order delivered successfully\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/admin/orders/1/status",
+							"host": ["{{base_url}}"],
+							"path": ["api", "admin", "orders", "1", "status"]
+						}
+					}
+				},
+				{
+					"name": "Update Order Status - Cancelled",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"cancelled\",\n    \"notes\": \"Order cancelled by customer\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/admin/orders/1/status",
+							"host": ["{{base_url}}"],
+							"path": ["api", "admin", "orders", "1", "status"]
+						}
+					}
+				},
+				{
+					"name": "Delete Order",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/admin/orders/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "admin", "orders", "1"]
+						}
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000",
+			"type": "string"
+		},
+		{
+			"key": "public_token",
+			"value": "your_public_user_jwt_token_here",
+			"type": "string"
+		},
+		{
+			"key": "admin_token",
+			"value": "your_admin_jwt_token_here",
+			"type": "string"
+		}
+	]
+} 

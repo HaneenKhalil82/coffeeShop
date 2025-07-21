@@ -15,6 +15,8 @@ import Contact from './pages/Contact'
 import Cart from './pages/Cart'
 import Checkout from './pages/Checkout'
 import ProductSingle from './pages/ProductSingle'
+import ApiDemo from './components/ApiDemo'
+import Profile from './pages/Profile'
 
 // Chat Components
 import { ChatProvider } from './contexts/ChatContext'
@@ -160,6 +162,8 @@ function App() {
                   <Route path="/contact" element={<Contact />} />
                   <Route path="/cart" element={<Cart />} />
                   <Route path="/checkout" element={<Checkout />} />
+                  <Route path="/profile" element={<Profile />} />
+                  <Route path="/api-demo" element={<ApiDemo />} />
                 </Routes>
               </main>
               
