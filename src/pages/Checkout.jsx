@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
-import { FaArrowLeft, FaArrowRight, FaCreditCard, FaPaypal, FaLock, FaCheck, FaExclamationTriangle, FaTimes } from 'react-icons/fa'
+import { Link, useNavigate } from 'react-router-dom'
+import { FaArrowLeft, FaArrowRight, FaCreditCard, FaPaypal, FaMoneyBill, FaCheckCircle, FaExclamationTriangle, FaTimes, FaCheck, FaPlus, FaEdit, FaTrash, FaMapMarkerAlt, FaShoppingBag } from 'react-icons/fa'
 import { useCart, useRTL } from '../App'
+import { useAuth } from '../contexts/AuthContext'
+import { getUserAddresses, addUserAddress, updateUserAddress, deleteUserAddress, getDeliveryFee, validatePromoCode, placeOrder, getDeliveryLocations } from '../services/api'
 import HeroSection from './../components/HeroSection'
 
 // Toast Component
@@ -27,39 +29,140 @@ const Toast = ({ message, type, onClose }) => {
 
 const Checkout = () => {
   const { isArabic } = useRTL()
+  const { isAuthenticated } = useAuth()
   const { cartItems, clearCart } = useCart()
+  const navigate = useNavigate()
 
-  const [step, setStep] = useState(1) // 1: Info, 2: Payment, 3: Confirmation
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/login')
+    }
+  }, [isAuthenticated, navigate])
+
+  // All state declarations first
+  const [step, setStep] = useState(1) // 1: Address, 2: Payment, 3: Confirmation
   const [loading, setLoading] = useState(false)
   const [toast, setToast] = useState(null)
   const [errors, setErrors] = useState({})
   const [showOrderConfirmModal, setShowOrderConfirmModal] = useState(false)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [orderData, setOrderData] = useState(null)
+
+  // Address Management
+  const [addresses, setAddresses] = useState([])
+  const [selectedAddressId, setSelectedAddressId] = useState(null)
+  const [showAddressModal, setShowAddressModal] = useState(false)
+  const [editingAddress, setEditingAddress] = useState(null)
+  const [addressForm, setAddressForm] = useState({
+    title: '',
+    address: '',
+    building_number: '',
+    apartment_number: '',
+    floor: '',
+    additional_notes: '',
+    delivery_location_id: '',
+    is_default: false
+  })
+
+  // Delivery & Pricing
+  const [deliveryLocations, setDeliveryLocations] = useState([])
+  const [deliveryFee, setDeliveryFee] = useState(0)
+  const [calculatingDeliveryFee, setCalculatingDeliveryFee] = useState(false)
+
+  // Promo Code
+  const [promoCode, setPromoCode] = useState('')
+  const [promoDiscount, setPromoDiscount] = useState(0)
+  const [promoMessage, setPromoMessage] = useState('')
+  const [validatingPromo, setValidatingPromo] = useState(false)
+
+  // Order Type
+  const [orderType, setOrderType] = useState('delivery') // 'delivery' or 'takeaway'
+
+  // Payment Info
   const [formData, setFormData] = useState({
-    // Customer Info
+    // Customer Information
     firstName: '',
     lastName: '',
     email: '',
-    phoneCountry: 'saudi', // 'saudi' or 'egypt'
     phone: '',
-    
-    // Delivery Info
+    phoneCountry: 'egypt', // Default country
+    // Address Information
     address: '',
     city: '',
-    district: '',
-    postalCode: '',
-    deliveryNotes: '',
-    
-    // Payment Info
-    paymentMethod: 'card',
+    // Payment Information
+    paymentMethod: 'cash_on_delivery',
     cardNumber: '',
     expiryDate: '',
     cvv: '',
-    cardholderName: ''
+    cardholderName: '',
+    // Additional Notes
+    customer_notes: '',
+    scheduled_delivery_time: ''
   })
 
-  // Note: Cart empty check is handled in the render logic below
+  // Load initial data
+  useEffect(() => {
+    if (isAuthenticated) {
+      loadAddresses()
+      loadDeliveryLocations()
+    }
+  }, [isAuthenticated])
+
+  // Calculate delivery fee when address changes
+  useEffect(() => {
+    if (selectedAddressId && orderType === 'delivery') {
+      calculateDeliveryFee()
+    } else if (orderType === 'takeaway') {
+      setDeliveryFee(0)
+    }
+  }, [selectedAddressId, orderType])
+
+  const loadAddresses = async () => {
+    try {
+      const response = await getUserAddresses()
+      const addressesData = response.data.data || response.data
+      setAddresses(Array.isArray(addressesData) ? addressesData : [])
+      
+      // Auto-select default address
+      const defaultAddress = addressesData.find(addr => addr.is_default)
+      if (defaultAddress) {
+        setSelectedAddressId(defaultAddress.id)
+      } else if (addressesData.length > 0) {
+        setSelectedAddressId(addressesData[0].id)
+      }
+    } catch (error) {
+      console.error('Error loading addresses:', error)
+      showToast(isArabic ? 'خطأ في تحميل العناوين' : 'Error loading addresses', 'error')
+    }
+  }
+
+  const loadDeliveryLocations = async () => {
+    try {
+      const response = await getDeliveryLocations()
+      const locationsData = response.data.data || response.data
+      setDeliveryLocations(Array.isArray(locationsData) ? locationsData : [])
+    } catch (error) {
+      console.error('Error loading delivery locations:', error)
+    }
+  }
+
+  const calculateDeliveryFee = async () => {
+    if (!selectedAddressId) return
+    
+    setCalculatingDeliveryFee(true)
+    try {
+      const response = await getDeliveryFee(selectedAddressId)
+      const fee = response.data.delivery_fee || response.data.data?.delivery_fee || 0
+      setDeliveryFee(Number(fee) || 0)
+    } catch (error) {
+      console.error('Error calculating delivery fee:', error)
+      setDeliveryFee(10) // Fallback fee
+      showToast(isArabic ? 'خطأ في حساب رسوم التوصيل' : 'Error calculating delivery fee', 'error')
+    } finally {
+      setCalculatingDeliveryFee(false)
+    }
+  }
 
   const showToast = (message, type = 'info') => {
     setToast({ message, type })
@@ -67,219 +170,147 @@ const Checkout = () => {
 
   const content = isArabic ? {
     title: 'إتمام الطلب',
-    subtitle: 'أكمل طلبك بسهولة وأمان',
     steps: {
-      1: 'معلومات الشحن',
-      2: 'الدفع',
-      3: 'تأكيد الطلب'
-    },
-    customerInfo: {
-      title: 'معلومات العميل',
-      firstName: 'الاسم الأول',
-      lastName: 'الاسم الأخير',
-      email: 'البريد الإلكتروني',
-      phoneCountry: 'الدولة',
-      phone: 'رقم الهاتف'
-    },
-    phoneCountries: {
-      saudi: 'المملكة العربية السعودية (+966)',
-      egypt: 'مصر (+20)'
-    },
-    deliveryInfo: {
-      title: 'معلومات التوصيل',
       address: 'العنوان',
-      city: 'المدينة',
-      district: 'الحي',
-      postalCode: 'الرمز البريدي',
-      deliveryNotes: 'ملاحظات التوصيل'
+      payment: 'الدفع',
+      confirm: 'التأكيد'
     },
-    paymentInfo: {
-      title: 'معلومات الدفع',
-      paymentMethod: 'طريقة الدفع',
-      card: 'بطاقة ائتمان',
-      cash: 'الدفع عند الاستلام',
-      paypal: 'باي بال',
-      cardNumber: 'رقم البطاقة',
-      expiryDate: 'تاريخ الانتهاء',
-      cvv: 'رمز الأمان',
-      cardholderName: 'اسم حامل البطاقة'
+    orderType: {
+      title: 'نوع الطلب',
+      delivery: 'توصيل',
+      takeaway: 'استلام من المحل'
+    },
+    address: {
+      title: 'عنوان التوصيل',
+      select: 'اختر العنوان',
+      add: 'إضافة عنوان جديد',
+      edit: 'تعديل',
+      delete: 'حذف',
+      form: {
+        title: 'اسم العنوان',
+        address: 'العنوان',
+        building: 'رقم المبنى',
+        apartment: 'رقم الشقة',
+        floor: 'الطابق',
+        notes: 'ملاحظات إضافية',
+        location: 'منطقة التوصيل',
+        default: 'جعل هذا العنوان الافتراضي'
+      }
+    },
+    promo: {
+      title: 'كود الخصم',
+      placeholder: 'أدخل كود الخصم',
+      apply: 'تطبيق',
+      validating: 'جاري التحقق...'
     },
     orderSummary: {
       title: 'ملخص الطلب',
-      items: 'المنتجات',
       subtotal: 'المجموع الفرعي',
-      tax: 'ضريبة القيمة المضافة (15%)',
-      delivery: 'رسوم التوصيل',
+      tax: 'الضريبة',
+      delivery: 'التوصيل',
       discount: 'الخصم',
       total: 'المجموع الكلي'
     },
+    paymentInfo: {
+      title: 'معلومات الدفع',
+      method: 'طريقة الدفع',
+      cash: 'الدفع عند الاستلام',
+      card: 'بطاقة ائتمانية',
+      paypal: 'PayPal'
+    },
     buttons: {
-      continue: 'متابعة',
       back: 'رجوع',
+      next: 'التالي',
       placeOrder: 'تأكيد الطلب',
-      backToCart: 'العودة للسلة'
-    },
-    placeholders: {
-      firstName: 'أدخل اسمك الأول',
-      lastName: 'أدخل اسمك الأخير',
-      email: 'أدخل بريدك الإلكتروني',
-      phoneSaudi: '5X XXX XXXX',
-      phoneEgypt: '1X XXXX XXXX',
-      address: 'أدخل عنوانك الكامل',
-      city: 'أدخل المدينة',
-      district: 'أدخل الحي',
-      postalCode: 'أدخل الرمز البريدي',
-      deliveryNotes: 'ملاحظات إضافية للتوصيل',
-      cardNumber: '1234 5678 9012 3456',
-      expiryDate: 'MM/YY',
-      cvv: '123',
-      cardholderName: 'اسم حامل البطاقة'
-    },
-    confirmation: {
-      title: 'تم تأكيد طلبك!',
-      orderNumber: 'رقم الطلب',
-      message: 'شكراً لك! تم استلام طلبك وسيتم التواصل معك قريباً لتأكيد التوصيل.',
-      estimatedDelivery: 'وقت التوصيل المتوقع: 30-45 دقيقة',
-      trackOrder: 'تتبع الطلب',
-      continueShopping: 'متابعة التسوق'
-    },
-    orderConfirmModal: {
-      title: 'تأكيد الطلب',
-      message: 'هل أنت متأكد من أنك تريد تأكيد طلبك؟',
-      orderTotal: 'إجمالي الطلب',
-      confirmButton: 'نعم، أكد الطلب',
-      cancelButton: 'إلغاء'
-    },
-    successModal: {
-      title: 'تم تأكيد طلبك بنجاح! 🎉',
-      orderNumber: 'رقم الطلب',
-      message: 'شكراً لك! تم استلام طلبك وسيتم التواصل معك قريباً لتأكيد التوصيل.',
-      estimatedDelivery: 'وقت التوصيل المتوقع: 30-45 دقيقة',
-      continueShoppingButton: 'متابعة التسوق',
-      closeButton: 'إغلاق'
-    },
-    validation: {
-      required: 'هذا الحقل مطلوب',
-      emailInvalid: 'بريد إلكتروني غير صالح',
-      phoneInvalidSaudi: 'رقم هاتف سعودي غير صالح - يجب أن يبدأ بـ 5 ويتكون من 9 أرقام',
-      phoneInvalidEgypt: 'رقم هاتف مصري غير صالح - يجب أن يبدأ بـ 1 ويتكون من 10 أرقام',
-      cardInvalid: 'رقم بطاقة غير صالح',
-      expiryInvalid: 'تاريخ انتهاء غير صالح',
-      cvvInvalid: 'رمز أمان غير صالح'
+      save: 'حفظ',
+      cancel: 'إلغاء'
     },
     messages: {
       orderSuccess: 'تم تأكيد طلبك بنجاح!',
-      orderError: 'حدث خطأ في معالجة طلبك',
-      processingOrder: 'جاري معالجة طلبك...',
-      validationError: 'يرجى تصحيح الأخطاء في النموذج'
+      processingOrder: 'جاري معالجة الطلب...',
+      orderError: 'خطأ في تأكيد الطلب',
+      validationError: 'يرجى تعبئة جميع الحقول المطلوبة'
+    },
+    validation: {
+      required: 'هذا الحقل مطلوب',
+      emailInvalid: 'يرجى إدخال بريد إلكتروني صحيح',
+      phoneInvalidSaudi: 'يرجى إدخال رقم هاتف سعودي صحيح (5XXXXXXXX)',
+      phoneInvalidEgypt: 'يرجى إدخال رقم هاتف مصري صحيح (1XXXXXXXXX)',
+      cardInvalid: 'يرجى إدخال رقم بطاقة صحيح',
+      expiryInvalid: 'يرجى إدخال تاريخ انتهاء صحيح (MM/YY)',
+      cvvInvalid: 'يرجى إدخال رمز CVV صحيح'
     }
   } : {
     title: 'Checkout',
-    subtitle: 'Complete your order safely and easily',
     steps: {
-      1: 'Shipping Info',
-      2: 'Payment',
-      3: 'Order Confirmation'
-    },
-    customerInfo: {
-      title: 'Customer Information',
-      firstName: 'First Name',
-      lastName: 'Last Name',
-      email: 'Email',
-      phoneCountry: 'Country',
-      phone: 'Phone Number'
-    },
-    phoneCountries: {
-      saudi: 'Saudi Arabia (+966)',
-      egypt: 'Egypt (+20)'
-    },
-    deliveryInfo: {
-      title: 'Delivery Information',
       address: 'Address',
-      city: 'City',
-      district: 'District',
-      postalCode: 'Postal Code',
-      deliveryNotes: 'Delivery Notes'
+      payment: 'Payment',
+      confirm: 'Confirmation'
     },
-    paymentInfo: {
-      title: 'Payment Information',
-      paymentMethod: 'Payment Method',
-      card: 'Credit Card',
-      cash: 'Cash on Delivery',
-      paypal: 'PayPal',
-      cardNumber: 'Card Number',
-      expiryDate: 'Expiry Date',
-      cvv: 'CVV',
-      cardholderName: 'Cardholder Name'
+    orderType: {
+      title: 'Order Type',
+      delivery: 'Delivery',
+      takeaway: 'Takeaway'
+    },
+    address: {
+      title: 'Delivery Address',
+      select: 'Select Address',
+      add: 'Add New Address',
+      edit: 'Edit',
+      delete: 'Delete',
+      form: {
+        title: 'Address Title',
+        address: 'Address',
+        building: 'Building Number',
+        apartment: 'Apartment Number',
+        floor: 'Floor',
+        notes: 'Additional Notes',
+        location: 'Delivery Location',
+        default: 'Make this default address'
+      }
+    },
+    promo: {
+      title: 'Promo Code',
+      placeholder: 'Enter promo code',
+      apply: 'Apply',
+      validating: 'Validating...'
     },
     orderSummary: {
       title: 'Order Summary',
-      items: 'Items',
       subtotal: 'Subtotal',
-      tax: 'VAT (15%)',
-      delivery: 'Delivery Fee',
+      tax: 'Tax',
+      delivery: 'Delivery',
       discount: 'Discount',
       total: 'Total'
     },
+    paymentInfo: {
+      title: 'Payment Information',
+      method: 'Payment Method',
+      cash: 'Cash on Delivery',
+      card: 'Credit Card',
+      paypal: 'PayPal'
+    },
     buttons: {
-      continue: 'Continue',
       back: 'Back',
+      next: 'Next',
       placeOrder: 'Place Order',
-      backToCart: 'Back to Cart'
-    },
-    placeholders: {
-      firstName: 'Enter your first name',
-      lastName: 'Enter your last name',
-      email: 'Enter your email',
-      phoneSaudi: '5X XXX XXXX',
-      phoneEgypt: '1X XXXX XXXX',
-      address: 'Enter your full address',
-      city: 'Enter city',
-      district: 'Enter district',
-      postalCode: 'Enter postal code',
-      deliveryNotes: 'Additional delivery notes',
-      cardNumber: '1234 5678 9012 3456',
-      expiryDate: 'MM/YY',
-      cvv: '123',
-      cardholderName: 'Cardholder name'
-    },
-    confirmation: {
-      title: 'Order Confirmed!',
-      orderNumber: 'Order Number',
-      message: 'Thank you! Your order has been received and we will contact you shortly to confirm delivery.',
-      estimatedDelivery: 'Estimated delivery time: 30-45 minutes',
-      trackOrder: 'Track Order',
-      continueShopping: 'Continue Shopping'
-    },
-    orderConfirmModal: {
-      title: 'Confirm Order',
-      message: 'Are you sure you want to confirm your order?',
-      orderTotal: 'Order Total',
-      confirmButton: 'Yes, Confirm Order',
-      cancelButton: 'Cancel'
-    },
-    successModal: {
-      title: 'Order Confirmed Successfully! 🎉',
-      orderNumber: 'Order Number',
-      message: 'Thank you! Your order has been received and we will contact you shortly to confirm delivery.',
-      estimatedDelivery: 'Estimated delivery time: 30-45 minutes',
-      continueShoppingButton: 'Continue Shopping',
-      closeButton: 'Close'
-    },
-    validation: {
-      required: 'This field is required',
-      emailInvalid: 'Invalid email address',
-      phoneInvalidSaudi: 'Invalid Saudi phone number - must start with 5 and be 9 digits',
-      phoneInvalidEgypt: 'Invalid Egyptian phone number - must start with 1 and be 10 digits',
-      cardInvalid: 'Invalid card number',
-      expiryInvalid: 'Invalid expiry date',
-      cvvInvalid: 'Invalid CVV'
+      save: 'Save',
+      cancel: 'Cancel'
     },
     messages: {
       orderSuccess: 'Order placed successfully!',
-      orderError: 'Error processing your order',
       processingOrder: 'Processing your order...',
-      validationError: 'Please correct the errors in the form'
+      orderError: 'Error placing order',
+      validationError: 'Please fill in all required fields'
+    },
+    validation: {
+      required: 'This field is required',
+      emailInvalid: 'Please enter a valid email address',
+      phoneInvalidSaudi: 'Please enter a valid Saudi phone number (5XXXXXXXX)',
+      phoneInvalidEgypt: 'Please enter a valid Egyptian phone number (1XXXXXXXXX)',
+      cardInvalid: 'Please enter a valid card number',
+      expiryInvalid: 'Please enter a valid expiry date (MM/YY)',
+      cvvInvalid: 'Please enter a valid CVV code'
     }
   }
 
@@ -287,44 +318,22 @@ const Checkout = () => {
   const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0)
   const taxRate = 0.15
   const tax = subtotal * taxRate
-  const deliveryFee = subtotal >= 100 ? 0 : 10
-  const discount = subtotal >= 50 ? 5 : 0
-  const total = subtotal + tax + deliveryFee - discount
+  const total = subtotal + tax + (Number(deliveryFee) || 0) - promoDiscount
 
   // Form validation
   const validateForm = () => {
     const newErrors = {}
 
     if (step === 1) {
-      // Customer info validation
-      if (!formData.firstName.trim()) newErrors.firstName = content.validation.required
-      if (!formData.lastName.trim()) newErrors.lastName = content.validation.required
-      if (!formData.email.trim()) {
-        newErrors.email = content.validation.required
-      } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-        newErrors.email = content.validation.emailInvalid
+      // Order type validation
+      if (!orderType) {
+        newErrors.orderType = content.validation.required
       }
-      if (!formData.phone.trim()) {
-        newErrors.phone = content.validation.required
-      } else {
-        const cleanPhone = formData.phone.replace(/\s/g, '')
-        
-        if (formData.phoneCountry === 'saudi') {
-          // Saudi format: 5XXXXXXXX (9 digits starting with 5)
-          if (!/^5\d{8}$/.test(cleanPhone)) {
-            newErrors.phone = content.validation.phoneInvalidSaudi
-          }
-        } else if (formData.phoneCountry === 'egypt') {
-          // Egyptian format: 1XXXXXXXXX (10 digits starting with 1)
-          if (!/^1[0125]\d{8}$/.test(cleanPhone)) {
-            newErrors.phone = content.validation.phoneInvalidEgypt
-          }
-        }
+      
+      // Address validation for delivery orders
+      if (orderType === 'delivery' && !selectedAddressId) {
+        newErrors.address = isArabic ? 'يرجى تحديد عنوان التوصيل' : 'Please select delivery address'
       }
-
-      // Delivery info validation
-      if (!formData.address.trim()) newErrors.address = content.validation.required
-      if (!formData.city.trim()) newErrors.city = content.validation.required
     }
 
     if (step === 2 && formData.paymentMethod === 'card') {
@@ -476,14 +485,89 @@ const Checkout = () => {
     }
   }
 
-  const handlePlaceOrder = () => {
-    if (!validateForm()) {
-      showToast(content.messages.validationError, 'error')
-      return
-    }
+  const handlePlaceOrder = async () => {
+    setShowOrderConfirmModal(false)
+    setLoading(true)
     
-    // Show confirmation modal first
-    setShowOrderConfirmModal(true)
+    try {
+      // Prepare order data for API
+      const orderItems = cartItems.map(item => ({
+        product_id: Number(item.id),
+        quantity: Number(item.quantity),
+        notes: item.notes || ''
+      }))
+
+      const orderData = {
+        branch_id: 1, // Default branch - could be made dynamic
+        order_type: orderType,
+        payment_method: formData.paymentMethod,
+        customer_notes: formData.customer_notes || '',
+        items: orderItems
+      }
+
+      // Add delivery-specific fields
+      if (orderType === 'delivery') {
+        if (!selectedAddressId) {
+          throw new Error(isArabic ? 'يرجى تحديد عنوان التوصيل' : 'Please select delivery address')
+        }
+        orderData.user_address_id = Number(selectedAddressId)
+        orderData.delivery_notes = addresses.find(addr => addr.id === selectedAddressId)?.additional_notes || ''
+      }
+
+      // Add promo code if applied
+      if (promoCode && promoDiscount > 0) {
+        orderData.promo_code = promoCode
+      }
+
+      // Add scheduled delivery time if provided
+      if (formData.scheduled_delivery_time) {
+        orderData.scheduled_delivery_time = formData.scheduled_delivery_time
+      }
+
+      const response = await placeOrder(orderData)
+      const newOrderData = response.data.data || response.data
+
+      // Store order details for success modal
+      setOrderData({
+        ...newOrderData,
+        orderNumber: newOrderData.id || newOrderData.order_number || Date.now().toString(36).toUpperCase(),
+        items: cartItems,
+        totals: {
+          subtotal: cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0),
+          tax: cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0) * 0.15,
+          deliveryFee,
+          discount: promoDiscount,
+          total: cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0) * 1.15 + (Number(deliveryFee) || 0) - promoDiscount
+        },
+        orderDate: new Date().toISOString(),
+        status: newOrderData.status || 'confirmed'
+      })
+
+      // Clear cart and show success modal
+      clearCart()
+      setShowSuccessModal(true)
+      showToast(isArabic ? 'تم تأكيد طلبك بنجاح!' : 'Order placed successfully!', 'success')
+      
+    } catch (error) {
+      console.error('Error placing order:', error)
+      
+      // Handle validation errors (422) with specific messages
+      if (error.response?.status === 422) {
+        const validationErrors = error.response.data.errors || error.response.data.message || {}
+        console.error('Validation errors:', validationErrors)
+        
+        if (typeof validationErrors === 'object' && Object.keys(validationErrors).length > 0) {
+          const errorMessages = Object.values(validationErrors).flat()
+          showToast(errorMessages.join('. '), 'error')
+        } else {
+          showToast(validationErrors || (isArabic ? 'خطأ في البيانات المرسلة' : 'Validation error'), 'error')
+        }
+      } else {
+        showToast(error.response?.data?.message || error.message || (isArabic ? 'خطأ في تأكيد الطلب' : 'Error placing order'), 'error')
+      }
+    } finally {
+      setLoading(false)
+    }
   }
 
   const confirmPlaceOrder = async () => {
@@ -507,7 +591,7 @@ const Checkout = () => {
           subtotal,
           tax,
           deliveryFee,
-          discount,
+          discount: promoDiscount,
           total
         },
         orderDate: new Date().toISOString(),
@@ -525,6 +609,194 @@ const Checkout = () => {
       showToast(content.messages.orderError, 'error')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleAddAddress = async () => {
+    try {
+      setLoading(true)
+      const response = await addUserAddress(addressForm)
+      const newAddress = response.data.data || response.data
+      
+      setAddresses(prev => [...prev, newAddress])
+      setSelectedAddressId(newAddress.id)
+      setShowAddressModal(false)
+      resetAddressForm()
+      showToast(isArabic ? 'تم إضافة العنوان بنجاح' : 'Address added successfully', 'success')
+    } catch (error) {
+      console.error('Error adding address:', error)
+      showToast(error.response?.data?.message || (isArabic ? 'خطأ في إضافة العنوان' : 'Error adding address'), 'error')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleEditAddress = async () => {
+    try {
+      setLoading(true)
+      const response = await updateUserAddress(editingAddress.id, addressForm)
+      const updatedAddress = response.data.data || response.data
+      
+      setAddresses(prev => prev.map(addr => 
+        addr.id === editingAddress.id ? updatedAddress : addr
+      ))
+      setShowAddressModal(false)
+      setEditingAddress(null)
+      resetAddressForm()
+      showToast(isArabic ? 'تم تحديث العنوان بنجاح' : 'Address updated successfully', 'success')
+    } catch (error) {
+      console.error('Error updating address:', error)
+      showToast(error.response?.data?.message || (isArabic ? 'خطأ في تحديث العنوان' : 'Error updating address'), 'error')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleDeleteAddress = async (addressId) => {
+    if (!confirm(isArabic ? 'هل أنت متأكد من حذف هذا العنوان؟' : 'Are you sure you want to delete this address?')) {
+      return
+    }
+
+    try {
+      setLoading(true)
+      await deleteUserAddress(addressId)
+      
+      setAddresses(prev => prev.filter(addr => addr.id !== addressId))
+      if (selectedAddressId === addressId) {
+        const remainingAddresses = addresses.filter(addr => addr.id !== addressId)
+        setSelectedAddressId(remainingAddresses.length > 0 ? remainingAddresses[0].id : null)
+      }
+      showToast(isArabic ? 'تم حذف العنوان بنجاح' : 'Address deleted successfully', 'success')
+    } catch (error) {
+      console.error('Error deleting address:', error)
+      showToast(error.response?.data?.message || (isArabic ? 'خطأ في حذف العنوان' : 'Error deleting address'), 'error')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const resetAddressForm = () => {
+    setAddressForm({
+      title: '',
+      address: '',
+      building_number: '',
+      apartment_number: '',
+      floor: '',
+      additional_notes: '',
+      delivery_location_id: '',
+      is_default: false
+    })
+  }
+
+  const openAddressModal = (address = null) => {
+    if (address) {
+      setEditingAddress(address)
+      setAddressForm({
+        title: address.title || '',
+        address: address.address || '',
+        building_number: address.building_number || '',
+        apartment_number: address.apartment_number || '',
+        floor: address.floor || '',
+        additional_notes: address.additional_notes || '',
+        delivery_location_id: address.delivery_location_id || '',
+        is_default: address.is_default || false
+      })
+    } else {
+      setEditingAddress(null)
+      resetAddressForm()
+    }
+    setShowAddressModal(true)
+  }
+
+  const handleValidatePromoCode = async () => {
+    if (!promoCode.trim()) return
+
+    setValidatingPromo(true)
+    try {
+      const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+      
+      // Hardcoded promo codes for immediate testing
+      const hardcodedPromoCodes = {
+        'WELCOME10': {
+          type: 'percentage',
+          value: 10,
+          minimum_order: 25,
+          message: isArabic ? 'تم تطبيق خصم 10%!' : '10% discount applied!'
+        },
+        'SAVE20': {
+          type: 'fixed',
+          value: 20,
+          minimum_order: 50,
+          message: isArabic ? 'تم خصم 20 جنيه!' : '20 EGP discount applied!'
+        },
+        'FIRST15': {
+          type: 'percentage',
+          value: 15,
+          minimum_order: 30,
+          message: isArabic ? 'خصم 15% للعملاء الجدد!' : '15% first customer discount!'
+        }
+      }
+
+      const promoCodeUpper = promoCode.toUpperCase()
+      const hardcodedPromo = hardcodedPromoCodes[promoCodeUpper]
+
+      if (hardcodedPromo) {
+        // Check minimum order amount
+        if (subtotal < hardcodedPromo.minimum_order) {
+          const minOrderMessage = isArabic 
+            ? `الحد الأدنى للطلب ${hardcodedPromo.minimum_order} ريال`
+            : `Minimum order ${hardcodedPromo.minimum_order} EGP required`
+          setPromoDiscount(0)
+          setPromoMessage(minOrderMessage)
+          showToast(minOrderMessage, 'error')
+          setValidatingPromo(false)
+          return
+        }
+
+        // Calculate discount
+        let discount = 0
+        if (hardcodedPromo.type === 'percentage') {
+          discount = subtotal * (hardcodedPromo.value / 100)
+        } else if (hardcodedPromo.type === 'fixed') {
+          discount = hardcodedPromo.value
+        }
+
+        // Apply discount
+        setPromoDiscount(discount)
+        setPromoMessage(hardcodedPromo.message)
+        showToast(hardcodedPromo.message, 'success')
+        setValidatingPromo(false)
+        return
+      }
+
+      // If not a hardcoded promo, try API validation
+      try {
+        const response = await validatePromoCode(promoCode, subtotal)
+        
+        const promoData = response.data.data || response.data
+        if (promoData.valid || response.data.success) {
+          const discount = promoData.discount_amount || promoData.value || 0
+          setPromoDiscount(discount)
+          setPromoMessage(promoData.message || (isArabic ? 'تم تطبيق الكود بنجاح!' : 'Promo code applied successfully!'))
+          showToast(isArabic ? 'تم تطبيق الكود بنجاح!' : 'Promo code applied!', 'success')
+        } else {
+          setPromoDiscount(0)
+          setPromoMessage(promoData.message || (isArabic ? 'كود غير صالح' : 'Invalid promo code'))
+          showToast(promoData.message || (isArabic ? 'كود غير صالح' : 'Invalid promo code'), 'error')
+        }
+      } catch {
+        // API failed, show invalid code message
+        setPromoDiscount(0)
+        setPromoMessage(isArabic ? 'كود غير صالح' : 'Invalid promo code')
+        showToast(isArabic ? 'كود غير صالح' : 'Invalid promo code', 'error')
+      }
+    } catch (error) {
+      console.error('Error validating promo code:', error)
+      setPromoDiscount(0)
+      setPromoMessage(isArabic ? 'خطأ في التحقق من الكود' : 'Error validating promo code')
+      showToast(isArabic ? 'خطأ في التحقق من الكود' : 'Error validating promo code', 'error')
+    } finally {
+      setValidatingPromo(false)
     }
   }
 
@@ -633,211 +905,165 @@ const Checkout = () => {
       {/* Checkout Content */}
       <section className="section-padding relative z-10">
         <div className="w-full px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+          {/* Steps Content */}
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 sm:gap-8 lg:gap-12">
-            {/* Checkout Form */}
+            {/* Main Form Section */}
             <div className="xl:col-span-2">
               {step === 1 && (
-                <div className="backdrop-blur-sm border-2 border-primary/30 rounded-xl shadow-2xl p-6 md:p-8">
-                  {/* Customer Information */}
-                  <div className="mb-8">
-                    <h2 className="text-xl sm:text-2xl font-semibold mb-6 arabic-heading-font text-white">
-                      {content.customerInfo.title}
-                    </h2>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-white mb-2 arabic-body">
-                          {content.customerInfo.firstName}
-                        </label>
-                        <input
-                          type="text"
-                          name="firstName"
-                          value={formData.firstName}
-                          onChange={handleInputChange}
-                          placeholder={content.placeholders.firstName}
-                          className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent arabic-body bg-white/10 text-white placeholder-gray-300 ${
-                            errors.firstName ? 'border-red-500' : 'border-white/20'
-                          }`}
-                          required
-                        />
-                        {errors.firstName && (
-                          <p className="mt-1 text-sm text-red-400 arabic-body">{errors.firstName}</p>
-                        )}
-                      </div>
-                      
-                      <div>
-                        <label className="block text-sm font-medium text-white mb-2 arabic-body">
-                          {content.customerInfo.lastName}
-                        </label>
-                        <input
-                          type="text"
-                          name="lastName"
-                          value={formData.lastName}
-                          onChange={handleInputChange}
-                          placeholder={content.placeholders.lastName}
-                          className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent arabic-body bg-white/10 text-white placeholder-gray-300 ${
-                            errors.lastName ? 'border-red-500' : 'border-white/20'
-                          }`}
-                          required
-                        />
-                        {errors.lastName && (
-                          <p className="mt-1 text-sm text-red-400 arabic-body">{errors.lastName}</p>
-                        )}
-                      </div>
-                      
-                      <div>
-                        <label className="block text-sm font-medium text-white mb-2 arabic-body">
-                          {content.customerInfo.email}
-                        </label>
-                        <input
-                          type="email"
-                          name="email"
-                          value={formData.email}
-                          onChange={handleInputChange}
-                          placeholder={content.placeholders.email}
-                          className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent arabic-body bg-white/10 text-white placeholder-gray-300 ${
-                            errors.email ? 'border-red-500' : 'border-white/20'
-                          }`}
-                          required
-                        />
-                        {errors.email && (
-                          <p className="mt-1 text-sm text-red-400 arabic-body">{errors.email}</p>
-                        )}
-                      </div>
-                      
-                      <div>
-                        <label className="block text-sm font-medium text-white mb-2 arabic-body">
-                          {content.customerInfo.phoneCountry}
-                        </label>
-                        <select
-                          name="phoneCountry"
-                          value={formData.phoneCountry}
-                          onChange={handleInputChange}
-                          className="w-full px-4 py-3 border border-white/20 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent arabic-body bg-white/10 text-white"
-                        >
-                          <option value="saudi" className="text-black">{content.phoneCountries.saudi}</option>
-                          <option value="egypt" className="text-black">{content.phoneCountries.egypt}</option>
-                        </select>
-                      </div>
-                      
-                      <div>
-                        <label className="block text-sm font-medium text-white mb-2 arabic-body">
-                          {content.customerInfo.phone}
-                        </label>
-                        <div className="flex">
-                          <div className="flex items-center px-3 py-3 bg-white/20 border border-white/20 rounded-l-lg text-white font-medium">
-                            {formData.phoneCountry === 'egypt' ? '+20' : '+966'}
-                          </div>
-                          <input
-                            type="tel"
-                            name="phone"
-                            value={formData.phone}
-                            onChange={handleInputChange}
-                            placeholder={formData.phoneCountry === 'egypt' ? content.placeholders.phoneEgypt : content.placeholders.phoneSaudi}
-                            className={`flex-1 px-4 py-3 border rounded-r-lg focus:ring-2 focus:ring-primary focus:border-transparent arabic-body bg-white/10 text-white placeholder-gray-300 ${
-                              errors.phone ? 'border-red-500' : 'border-white/20'
-                            }`}
-                            dir="ltr"
-                            required
-                          />
-                        </div>
-                        {errors.phone && (
-                          <p className="mt-1 text-sm text-red-400 arabic-body">{errors.phone}</p>
-                        )}
-                      </div>
-                    </div>
+                <div className="backdrop-blur-sm rounded-xl overflow-hidden shadow-2xl">
+                  <div className="bg-primary px-4 md:px-8 py-4 md:py-6">
+                    <h3 className="text-white text-xl md:text-2xl font-bold arabic-heading-font">
+                      {content.steps.address}
+                    </h3>
                   </div>
 
-                  {/* Delivery Information */}
-                  <div className="border-t border-white/20 pt-8">
-                    <h2 className="text-xl sm:text-2xl font-semibold mb-6 arabic-heading-font text-white">
-                      {content.deliveryInfo.title}
-                    </h2>
-                    
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-sm font-medium text-white mb-2 arabic-body">
-                          {content.deliveryInfo.address}
-                        </label>
-                        <input
-                          type="text"
-                          name="address"
-                          value={formData.address}
-                          onChange={handleInputChange}
-                          placeholder={content.placeholders.address}
-                          className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent arabic-body bg-white/10 text-white placeholder-gray-300 ${
-                            errors.address ? 'border-red-500' : 'border-white/20'
+                  <div className="bg-black/40 p-4 md:p-8 lg:p-10 space-y-6">
+                    {/* Order Type Selection */}
+                    <div>
+                      <label className="block text-white font-semibold mb-3 arabic-body text-lg">
+                        {content.orderType.title}
+                      </label>
+                      <div className="grid grid-cols-2 gap-4">
+                        <button
+                          type="button"
+                          onClick={() => setOrderType('delivery')}
+                          className={`p-4 rounded-xl border-2 transition-all duration-300 ${
+                            orderType === 'delivery'
+                              ? 'border-primary bg-primary/20 text-white'
+                              : 'border-gray-400 text-gray-300 hover:border-primary'
                           }`}
-                          required
-                        />
-                        {errors.address && (
-                          <p className="mt-1 text-sm text-red-400 arabic-body">{errors.address}</p>
+                        >
+                          <FaMapMarkerAlt className="w-6 h-6 mx-auto mb-2" />
+                          <span className="arabic-body font-medium">{content.orderType.delivery}</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setOrderType('takeaway')}
+                          className={`p-4 rounded-xl border-2 transition-all duration-300 ${
+                            orderType === 'takeaway'
+                              ? 'border-primary bg-primary/20 text-white'
+                              : 'border-gray-400 text-gray-300 hover:border-primary'
+                          }`}
+                        >
+                          <FaShoppingBag className="w-6 h-6 mx-auto mb-2" />
+                          <span className="arabic-body font-medium">{content.orderType.takeaway}</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Address Selection (only for delivery) */}
+                    {orderType === 'delivery' && (
+                      <div>
+                        <div className="flex justify-between items-center mb-4">
+                          <label className="text-white font-semibold arabic-body text-lg">
+                            {content.address.title}
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => openAddressModal()}
+                            className="flex items-center gap-2 text-primary hover:text-primary/80 transition-colors"
+                          >
+                            <FaPlus className="w-4 h-4" />
+                            <span className="arabic-body">{content.address.add}</span>
+                          </button>
+                        </div>
+
+                        {addresses.length === 0 ? (
+                          <div className="text-center py-8 border-2 border-dashed border-gray-500 rounded-xl">
+                            <FaMapMarkerAlt className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                            <p className="text-gray-400 arabic-body">
+                              {isArabic ? 'لا توجد عناوين محفوظة' : 'No saved addresses'}
+                            </p>
+                            <button
+                              type="button"
+                              onClick={() => openAddressModal()}
+                              className="mt-4 bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary/90 transition-colors"
+                            >
+                              {content.address.add}
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="space-y-3">
+                            {addresses.map((address) => (
+                              <div
+                                key={address.id}
+                                className={`p-4 rounded-xl border-2 cursor-pointer transition-all duration-300 ${
+                                  selectedAddressId === address.id
+                                    ? 'border-primary bg-primary/20'
+                                    : 'border-gray-500 hover:border-primary/50'
+                                }`}
+                                onClick={() => setSelectedAddressId(address.id)}
+                              >
+                                <div className="flex justify-between items-start">
+                                  <div className="flex-1">
+                                    <h4 className="text-white font-semibold arabic-body mb-1">
+                                      {address.title}
+                                    </h4>
+                                    <p className="text-gray-300 arabic-body text-sm">
+                                      {address.address}
+                                      {address.building_number && `, ${isArabic ? 'مبنى' : 'Building'} ${address.building_number}`}
+                                      {address.apartment_number && `, ${isArabic ? 'شقة' : 'Apt'} ${address.apartment_number}`}
+                                    </p>
+                                    {address.additional_notes && (
+                                      <p className="text-gray-400 arabic-body text-xs mt-1">
+                                        {address.additional_notes}
+                                      </p>
+                                    )}
+                                  </div>
+                                  <div className="flex gap-2 ml-4">
+                                    <button
+                                      type="button"
+                                      onClick={(e) => {
+                                        e.stopPropagation()
+                                        openAddressModal(address)
+                                      }}
+                                      className="text-gray-400 hover:text-primary transition-colors"
+                                    >
+                                      <FaEdit className="w-4 h-4" />
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={(e) => {
+                                        e.stopPropagation()
+                                        handleDeleteAddress(address.id)
+                                      }}
+                                      className="text-gray-400 hover:text-red-400 transition-colors"
+                                    >
+                                      <FaTrash className="w-4 h-4" />
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
                         )}
                       </div>
-                      
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div>
-                          <label className="block text-sm font-medium text-white mb-2 arabic-body">
-                            {content.deliveryInfo.city}
-                          </label>
-                          <input
-                            type="text"
-                            name="city"
-                            value={formData.city}
-                            onChange={handleInputChange}
-                            placeholder={content.placeholders.city}
-                            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent arabic-body bg-white/10 text-white placeholder-gray-300 ${
-                              errors.city ? 'border-red-500' : 'border-white/20'
-                            }`}
-                            required
-                          />
-                          {errors.city && (
-                            <p className="mt-1 text-sm text-red-400 arabic-body">{errors.city}</p>
-                          )}
-                        </div>
-                        
-                        <div>
-                          <label className="block text-sm font-medium text-white mb-2 arabic-body">
-                            {content.deliveryInfo.district}
-                          </label>
-                          <input
-                            type="text"
-                            name="district"
-                            value={formData.district}
-                            onChange={handleInputChange}
-                            placeholder={content.placeholders.district}
-                            className="w-full px-4 py-3 border border-white/20 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent arabic-body bg-white/10 text-white placeholder-gray-300"
-                          />
-                        </div>
-                        
-                        <div>
-                          <label className="block text-sm font-medium text-white mb-2 arabic-body">
-                            {content.deliveryInfo.postalCode}
-                          </label>
-                          <input
-                            type="text"
-                            name="postalCode"
-                            value={formData.postalCode}
-                            onChange={handleInputChange}
-                            placeholder={content.placeholders.postalCode}
-                            className="w-full px-4 py-3 border border-white/20 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent arabic-body bg-white/10 text-white placeholder-gray-300"
-                          />
-                        </div>
-                      </div>
-                      
-                      <div>
-                        <label className="block text-sm font-medium text-white mb-2 arabic-body">
-                          {content.deliveryInfo.deliveryNotes}
-                        </label>
-                        <textarea
-                          name="deliveryNotes"
-                          value={formData.deliveryNotes}
-                          onChange={handleInputChange}
-                          placeholder={content.placeholders.deliveryNotes}
-                          rows={3}
-                          className="w-full px-4 py-3 border border-white/20 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent arabic-body resize-none bg-white/10 text-white placeholder-gray-300"
-                        />
-                      </div>
+                    )}
+
+                    {/* Customer Notes */}
+                    <div>
+                      <label className="block text-white font-semibold mb-3 arabic-body text-lg">
+                        {isArabic ? 'ملاحظات إضافية' : 'Additional Notes'}
+                      </label>
+                      <textarea
+                        value={formData.customer_notes}
+                        onChange={(e) => setFormData(prev => ({ ...prev, customer_notes: e.target.value }))}
+                        placeholder={isArabic ? 'أي ملاحظات خاصة للطلب...' : 'Any special notes for your order...'}
+                        className="w-full bg-white/10 text-white placeholder-gray-400 rounded-xl px-4 py-3 h-24 resize-none focus:outline-none focus:ring-2 focus:ring-primary"
+                        dir={isArabic ? 'rtl' : 'ltr'}
+                      />
+                    </div>
+
+                    {/* Navigation */}
+                    <div className="flex justify-end pt-4">
+                      <button
+                        onClick={() => setStep(2)}
+                        disabled={orderType === 'delivery' && !selectedAddressId}
+                        className="bg-primary text-white px-8 py-3 rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                      >
+                        <span className="arabic-body font-semibold">{content.buttons.next}</span>
+                        {isArabic ? <FaArrowLeft /> : <FaArrowRight />}
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -852,7 +1078,7 @@ const Checkout = () => {
                   {/* Payment Method Selection */}
                   <div className="mb-6">
                     <label className="block text-sm font-medium text-white mb-4 arabic-body">
-                      {content.paymentInfo.paymentMethod}
+                      {content.paymentInfo.method}
                     </label>
                     
                     <div className="space-y-3">
@@ -870,15 +1096,15 @@ const Checkout = () => {
                       </label>
                       
                       <label className="flex items-center p-4 border border-white/20 rounded-lg cursor-pointer hover:bg-white/5 bg-white/10">
-                        <input
-                          type="radio"
-                          name="paymentMethod"
-                          value="cash"
-                          checked={formData.paymentMethod === 'cash'}
-                          onChange={handleInputChange}
-                          className="mr-3 ml-3"
-                        />
-                        <span className="w-5 h-5 mr-3 ml-3 text-white">💵</span>
+                                                  <input
+                            type="radio"
+                            name="paymentMethod"
+                            value="cash_on_delivery"
+                            checked={formData.paymentMethod === 'cash_on_delivery'}
+                            onChange={handleInputChange}
+                            className="mr-3 ml-3"
+                          />
+                        <FaMoneyBill className="w-5 h-5 text-white mr-3 ml-3" />
                         <span className="arabic-body text-white">{content.paymentInfo.cash}</span>
                       </label>
                     </div>
@@ -973,7 +1199,7 @@ const Checkout = () => {
                   {/* Security Notice */}
                   <div className="mt-6 p-4 bg-green-500/10 rounded-lg border border-green-500/20">
                     <div className="flex items-center space-x-3 space-x-reverse">
-                      <FaLock className="w-5 h-5 text-green-400" />
+                      <FaCheckCircle className="w-5 h-5 text-green-400" />
                       <span className="text-sm text-green-400 arabic-body">
                         {isArabic ? 'معلوماتك محمية بتشفير SSL آمن' : 'Your information is protected with secure SSL encryption'}
                       </span>
@@ -1007,11 +1233,11 @@ const Checkout = () => {
                 <div>
                   {step < 2 ? (
                     <button
-                      onClick={handleNextStep}
-                      disabled={loading}
-                      className="bg-primary text-white px-6 sm:px-8 py-3 rounded-lg hover:bg-primary/90 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
-                    >
-                      {content.buttons.continue}
+                                              onClick={handleNextStep}
+                        disabled={loading}
+                        className="bg-primary text-white px-6 sm:px-8 py-3 rounded-lg hover:bg-primary/90 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
+                      >
+                        {content.buttons.next}
                     </button>
                   ) : (
                     <button
@@ -1034,66 +1260,92 @@ const Checkout = () => {
             </div>
 
             {/* Order Summary */}
-            <div className="xl:col-span-1">
-              <div className="backdrop-blur-sm border-2 border-primary/30 rounded-xl shadow-2xl p-6 md:p-8 sticky top-24">
-                <h3 className="text-lg sm:text-xl font-semibold mb-6 arabic-heading-font text-white">
+            <div className="backdrop-blur-sm rounded-xl overflow-hidden shadow-2xl">
+              <div className="bg-primary px-4 md:px-8 py-4 md:py-6">
+                <h3 className="text-white text-xl md:text-2xl font-bold arabic-heading-font">
                   {content.orderSummary.title}
                 </h3>
-
-                {/* Items */}
+              </div>
+              
+              <div className="bg-black/40 p-4 md:p-8 lg:p-10">
+                {/* Cart Items */}
                 <div className="space-y-4 mb-6">
                   {cartItems.map((item) => (
-                    <div key={item.id} className="flex items-center space-x-3 space-x-reverse">
-                      <img
-                        src={item.image}
-                        alt={item.name}
-                        className="w-12 h-12 object-cover rounded-lg shadow-lg"
-                        onError={(e) => {
-                          e.target.src = '/images/menu1.jpg'
-                        }}
-                      />
-                      <div className="flex-grow">
-                        <h4 className="font-medium arabic-heading-font text-sm text-white">{item.name}</h4>
-                        <p className="text-sm text-gray-300">
-                          {item.quantity} × {item.price.toFixed(2)} EGP
-                        </p>
+                    <div key={item.id} className="flex items-center justify-between py-2 border-b border-gray-600">
+                      <div className="flex-1">
+                        <span className="text-white font-medium arabic-body text-sm sm:text-base">{item.name}</span>
+                        <span className="text-gray-400 arabic-body text-xs sm:text-sm block">
+                          {item.quantity} x {item.price} EGP
+                        </span>
                       </div>
-                      <span className="font-semibold text-white text-sm">
+                      <span className="text-white font-bold text-sm sm:text-base">
                         {(item.price * item.quantity).toFixed(2)} EGP
                       </span>
                     </div>
                   ))}
                 </div>
 
-                {/* Totals */}
-                <div className="space-y-3 border-t border-white/20 pt-4">
+                {/* Promo Code Section */}
+                <div className="border-t border-gray-600 pt-6 mb-6">
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={promoCode}
+                      onChange={(e) => setPromoCode(e.target.value)}
+                      placeholder={content.promo.placeholder}
+                      className="flex-1 bg-white/10 text-white placeholder-gray-400 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary"
+                      dir={isArabic ? 'rtl' : 'ltr'}
+                    />
+                    <button
+                      type="button"
+                      onClick={handleValidatePromoCode}
+                      disabled={!promoCode.trim() || validatingPromo}
+                      className="bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {validatingPromo ? content.promo.validating : content.promo.apply}
+                    </button>
+                  </div>
+                  {promoMessage && (
+                    <p className={`mt-2 text-sm ${promoDiscount > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                      {promoMessage}
+                    </p>
+                  )}
+                </div>
+                
+                {/* Order Totals */}
+                <div className="space-y-3 border-t border-gray-600 pt-6">
                   <div className="flex justify-between items-center text-gray-300">
                     <span className="arabic-body text-sm sm:text-base">{content.orderSummary.subtotal}</span>
-                    <span className="text-white text-sm sm:text-base">{subtotal.toFixed(2)} EGP</span>
+                    <span className="text-sm sm:text-base">{subtotal.toFixed(2)} EGP</span>
                   </div>
                   
                   <div className="flex justify-between items-center text-gray-300">
                     <span className="arabic-body text-sm sm:text-base">{content.orderSummary.tax}</span>
-                    <span className="text-white text-sm sm:text-base">{tax.toFixed(2)} EGP</span>
+                    <span className="text-sm sm:text-base">{(subtotal * taxRate).toFixed(2)} EGP</span>
                   </div>
                   
-                  <div className="flex justify-between items-center text-gray-300">
-                    <span className="arabic-body text-sm sm:text-base">{content.orderSummary.delivery}</span>
-                    <span className="text-white text-sm sm:text-base">
-                      {deliveryFee === 0 ? (isArabic ? 'مجاني' : 'Free') : `${deliveryFee.toFixed(2)} EGP`}
-                    </span>
-                  </div>
-                  
-                  {discount > 0 && (
+                  {orderType === 'delivery' && (
                     <div className="flex justify-between items-center text-gray-300">
-                      <span className="arabic-body text-sm sm:text-base">{content.orderSummary.discount}</span>
-                      <span className="text-green-400 text-sm sm:text-base">-{discount.toFixed(2)} EGP</span>
+                      <span className="arabic-body text-sm sm:text-base">
+                        {content.orderSummary.delivery}
+                        {calculatingDeliveryFee && (
+                          <span className="text-xs ml-2">(جاري الحساب...)</span>
+                        )}
+                      </span>
+                                             <span className="text-sm sm:text-base">{(Number(deliveryFee) || 0).toFixed(2)} EGP</span>
                     </div>
                   )}
                   
-                  <div className="flex justify-between items-center text-base sm:text-lg font-bold border-t border-white/20 pt-3">
-                    <span className="arabic-heading-font text-white">TOTAL</span>
-                    <span className="text-white">{total.toFixed(2)} EGP</span>
+                  {promoDiscount > 0 && (
+                    <div className="flex justify-between items-center text-gray-300">
+                      <span className="arabic-body text-sm sm:text-base">{content.orderSummary.discount}</span>
+                      <span className="text-green-400 text-sm sm:text-base">-{promoDiscount.toFixed(2)} EGP</span>
+                    </div>
+                  )}
+                  
+                  <div className="flex justify-between items-center text-white font-bold text-lg border-t border-gray-600 pt-3">
+                    <span className="arabic-body">{content.orderSummary.total}</span>
+                    <span>{total.toFixed(2)} EGP</span>
                   </div>
                 </div>
               </div>
@@ -1152,6 +1404,164 @@ const Checkout = () => {
         </div>
       )}
 
+      {/* Address Modal */}
+      {showAddressModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xl font-bold text-gray-900">
+                  {editingAddress ? content.address.edit : content.address.add}
+                </h3>
+                <button
+                  onClick={() => setShowAddressModal(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <FaTimes className="w-5 h-5" />
+                </button>
+              </div>
+
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault()
+                  editingAddress ? handleEditAddress() : handleAddAddress()
+                }}
+                className="space-y-4"
+              >
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {content.address.form.title}
+                  </label>
+                  <input
+                    type="text"
+                    value={addressForm.title}
+                    onChange={(e) => setAddressForm(prev => ({ ...prev, title: e.target.value }))}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+                    required
+                    placeholder={isArabic ? 'مثل: المنزل، العمل' : 'e.g., Home, Work'}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {content.address.form.address}
+                  </label>
+                  <textarea
+                    value={addressForm.address}
+                    onChange={(e) => setAddressForm(prev => ({ ...prev, address: e.target.value }))}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 h-20 resize-none focus:outline-none focus:ring-2 focus:ring-primary"
+                    required
+                    placeholder={isArabic ? 'العنوان الكامل' : 'Full address'}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      {content.address.form.building}
+                    </label>
+                    <input
+                      type="text"
+                      value={addressForm.building_number}
+                      onChange={(e) => setAddressForm(prev => ({ ...prev, building_number: e.target.value }))}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      {content.address.form.apartment}
+                    </label>
+                    <input
+                      type="text"
+                      value={addressForm.apartment_number}
+                      onChange={(e) => setAddressForm(prev => ({ ...prev, apartment_number: e.target.value }))}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {content.address.form.floor}
+                  </label>
+                  <input
+                    type="text"
+                    value={addressForm.floor}
+                    onChange={(e) => setAddressForm(prev => ({ ...prev, floor: e.target.value }))}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+                    placeholder={isArabic ? 'الطابق الأول' : 'Ground floor'}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {content.address.form.location}
+                  </label>
+                  <select
+                    value={addressForm.delivery_location_id}
+                    onChange={(e) => setAddressForm(prev => ({ ...prev, delivery_location_id: e.target.value }))}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+                    required
+                  >
+                    <option value="">
+                      {isArabic ? 'اختر المنطقة' : 'Select location'}
+                    </option>
+                    {deliveryLocations.map((location) => (
+                      <option key={location.id} value={location.id}>
+                        {location.name} ({location.delivery_fee} EGP)
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {content.address.form.notes}
+                  </label>
+                  <textarea
+                    value={addressForm.additional_notes}
+                    onChange={(e) => setAddressForm(prev => ({ ...prev, additional_notes: e.target.value }))}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 h-16 resize-none focus:outline-none focus:ring-2 focus:ring-primary"
+                    placeholder={isArabic ? 'ملاحظات إضافية للتوصيل' : 'Additional delivery notes'}
+                  />
+                </div>
+
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="defaultAddress"
+                    checked={addressForm.is_default}
+                    onChange={(e) => setAddressForm(prev => ({ ...prev, is_default: e.target.checked }))}
+                    className="w-4 h-4 text-primary focus:ring-primary border-gray-300 rounded"
+                  />
+                  <label htmlFor="defaultAddress" className="ml-2 text-sm text-gray-700">
+                    {content.address.form.default}
+                  </label>
+                </div>
+
+                <div className="flex gap-3 pt-4">
+                  <button
+                    type="button"
+                    onClick={() => setShowAddressModal(false)}
+                    className="flex-1 bg-gray-200 text-gray-800 py-3 rounded-lg hover:bg-gray-300 transition-colors"
+                  >
+                    {content.buttons.cancel}
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="flex-1 bg-primary text-white py-3 rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50"
+                  >
+                    {loading ? '...' : content.buttons.save}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Success Modal */}
       {showSuccessModal && orderData && (
         <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
@@ -1159,7 +1569,7 @@ const Checkout = () => {
             <div className="p-6 sm:p-8">
               <div className="text-center mb-6">
                 <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <FaCheck className="w-10 h-10 text-green-600" />
+                  <FaCheckCircle className="w-10 h-10 text-green-600" />
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-2 arabic-heading-font">
                   {content.successModal.title}

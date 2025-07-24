@@ -68,48 +68,58 @@ const ProductsSection = () => {
   }
 
   const handleModalAddToCart = (product, quantity = 1) => {
+    let allSuccess = true
     for (let i = 0; i < quantity; i++) {
-      addToCart(product)
+      const result = addToCart(product)
+      if (!result.success) {
+        allSuccess = false
+        break
+      }
     }
     
-    // Show success message
-    const message = isArabic ? `تم إضافة ${product.name} إلى السلة!` : `${product.name} added to cart!`
-    
-    // Create a temporary toast notification
-    const toast = document.createElement('div')
-    toast.className = 'fixed top-24 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-bounce'
-    toast.textContent = message
-    toast.style.direction = isArabic ? 'rtl' : 'ltr'
-    
-    document.body.appendChild(toast)
-    
-    setTimeout(() => {
-      if (document.body.contains(toast)) {
-        document.body.removeChild(toast)
-      }
-    }, 3000)
+    if (allSuccess) {
+      // Show success message
+      const message = isArabic ? `تم إضافة ${product.name} إلى السلة!` : `${product.name} added to cart!`
+      
+      // Create a temporary toast notification
+      const toast = document.createElement('div')
+      toast.className = 'fixed top-24 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-bounce'
+      toast.textContent = message
+      toast.style.direction = isArabic ? 'rtl' : 'ltr'
+      
+      document.body.appendChild(toast)
+      
+      setTimeout(() => {
+        if (document.body.contains(toast)) {
+          document.body.removeChild(toast)
+        }
+      }, 3000)
+    }
     
     closeModal()
   }
 
   const handleAddToCart = (item) => {
-    addToCart(item)
-    // Show success message
-    const message = isArabic ? `تم إضافة ${item.name} إلى السلة!` : `${item.name} added to cart!`
+    const result = addToCart(item)
     
-    // Create a temporary toast notification
-    const toast = document.createElement('div')
-    toast.className = 'fixed top-24 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-bounce'
-    toast.textContent = message
-    toast.style.direction = isArabic ? 'rtl' : 'ltr'
-    
-    document.body.appendChild(toast)
-    
-    setTimeout(() => {
-      if (document.body.contains(toast)) {
-        document.body.removeChild(toast)
-      }
-    }, 3000)
+    if (result.success) {
+      // Show success message
+      const message = isArabic ? `تم إضافة ${item.name} إلى السلة!` : `${item.name} added to cart!`
+      
+      // Create a temporary toast notification
+      const toast = document.createElement('div')
+      toast.className = 'fixed top-24 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-bounce'
+      toast.textContent = message
+      toast.style.direction = isArabic ? 'rtl' : 'ltr'
+      
+      document.body.appendChild(toast)
+      
+      setTimeout(() => {
+        if (document.body.contains(toast)) {
+          document.body.removeChild(toast)
+        }
+      }, 3000)
+    }
   }
 
   return (

@@ -141,14 +141,23 @@ const Menu = () => {
   const handleAddToCart = (item, quantity = 1) => {
     setLoading(true)
     setTimeout(() => {
+      let allSuccess = true
       for (let i = 0; i < quantity; i++) {
-        addToCart(item)
+        const result = addToCart(item)
+        if (!result.success) {
+          allSuccess = false
+          break
+        }
       }
-      setToastMessage(isArabic ? `تم إضافة ${item.name} إلى السلة` : `${item.name} added to cart`)
-      setShowToast(true)
+      
+      if (allSuccess) {
+        setToastMessage(isArabic ? `تم إضافة ${item.name} إلى السلة` : `${item.name} added to cart`)
+        setShowToast(true)
+        setShowItemModal(false)
+        setItemQuantity(1)
+      }
+      
       setLoading(false)
-      setShowItemModal(false)
-      setItemQuantity(1)
     }, 500)
   }
 

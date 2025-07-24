@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { FaBars, FaTimes, FaShoppingCart, FaLanguage, FaUser, FaChevronDown } from 'react-icons/fa'
+import { toast } from 'react-toastify'
 import { useCart, useRTL } from '../App'
 import { useAuth } from '../contexts/AuthContext' 
 import { useEffect, useRef } from 'react';
@@ -55,9 +56,20 @@ const Navbar = () => {
         { path: '/contact', label: 'Contact' },
       ]
 
-  const handleLogout = () => {
-    logout()
-    navigate('/')
+  const handleLogout = async () => {
+    try {
+      await logout()
+      toast.success(isArabic ? "تم تسجيل الخروج بنجاح" : "Logged out successfully", {
+        position: "top-right",
+        autoClose: 2000,
+      })
+      navigate('/')
+    } catch (error) {
+      toast.error(isArabic ? "خطأ في تسجيل الخروج" : "Error logging out", {
+        position: "top-right",
+        autoClose: 3000,
+      })
+    }
   }
 
   return (

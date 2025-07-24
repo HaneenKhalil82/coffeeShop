@@ -3,31 +3,41 @@ import { useAuth } from '../contexts/AuthContext';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { User, Mail, Phone, Camera, Edit, Save, X } from 'lucide-react';
+import { User, Mail, Phone, Camera, Edit, Save, X, Package, Clock, CheckCircle, XCircle, Truck, Eye } from 'lucide-react';
 import { toast } from 'react-toastify';
-import { updateUserProfile, changePassword } from '../services/api';
+import { updateUserProfile, changePassword, getUserOrders, getOrderDetails } from '../services/api';
+import { useRTL } from '../App';
 
-const profileSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters'),
-  email: z.string().email('Please enter a valid email'),
+const createProfileSchema = (isArabic) => z.object({
+  name: z.string().min(2, isArabic ? 'الاسم يجب أن يكون على الأقل حرفين' : 'Name must be at least 2 characters'),
+  email: z.string().email(isArabic ? 'يرجى إدخال بريد إلكتروني صحيح' : 'Please enter a valid email'),
   mobile: z.string().optional(),
   profile_image: z.string().optional(),
 });
 
-const passwordSchema = z.object({
-  current_password: z.string().min(6, 'Current password is required'),
-  password: z.string().min(6, 'New password must be at least 6 characters'),
-  password_confirmation: z.string().min(6, 'Password confirmation is required'),
+const createPasswordSchema = (isArabic) => z.object({
+  current_password: z.string().min(6, isArabic ? 'كلمة المرور الحالية مطلوبة' : 'Current password is required'),
+  password: z.string().min(6, isArabic ? 'كلمة المرور الجديدة يجب أن تكون على الأقل 6 أحرف' : 'New password must be at least 6 characters'),
+  password_confirmation: z.string().min(6, isArabic ? 'تأكيد كلمة المرور مطلوب' : 'Password confirmation is required'),
 }).refine((data) => data.password === data.password_confirmation, {
-  message: "Passwords don't match",
+  message: isArabic ? "كلمات المرور غير متطابقة" : "Passwords don't match",
   path: ["password_confirmation"],
 });
 
+
+
 const Profile = () => {
   const { user, logout, refreshUserData } = useAuth();
+  const { isArabic } = useRTL();
   const [isEditing, setIsEditing] = useState(false);
   const [activeTab, setActiveTab] = useState('profile');
   const [loading, setLoading] = useState(false);
+  
+  // Orders state
+  const [orders, setOrders] = useState([]);
+  const [ordersLoading, setOrdersLoading] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [orderDetailsLoading, setOrderDetailsLoading] = useState(false);
 
   const {
     register: registerProfile,
@@ -35,7 +45,7 @@ const Profile = () => {
     formState: { errors: profileErrors },
     reset: resetProfile
   } = useForm({
-    resolver: zodResolver(profileSchema),
+    resolver: zodResolver(createProfileSchema(isArabic)),
     defaultValues: {
       name: user?.name || '',
       email: user?.email || '',
@@ -50,7 +60,7 @@ const Profile = () => {
     formState: { errors: passwordErrors },
     reset: resetPassword
   } = useForm({
-    resolver: zodResolver(passwordSchema),
+    resolver: zodResolver(createPasswordSchema(isArabic)),
   });
 
   useEffect(() => {
@@ -66,18 +76,41 @@ const Profile = () => {
 
   const onProfileSubmit = async (data) => {
     setLoading(true);
+    console.log('🚀 Profile Update Started');
+    console.log('📝 Form Data:', data);
+    console.log('👤 Current User:', user);
+    console.log('🔑 Auth Token Present:', !!localStorage.getItem('auth_token'));
+    
     try {
       const response = await updateUserProfile(data);
+      console.log('✅ Profile Update Response:', response);
       
-      if (response.status === 200) {
-        toast.success('Profile updated successfully!');
+      if (response.status === 200 || response.status === 201) {
+        toast.success(isArabic ? 'تم تحديث الملف الشخصي بنجاح!' : 'Profile updated successfully!');
+        console.log('🔄 Refreshing user data...');
         await refreshUserData();
         setIsEditing(false);
+        console.log('✨ Profile update completed successfully');
+      } else {
+        console.warn('⚠️ Unexpected response status:', response.status);
+        toast.warning(isArabic ? 'استجابة غير متوقعة من الخادم' : 'Unexpected server response');
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to update profile');
+      console.error('❌ Profile Update Error:', {
+        message: error.message,
+        status: error.response?.status,
+        data: error.response?.data,
+        statusText: error.response?.statusText
+      });
+      
+      const errorMessage = error.response?.data?.message || 
+                          error.response?.data?.error || 
+                          error.message || 
+                          (isArabic ? 'فشل في تحديث الملف الشخصي' : 'Failed to update profile');
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
+      console.log('🏁 Profile update process finished');
     }
   };
 
@@ -87,25 +120,150 @@ const Profile = () => {
       const response = await changePassword(data);
       
       if (response.status === 200) {
-        toast.success('Password changed successfully!');
+        toast.success(isArabic ? 'تم تغيير كلمة المرور بنجاح!' : 'Password changed successfully!');
         resetPassword();
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to change password');
+      toast.error(error.response?.data?.message || (isArabic ? 'فشل في تغيير كلمة المرور' : 'Failed to change password'));
     } finally {
       setLoading(false);
     }
   };
 
+  // =================== 🛒 ORDERS FUNCTIONALITY ===================
+  
+  const fetchUserOrders = async () => {
+    setOrdersLoading(true);
+    try {
+      console.log('🛒 Fetching user orders...');
+      console.log('🔑 Auth token available:', !!localStorage.getItem('auth_token'));
+      console.log('👤 User authenticated:', !!user);
+      
+      const response = await getUserOrders();
+      console.log('🛒 Orders API Response Status:', response.status);
+      console.log('🛒 Orders API Response Data:', response.data);
+      
+      // Handle different response structures
+      let ordersData = [];
+      if (response.data) {
+        if (Array.isArray(response.data)) {
+          ordersData = response.data;
+        } else if (response.data.orders && Array.isArray(response.data.orders)) {
+          ordersData = response.data.orders;
+        } else if (response.data.data && Array.isArray(response.data.data)) {
+          ordersData = response.data.data;
+        } else {
+          console.log('🛒 Unexpected response structure, treating as empty array');
+          ordersData = [];
+        }
+      }
+      
+      console.log('🛒 Processed orders data:', ordersData);
+      console.log('🛒 Number of orders found:', ordersData.length);
+      
+      setOrders(ordersData);
+      
+      if (ordersData.length === 0) {
+        toast.info(isArabic ? 'لا توجد طلبات حالياً' : 'No orders found');
+      } else {
+        toast.success(isArabic ? `تم العثور على ${ordersData.length} طلب` : `Found ${ordersData.length} orders`);
+      }
+      
+    } catch (error) {
+      console.error('❌ Error fetching orders details:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+        statusText: error.response?.statusText
+      });
+      
+      const errorMessage = error.response?.data?.message || 
+                          error.response?.data?.error || 
+                          error.message || 
+                          (isArabic ? 'فشل في جلب الطلبات' : 'Failed to fetch orders');
+      
+      toast.error(errorMessage);
+    } finally {
+      setOrdersLoading(false);
+    }
+  };
+
+  const fetchOrderDetails = async (orderId) => {
+    setOrderDetailsLoading(true);
+    try {
+      console.log('🛒 Fetching order details for ID:', orderId);
+      const response = await getOrderDetails(orderId);
+      console.log('🛒 Order details response:', response.data);
+      
+      setSelectedOrder(response.data.order || response.data);
+      
+    } catch (error) {
+      console.error('❌ Error fetching order details:', error);
+      toast.error(isArabic ? 'فشل في جلب تفاصيل الطلب' : 'Failed to fetch order details');
+    } finally {
+      setOrderDetailsLoading(false);
+    }
+  };
+
+  const getOrderStatusIcon = (status) => {
+    switch (status?.toLowerCase()) {
+      case 'pending':
+        return <Clock className="text-yellow-500" size={20} />;
+      case 'confirmed':
+        return <CheckCircle className="text-blue-500" size={20} />;
+      case 'preparing':
+        return <Package className="text-orange-500" size={20} />;
+      case 'out_for_delivery':
+        return <Truck className="text-purple-500" size={20} />;
+      case 'completed':
+        return <CheckCircle className="text-green-500" size={20} />;
+      case 'cancelled':
+        return <XCircle className="text-red-500" size={20} />;
+      default:
+        return <Clock className="text-white" size={20} />;
+    }
+  };
+
+  const getOrderStatusText = (status) => {
+    if (!isArabic) {
+      switch (status?.toLowerCase()) {
+        case 'pending': return 'Pending';
+        case 'confirmed': return 'Confirmed';
+        case 'preparing': return 'Preparing';
+        case 'out_for_delivery': return 'Out for Delivery';
+        case 'completed': return 'Completed';
+        case 'cancelled': return 'Cancelled';
+        default: return 'Unknown';
+      }
+    } else {
+      switch (status?.toLowerCase()) {
+        case 'pending': return 'في الانتظار';
+        case 'confirmed': return 'مؤكد';
+        case 'preparing': return 'قيد التحضير';
+        case 'out_for_delivery': return 'في الطريق';
+        case 'completed': return 'مكتمل';
+        case 'cancelled': return 'ملغي';
+        default: return 'غير معروف';
+      }
+    }
+  };
+
+  // Load orders when orders tab is active
+  useEffect(() => {
+    if (activeTab === 'orders' && user && orders.length === 0) {
+      fetchUserOrders();
+    }
+  }, [activeTab, user]);
+
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        // In a real app, you'd upload to a server
-        // For now, we'll just show a placeholder
-        toast.info('Image upload feature coming soon!');
-      };
+              const reader = new FileReader();
+        reader.onloadend = () => {
+          // In a real app, you'd upload to a server
+          // For now, we'll just show a placeholder
+          toast.info(isArabic ? 'ميزة رفع الصور قريباً!' : 'Image upload feature coming soon!');
+        };
       reader.readAsDataURL(file);
     }
   };
@@ -114,20 +272,37 @@ const Profile = () => {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">
-            Please log in to view your profile
+          <h2 className="text-2xl font-bold text-white mb-4">
+            {isArabic ? 'يرجى تسجيل الدخول لعرض ملفك الشخصي' : 'Please log in to view your profile'}
           </h2>
         </div>
       </div>
     );
   }
 
-  return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Profile Header */}
-        <div className="bg-white rounded-xl shadow-lg overflow-hidden mb-8">
-          <div className="bg-gradient-to-r from-amber-500 to-orange-600 h-32 sm:h-40"></div>
+      return (
+      <div 
+        className="min-h-screen py-8 bg-cover bg-center bg-no-repeat relative" 
+        dir={isArabic ? 'rtl' : 'ltr'}
+        style={{
+          backgroundImage: 'url(/images/bg_4.jpg)',
+        }}
+      >
+        {/* Background overlay for better readability */}
+        <div className="absolute inset-0"></div>
+        
+        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+
+
+                  {/* Profile Header */}
+          <div 
+            className="rounded-xl shadow-xl overflow-hidden mb-8 border-2 border-primary bg-cover bg-center relative"
+            style={{ backgroundImage: 'url(/images/bg_4.jpg)' }}
+          >
+            {/* Component overlay */}
+            <div className="absolute inset-0 bg-black bg-opacity-40"></div>
+            <div className="relative z-10">
+          <div className="bg-gradient-to-r from-amber-600 to-primary h-32 sm:h-40"></div>
           <div className="relative px-6 pb-6">
             {/* Profile Image */}
             <div className="flex items-end -mt-16 mb-4">
@@ -140,10 +315,10 @@ const Profile = () => {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <User size={40} className="text-gray-500" />
+                                          <User size={40} className="text-white" />
                   )}
                 </div>
-                <label className="absolute bottom-0 right-0 bg-amber-500 rounded-full p-2 cursor-pointer hover:bg-amber-600 transition-colors">
+                <label className="absolute bottom-0 right-0 bg-primary rounded-full p-2 cursor-pointer hover:bg-primary transition-colors">
                   <Camera size={16} className="text-white" />
                   <input
                     type="file"
@@ -154,45 +329,62 @@ const Profile = () => {
                 </label>
               </div>
               <div className="ml-4 flex-1">
-                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+                <h1 className="text-2xl sm:text-3xl font-bold text-white">
                   {user.name}
                 </h1>
-                <p className="text-gray-600">{user.email}</p>
+                <p className="text-white">{user.email}</p>
               </div>
               <button
                 onClick={() => setIsEditing(!isEditing)}
-                className="ml-4 flex items-center gap-2 px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors"
+                className={`${isArabic ? 'mr-4' : 'ml-4'} flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary transition-colors`}
               >
                 {isEditing ? <X size={16} /> : <Edit size={16} />}
-                {isEditing ? 'Cancel' : 'Edit'}
+                {isEditing ? (isArabic ? 'إلغاء' : 'Cancel') : (isArabic ? 'تعديل' : 'Edit')}
               </button>
             </div>
           </div>
-        </div>
+            </div>
+          </div>
 
         {/* Tabs */}
-        <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+        <div 
+          className="rounded-xl shadow-xl overflow-hidden border-2 border-primary bg-cover bg-center relative"
+          style={{ backgroundImage: 'url(/images/bg_4.jpg)' }}
+        >
+          {/* Component overlay */}
+          <div className="absolute inset-0 bg-black bg-opacity-40"></div>
+          <div className="relative z-10">
           <div className="border-b border-gray-200">
             <nav className="flex">
               <button
                 onClick={() => setActiveTab('profile')}
                 className={`flex-1 py-4 px-6 text-center font-medium ${
                   activeTab === 'profile'
-                    ? 'border-b-2 border-amber-500 text-amber-600'
-                    : 'text-gray-500 hover:text-gray-700'
+                    ? 'border-b-2 border-primary text-primary'
+                    : 'text-white hover:text-primary'
                 }`}
               >
-                Profile Info
+                {isArabic ? 'معلومات الملف الشخصي' : 'Profile Info'}
               </button>
               <button
                 onClick={() => setActiveTab('password')}
                 className={`flex-1 py-4 px-6 text-center font-medium ${
                   activeTab === 'password'
-                    ? 'border-b-2 border-amber-500 text-amber-600'
-                    : 'text-gray-500 hover:text-gray-700'
+                    ? 'border-b-2 border-primary text-primary'
+                    : 'text-white hover:text-primary'
                 }`}
               >
-                Change Password
+                {isArabic ? 'تغيير كلمة المرور' : 'Change Password'}
+              </button>
+              <button
+                onClick={() => setActiveTab('orders')}
+                className={`flex-1 py-4 px-6 text-center font-medium ${
+                  activeTab === 'orders'
+                    ? 'border-b-2 border-primary text-primary'
+                    : 'text-white hover:text-primary'
+                }`}
+              >
+                {isArabic ? 'طلباتي' : 'My Orders'}
               </button>
             </nav>
           </div>
@@ -203,19 +395,24 @@ const Profile = () => {
                 <div className="grid md:grid-cols-2 gap-6">
                   {/* Name Field */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Full Name
+                    <label className="block text-sm font-medium text-white mb-2">
+                      {isArabic ? 'الاسم الكامل' : 'Full Name'}
                     </label>
                     <div className="relative">
-                      <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                      <User className={`absolute ${isArabic ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2 text-white`} size={20} />
                       <input
                         {...registerProfile('name')}
                         type="text"
                         disabled={!isEditing}
-                        className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 ${
-                          !isEditing ? 'bg-gray-50 text-gray-500' : 'bg-white'
+                        className={`w-full ${isArabic ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-3 border-2 border-primary rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-white bg-cover bg-center backdrop-blur-sm ${
+                          !isEditing ? 'opacity-75' : ''
                         }`}
-                        placeholder="Enter your full name"
+                        style={{ 
+                          backgroundImage: 'url(/images/bg_4.jpg)',
+                          backgroundBlendMode: 'overlay',
+                          backgroundColor: 'rgba(0, 0, 0, 0.3)'
+                        }}
+                        placeholder={isArabic ? 'أدخل اسمك الكامل' : 'Enter your full name'}
                       />
                     </div>
                     {profileErrors.name && (
@@ -225,19 +422,24 @@ const Profile = () => {
 
                   {/* Email Field */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Email Address
+                    <label className="block text-sm font-medium text-white mb-2">
+                      {isArabic ? 'عنوان البريد الإلكتروني' : 'Email Address'}
                     </label>
                     <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                      <Mail className={`absolute ${isArabic ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2 text-white`} size={20} />
                       <input
                         {...registerProfile('email')}
                         type="email"
                         disabled={!isEditing}
-                        className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 ${
-                          !isEditing ? 'bg-gray-50 text-gray-500' : 'bg-white'
+                        className={`w-full ${isArabic ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-3 border-2 border-primary rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-white bg-cover bg-center backdrop-blur-sm ${
+                          !isEditing ? 'opacity-75' : ''
                         }`}
-                        placeholder="Enter your email"
+                        style={{ 
+                          backgroundImage: 'url(/images/bg_4.jpg)',
+                          backgroundBlendMode: 'overlay',
+                          backgroundColor: 'rgba(0, 0, 0, 0.3)'
+                        }}
+                        placeholder={isArabic ? 'أدخل بريدك الإلكتروني' : 'Enter your email'}
                       />
                     </div>
                     {profileErrors.email && (
@@ -247,19 +449,24 @@ const Profile = () => {
 
                   {/* Mobile Field */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Mobile Number
+                    <label className="block text-sm font-medium text-white mb-2">
+                      {isArabic ? 'رقم الهاتف المحمول' : 'Mobile Number'}
                     </label>
                     <div className="relative">
-                      <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                      <Phone className={`absolute ${isArabic ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2 text-white`} size={20} />
                       <input
                         {...registerProfile('mobile')}
                         type="tel"
                         disabled={!isEditing}
-                        className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 ${
-                          !isEditing ? 'bg-gray-50 text-gray-500' : 'bg-white'
+                        className={`w-full ${isArabic ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-3 border-2 border-primary rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-white bg-cover bg-center backdrop-blur-sm ${
+                          !isEditing ? 'opacity-75' : ''
                         }`}
-                        placeholder="Enter your mobile number"
+                        style={{ 
+                          backgroundImage: 'url(/images/bg_4.jpg)',
+                          backgroundBlendMode: 'overlay',
+                          backgroundColor: 'rgba(0, 0, 0, 0.3)'
+                        }}
+                        placeholder={isArabic ? 'أدخل رقم هاتفك المحمول' : 'Enter your mobile number'}
                       />
                     </div>
                     {profileErrors.mobile && (
@@ -269,17 +476,22 @@ const Profile = () => {
 
                   {/* Profile Image URL Field */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Profile Image URL
+                    <label className="block text-sm font-medium text-white mb-2">
+                      {isArabic ? 'رابط صورة الملف الشخصي' : 'Profile Image URL'}
                     </label>
                     <input
                       {...registerProfile('profile_image')}
                       type="url"
                       disabled={!isEditing}
-                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 ${
-                        !isEditing ? 'bg-gray-50 text-gray-500' : 'bg-white'
+                      className={`w-full px-4 py-3 border-2 border-primary rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-white bg-cover bg-center backdrop-blur-sm ${
+                        !isEditing ? 'opacity-75' : ''
                       }`}
-                      placeholder="Enter image URL"
+                      style={{ 
+                        backgroundImage: 'url(/images/bg_4.jpg)',
+                        backgroundBlendMode: 'overlay',
+                        backgroundColor: 'rgba(0, 0, 0, 0.3)'
+                      }}
+                      placeholder={isArabic ? 'أدخل رابط الصورة' : 'Enter image URL'}
                     />
                     {profileErrors.profile_image && (
                       <p className="text-red-500 text-sm mt-1">{profileErrors.profile_image.message}</p>
@@ -288,21 +500,21 @@ const Profile = () => {
                 </div>
 
                 {isEditing && (
-                  <div className="flex justify-end space-x-4">
+                  <div className={`flex ${isArabic ? 'justify-start space-x-reverse' : 'justify-end'} space-x-4`}>
                     <button
                       type="button"
                       onClick={() => setIsEditing(false)}
-                      className="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                      className="px-6 py-3 border border-primary rounded-lg text-primary hover:bg-primary transition-colors"
                     >
-                      Cancel
+                      {isArabic ? 'إلغاء' : 'Cancel'}
                     </button>
                     <button
                       type="submit"
                       disabled={loading}
-                      className="flex items-center gap-2 px-6 py-3 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors disabled:opacity-50"
+                      className="flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary     transition-colors disabled:opacity-50"
                     >
                       <Save size={16} />
-                      {loading ? 'Saving...' : 'Save Changes'}
+                      {loading ? (isArabic ? 'جاري الحفظ...' : 'Saving...') : (isArabic ? 'حفظ التغييرات' : 'Save Changes')}
                     </button>
                   </div>
                 )}
@@ -313,14 +525,19 @@ const Profile = () => {
               <form onSubmit={handlePasswordSubmit(onPasswordSubmit)} className="max-w-md space-y-6">
                 {/* Current Password */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Current Password
+                  <label className="block text-sm font-medium text-white mb-2">
+                    {isArabic ? 'كلمة المرور الحالية' : 'Current Password'}
                   </label>
                   <input
                     {...registerPassword('current_password')}
                     type="password"
-                    className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-                    placeholder="Enter current password"
+                    className="w-full px-4 py-3 border-2 border-primary rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-white bg-cover bg-center backdrop-blur-sm"
+                    style={{ 
+                      backgroundImage: 'url(/images/bg_4.jpg)',
+                      backgroundBlendMode: 'overlay',
+                      backgroundColor: 'rgba(0, 0, 0, 0.3)'
+                    }}
+                    placeholder={isArabic ? 'أدخل كلمة المرور الحالية' : 'Enter current password'}
                   />
                   {passwordErrors.current_password && (
                     <p className="text-red-500 text-sm mt-1">{passwordErrors.current_password.message}</p>
@@ -329,14 +546,19 @@ const Profile = () => {
 
                 {/* New Password */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    New Password
+                  <label className="block text-sm font-medium text-white mb-2">
+                    {isArabic ? 'كلمة المرور الجديدة' : 'New Password'}
                   </label>
                   <input
                     {...registerPassword('password')}
                     type="password"
-                    className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-                    placeholder="Enter new password"
+                    className="w-full px-4 py-3 border-2 border-primary rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-white bg-cover bg-center backdrop-blur-sm"
+                    style={{ 
+                      backgroundImage: 'url(/images/bg_4.jpg)',
+                      backgroundBlendMode: 'overlay',
+                      backgroundColor: 'rgba(0, 0, 0, 0.3)'
+                    }}
+                    placeholder={isArabic ? 'أدخل كلمة المرور الجديدة' : 'Enter new password'}
                   />
                   {passwordErrors.password && (
                     <p className="text-red-500 text-sm mt-1">{passwordErrors.password.message}</p>
@@ -345,14 +567,19 @@ const Profile = () => {
 
                 {/* Confirm Password */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Confirm New Password
+                  <label className="block text-sm font-medium text-white mb-2">
+                    {isArabic ? 'تأكيد كلمة المرور الجديدة' : 'Confirm New Password'}
                   </label>
                   <input
                     {...registerPassword('password_confirmation')}
                     type="password"
-                    className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-                    placeholder="Confirm new password"
+                    className="w-full px-4 py-3 border-2 border-primary rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-white bg-cover bg-center backdrop-blur-sm"
+                    style={{ 
+                      backgroundImage: 'url(/images/bg_4.jpg)',
+                      backgroundBlendMode: 'overlay',
+                      backgroundColor: 'rgba(0, 0, 0, 0.3)'
+                    }}
+                    placeholder={isArabic ? 'أكد كلمة المرور الجديدة' : 'Confirm new password'}
                   />
                   {passwordErrors.password_confirmation && (
                     <p className="text-red-500 text-sm mt-1">{passwordErrors.password_confirmation.message}</p>
@@ -362,28 +589,226 @@ const Profile = () => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-3 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors disabled:opacity-50"
+                  className="w-full py-3 bg-primary text-white rounded-lg hover:bg-primary transition-colors disabled:opacity-50"
                 >
-                  {loading ? 'Changing Password...' : 'Change Password'}
+                  {loading ? (isArabic ? 'جاري تغيير كلمة المرور...' : 'Changing Password...') : (isArabic ? 'تغيير كلمة المرور' : 'Change Password')}
                 </button>
               </form>
             )}
+
+            {activeTab === 'orders' && (
+              <div className="space-y-6">
+                {/* Orders Header */}
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-semibold text-white">
+                    {isArabic ? 'طلباتي' : 'My Orders'}
+                  </h3>
+                  <button
+                    onClick={fetchUserOrders}
+                    disabled={ordersLoading}
+                    className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary transition-colors disabled:opacity-50"
+                  >
+                    {ordersLoading ? (isArabic ? 'جاري التحديث...' : 'Refreshing...') : (isArabic ? 'تحديث' : 'Refresh')}
+                  </button>
+                </div>
+
+                {/* Orders List */}
+                {ordersLoading ? (
+                  <div className="flex items-center justify-center py-12">
+                    <div className="text-center">
+                      <Package className="mx-auto text-white mb-4" size={48} />
+                      <p className="text-white">
+                        {isArabic ? 'جاري تحميل الطلبات...' : 'Loading orders...'}
+                      </p>
+                    </div>
+                  </div>
+                ) : orders.length === 0 ? (
+                  <div className="flex items-center justify-center py-12">
+                    <div className="text-center">
+                      <Package className="mx-auto text-white mb-4" size={48} />
+                      <p className="text-white">
+                        {isArabic ? 'لا توجد طلبات حتى الآن' : 'No orders yet'}
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {orders.map((order) => (
+                      <div
+                        key={order.id}
+                        className="bg-gray-50 rounded-lg p-4 border border-gray-200 hover:border-primary hover:shadow-md transition-all duration-200"
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-4">
+                            {getOrderStatusIcon(order.status)}
+                            <div>
+                              <h4 className="font-medium text-white">
+                                {isArabic ? `طلب رقم #${order.id}` : `Order #${order.id}`}
+                              </h4>
+                              <p className="text-sm text-white">
+                                {isArabic ? `النوع: ${order.order_type === 'delivery' ? 'توصيل' : 'استلام'}` : `Type: ${order.order_type}`}
+                              </p>
+                              <p className="text-sm text-white">
+                                {order.created_at ? new Date(order.created_at).toLocaleDateString(isArabic ? 'ar-SA' : 'en-US') : ''}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center space-x-4">
+                            <div className="text-right">
+                              <p className="font-medium text-white">
+                                {order.total_amount ? `$${parseFloat(order.total_amount).toFixed(2)}` : 'N/A'}
+                              </p>
+                              <p className="text-sm text-white">
+                                {getOrderStatusText(order.status)}
+                              </p>
+                            </div>
+                            <button
+                              onClick={() => fetchOrderDetails(order.id)}
+                              disabled={orderDetailsLoading}
+                              className="flex items-center gap-2 px-3 py-2 bg-primary text-white rounded-lg hover:bg-primary transition-colors disabled:opacity-50"
+                            >
+                              <Eye size={16} />
+                              {isArabic ? 'عرض' : 'View'}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Order Details Modal */}
+                {selectedOrder && (
+                  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                                        <div 
+                      className="bg-white bg-opacity-95 backdrop-blur-sm rounded-xl shadow-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto border-2 border-primary"
+                    >
+                      <div className="p-6">
+                        {/* Modal Header */}
+                        <div className="flex items-center justify-between mb-6">
+                          <h3 className="text-xl font-semibold text-gray-900">
+                            {isArabic ? `تفاصيل الطلب #${selectedOrder.id}` : `Order #${selectedOrder.id} Details`}
+                          </h3>
+                          <button
+                            onClick={() => setSelectedOrder(null)}
+                            className="text-gray-400 hover:text-primary transition-colors"
+                          >
+                            <X size={24} />
+                          </button>
+                        </div>
+
+                        {orderDetailsLoading ? (
+                          <div className="flex items-center justify-center py-8">
+                            <div className="text-center">
+                              <Package className="mx-auto text-gray-400 mb-4" size={48} />
+                              <p className="text-gray-500">
+                                {isArabic ? 'جاري تحميل التفاصيل...' : 'Loading details...'}
+                              </p>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="space-y-6">
+                            {/* Order Info */}
+                            <div className="grid md:grid-cols-2 gap-4">
+                              <div>
+                                <h4 className="font-medium text-gray-900 mb-2">
+                                  {isArabic ? 'معلومات الطلب' : 'Order Information'}
+                                </h4>
+                                <div className="space-y-2 text-sm">
+                                  <p><span className="font-medium">{isArabic ? 'الحالة:' : 'Status:'}</span> {getOrderStatusText(selectedOrder.status)}</p>
+                                  <p><span className="font-medium">{isArabic ? 'النوع:' : 'Type:'}</span> {selectedOrder.order_type === 'delivery' ? (isArabic ? 'توصيل' : 'Delivery') : (isArabic ? 'استلام' : 'Takeaway')}</p>
+                                  <p><span className="font-medium">{isArabic ? 'طريقة الدفع:' : 'Payment:'}</span> {selectedOrder.payment_method}</p>
+                                  <p><span className="font-medium">{isArabic ? 'التاريخ:' : 'Date:'}</span> {selectedOrder.created_at ? new Date(selectedOrder.created_at).toLocaleDateString(isArabic ? 'ar-SA' : 'en-US') : ''}</p>
+                                </div>
+                              </div>
+
+                              <div>
+                                <h4 className="font-medium text-gray-900 mb-2">
+                                  {isArabic ? 'الإجمالي' : 'Total'}
+                                </h4>
+                                <div className="space-y-2 text-sm">
+                                  <p><span className="font-medium">{isArabic ? 'المبلغ الفرعي:' : 'Subtotal:'}</span> ${selectedOrder.subtotal || '0.00'}</p>
+                                  <p><span className="font-medium">{isArabic ? 'رسوم التوصيل:' : 'Delivery Fee:'}</span> ${selectedOrder.delivery_fee || '0.00'}</p>
+                                  <p><span className="font-medium">{isArabic ? 'الخصم:' : 'Discount:'}</span> ${selectedOrder.discount_amount || '0.00'}</p>
+                                  <p className="font-bold text-lg"><span className="font-medium">{isArabic ? 'الإجمالي:' : 'Total:'}</span> ${selectedOrder.total_amount || '0.00'}</p>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Order Items */}
+                            {selectedOrder.items && selectedOrder.items.length > 0 && (
+                              <div>
+                                <h4 className="font-medium text-gray-900 mb-3">
+                                  {isArabic ? 'عناصر الطلب' : 'Order Items'}
+                                </h4>
+                                <div className="space-y-3">
+                                  {selectedOrder.items.map((item, index) => (
+                                    <div key={index} className="flex items-center justify-between bg-amber-50 border border-primary p-3 rounded-lg">
+                                      <div>
+                                        <p className="font-medium">{item.product_name || item.name || `${isArabic ? 'منتج' : 'Product'} ${index + 1}`}</p>
+                                        {item.notes && (
+                                          <p className="text-sm text-gray-500">{isArabic ? 'ملاحظات:' : 'Notes:'} {item.notes}</p>
+                                        )}
+                                      </div>
+                                      <div className="text-right">
+                                        <p className="font-medium">${item.price || '0.00'} × {item.quantity || 1}</p>
+                                        <p className="text-sm text-gray-500">${((item.price || 0) * (item.quantity || 1)).toFixed(2)}</p>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Notes */}
+                            {selectedOrder.customer_notes && (
+                              <div>
+                                <h4 className="font-medium text-gray-900 mb-2">
+                                  {isArabic ? 'ملاحظات العميل' : 'Customer Notes'}
+                                </h4>
+                                <p className="text-sm text-gray-600 bg-amber-50 border border-primary p-3 rounded-lg">
+                                  {selectedOrder.customer_notes}
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    </div>
+                )}
+              </div>
+            )}
+          </div>
           </div>
         </div>
 
         {/* Logout Section */}
-        <div className="bg-white rounded-xl shadow-lg p-6 mt-8">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Account Actions</h3>
+        <div 
+          className="rounded-xl shadow-xl p-6 mt-8 border-2 border-primary bg-cover bg-center relative"
+          style={{ backgroundImage: 'url(/images/bg_4.jpg)' }}
+        >
+          {/* Component overlay */}
+          <div className="absolute inset-0 bg-black bg-opacity-40 rounded-xl"></div>
+          <div className="relative z-10">
+                      <h3 className="text-lg font-semibold text-white mb-4">
+              {isArabic ? 'إجراءات الحساب' : 'Account Actions'}
+            </h3>
           <button
-            onClick={logout}
-            className="px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+            onClick={() => {
+              logout();
+              toast.info(isArabic ? 'تم تسجيل الخروج' : 'You have been logged out');
+            }}
+            className="px-6 py-3 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 hover:border-red-400 transition-colors"
           >
-            Logout
+            {isArabic ? 'تسجيل الخروج' : 'Logout'}
           </button>
+          </div>
+        </div>
         </div>
       </div>
-    </div>
-  );
-};
+    );
+  };
 
 export default Profile; 

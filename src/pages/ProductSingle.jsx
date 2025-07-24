@@ -233,14 +233,21 @@ const ProductSingle = () => {
         price: selectedSizeData?.price || product.price
       }
       
+      let allSuccess = true
       for (let i = 0; i < quantity; i++) {
-        addToCart(cartItem)
+        const result = addToCart(cartItem)
+        if (!result.success) {
+          allSuccess = false
+          break
+        }
       }
       
-      setShowToast(true)
-      setAddingToCart(false)
+      if (allSuccess) {
+        setShowToast(true)
+        setTimeout(() => setShowToast(false), 3000)
+      }
       
-      setTimeout(() => setShowToast(false), 3000)
+      setAddingToCart(false)
     }, 500)
   }
 

@@ -136,91 +136,37 @@ export const getUserAddresses = async () => {
     const response = await api.get(config.ENDPOINTS.ADDRESSES.GET_USER_ADDRESSES);
     return response;
   } catch (error) {
-    console.error('Error fetching user addresses:', error);
+    console.error('Error getting user addresses:', error);
     throw error;
   }
 };
 
-export const addAddress = async (addressData) => {
+export const addUserAddress = async (addressData) => {
   try {
     const response = await api.post(config.ENDPOINTS.ADDRESSES.ADD_ADDRESS, addressData);
     return response;
   } catch (error) {
-    console.error('Error adding address:', error);
+    console.error('Error adding user address:', error);
     throw error;
   }
 };
 
-export const updateAddress = async (addressId, addressData) => {
+export const updateUserAddress = async (addressId, addressData) => {
   try {
     const response = await api.put(`${config.ENDPOINTS.ADDRESSES.UPDATE_ADDRESS}/${addressId}`, addressData);
     return response;
   } catch (error) {
-    console.error('Error updating address:', error);
+    console.error('Error updating user address:', error);
     throw error;
   }
 };
 
-export const deleteAddress = async (addressId) => {
+export const deleteUserAddress = async (addressId) => {
   try {
     const response = await api.delete(`${config.ENDPOINTS.ADDRESSES.DELETE_ADDRESS}/${addressId}`);
     return response;
   } catch (error) {
-    console.error('Error deleting address:', error);
-    throw error;
-  }
-};
-
-// =================== ❤️ FAVORITES MANAGEMENT ===================
-
-export const getUserFavorites = async () => {
-  try {
-    const response = await api.get(config.ENDPOINTS.FAVORITES.GET_FAVORITES);
-    return response;
-  } catch (error) {
-    console.error('Error fetching user favorites:', error);
-    throw error;
-  }
-};
-
-export const addToFavorites = async (productId) => {
-  try {
-    const response = await api.post(config.ENDPOINTS.FAVORITES.ADD_FAVORITE, { product_id: productId });
-    return response;
-  } catch (error) {
-    console.error('Error adding to favorites:', error);
-    throw error;
-  }
-};
-
-export const removeFromFavorites = async (favoriteId) => {
-  try {
-    const response = await api.delete(`${config.ENDPOINTS.FAVORITES.REMOVE_FAVORITE}/${favoriteId}`);
-    return response;
-  } catch (error) {
-    console.error('Error removing from favorites:', error);
-    throw error;
-  }
-};
-
-// =================== 🛒 ORDER MANAGEMENT ===================
-
-export const getUserOrders = async () => {
-  try {
-    const response = await api.get(config.ENDPOINTS.ORDERS.GET_USER_ORDERS);
-    return response;
-  } catch (error) {
-    console.error('Error fetching user orders:', error);
-    throw error;
-  }
-};
-
-export const getOrderDetails = async (orderId) => {
-  try {
-    const response = await api.get(`${config.ENDPOINTS.ORDERS.GET_ORDER_DETAILS}/${orderId}`);
-    return response;
-  } catch (error) {
-    console.error('Error fetching order details:', error);
+    console.error('Error deleting user address:', error);
     throw error;
   }
 };
@@ -232,7 +178,7 @@ export const getDeliveryLocations = async () => {
     const response = await api.get(config.ENDPOINTS.DELIVERY.GET_DELIVERY_LOCATIONS);
     return response;
   } catch (error) {
-    console.error('Error fetching delivery locations:', error);
+    console.error('Error getting delivery locations:', error);
     throw error;
   }
 };
@@ -244,7 +190,7 @@ export const getDeliveryFee = async (userAddressId) => {
     });
     return response;
   } catch (error) {
-    console.error('Error fetching delivery fee:', error);
+    console.error('Error getting delivery fee:', error);
     throw error;
   }
 };
@@ -252,7 +198,7 @@ export const getDeliveryFee = async (userAddressId) => {
 export const validatePromoCode = async (code, orderAmount) => {
   try {
     const response = await api.post(config.ENDPOINTS.DELIVERY.VALIDATE_PROMO_CODE, {
-      code,
+      code: code,
       order_amount: orderAmount
     });
     return response;
@@ -268,6 +214,62 @@ export const placeOrder = async (orderData) => {
     return response;
   } catch (error) {
     console.error('Error placing order:', error);
+    throw error;
+  }
+};
+
+// =================== 🛒 ORDER MANAGEMENT ===================
+
+export const getUserOrders = async () => {
+  try {
+    const response = await api.get(config.ENDPOINTS.ORDERS.GET_USER_ORDERS);
+    return response;
+  } catch (error) {
+    console.error('Error getting user orders:', error);
+    throw error;
+  }
+};
+
+export const getOrderDetails = async (orderId) => {
+  try {
+    const response = await api.get(`${config.ENDPOINTS.ORDERS.GET_ORDER_DETAILS}/${orderId}`);
+    return response;
+  } catch (error) {
+    console.error('Error getting order details:', error);
+    throw error;
+  }
+};
+
+// =================== ❤️ FAVORITES MANAGEMENT ===================
+
+export const getUserFavorites = async () => {
+  try {
+    const response = await api.get(config.ENDPOINTS.FAVORITES.GET_FAVORITES);
+    return response;
+  } catch (error) {
+    console.error('Error getting user favorites:', error);
+    throw error;
+  }
+};
+
+export const addToFavorites = async (productId) => {
+  try {
+    const response = await api.post(config.ENDPOINTS.FAVORITES.ADD_FAVORITE, {
+      product_id: productId
+    });
+    return response;
+  } catch (error) {
+    console.error('Error adding to favorites:', error);
+    throw error;
+  }
+};
+
+export const removeFromFavorites = async (favoriteId) => {
+  try {
+    const response = await api.delete(`${config.ENDPOINTS.FAVORITES.REMOVE_FAVORITE}/${favoriteId}`);
+    return response;
+  } catch (error) {
+    console.error('Error removing from favorites:', error);
     throw error;
   }
 };

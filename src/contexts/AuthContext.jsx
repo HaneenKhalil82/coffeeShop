@@ -130,11 +130,21 @@ export const AuthProvider = ({ children }) => {
       setToken(null)
       localStorage.removeItem("auth_token")
       localStorage.removeItem("user")
+      
+      // Clear all cart-related data
       localStorage.removeItem("cart")
+      localStorage.removeItem("coffee-cart")
+      
+      // Clear user-specific cart data (cleanup for any existing user carts)
+      Object.keys(localStorage).forEach(key => {
+        if (key.startsWith('coffee-cart-')) {
+          localStorage.removeItem(key)
+        }
+      })
     }
   }
 
-  const updateProfile = async (profileData) => {
+  const updateProfile = async () => {
     try {
       const response = await getUserProfile();
       const updatedUser = response.data.user || response.data;

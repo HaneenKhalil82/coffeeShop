@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { ToastContainer, toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 import Navbar from './components/Navbar'
 // import HeroSlider from './components/HeroSlider'
 import Footer from './components/Footer'
@@ -8,7 +10,7 @@ import Menu from './pages/Menu'
 import About from './pages/About'
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
-// import { useAuth } from "./contexts/AuthContext";
+import { useAuth } from "./contexts/AuthContext";
 
 import Shop from './pages/Shop'
 import Contact from './pages/Contact'
@@ -51,33 +53,52 @@ export const useCart = () => {
 }
 
 function App() {
-  // const { user } = useAuth();
+  const { isAuthenticated, user } = useAuth()
   const [isRTL, setIsRTL] = useState(true) // Default to Arabic RTL
   const [isArabic, setIsArabic] = useState(true) // Default to Arabic
   const [cartItems, setCartItems] = useState([])
 
-  // Load cart from localStorage on app start
+  // Get user-specific cart key
+  const getCartKey = () => {
+    if (!isAuthenticated || !user) return null
+    return `coffee-cart-${user.id || user.email || 'guest'}`
+  }
+
+  // Load user-specific cart from localStorage when user changes
   useEffect(() => {
-    const savedCart = localStorage.getItem('coffee-cart')
-    if (savedCart) {
-      try {
-        const parsedCart = JSON.parse(savedCart)
-        setCartItems(parsedCart)
-      } catch (error) {
-        console.error('Error parsing cart from localStorage:', error)
-        localStorage.removeItem('coffee-cart')
+    if (isAuthenticated && user) {
+      const cartKey = getCartKey()
+      if (cartKey) {
+        const savedCart = localStorage.getItem(cartKey)
+        if (savedCart) {
+          try {
+            const parsedCart = JSON.parse(savedCart)
+            setCartItems(parsedCart)
+          } catch (error) {
+            console.error('Error parsing cart from localStorage:', error)
+            localStorage.removeItem(cartKey)
+          }
+        }
+      }
+    } else {
+      // Clear cart if user is not authenticated
+      setCartItems([])
+    }
+  }, [isAuthenticated, user])
+
+  // Save cart to user-specific localStorage whenever cart changes
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      const cartKey = getCartKey()
+      if (cartKey) {
+        if (cartItems.length > 0) {
+          localStorage.setItem(cartKey, JSON.stringify(cartItems))
+        } else {
+          localStorage.removeItem(cartKey)
+        }
       }
     }
-  }, [])
-
-  // Save cart to localStorage whenever cart changes
-  useEffect(() => {
-    if (cartItems.length > 0) {
-      localStorage.setItem('coffee-cart', JSON.stringify(cartItems))
-    } else {
-      localStorage.removeItem('coffee-cart')
-    }
-  }, [cartItems])
+  }, [cartItems, isAuthenticated, user])
 
   // Set RTL as default on app load
   useEffect(() => {
@@ -93,6 +114,14 @@ function App() {
   }
 
   const addToCart = (product) => {
+    if (!isAuthenticated) {
+      toast.error(isArabic ? "يجب تسجيل الدخول أولاً لإضافة المنتجات إلى السلة" : "Please login first to add items to cart", {
+        position: "top-right",
+        autoClose: 3000,
+      })
+      return { success: false, message: 'Not authenticated' }
+    }
+    
     setCartItems(prev => {
       const existingItem = prev.find(item => item.id === product.id)
       if (existingItem) {
@@ -104,6 +133,8 @@ function App() {
       }
       return [...prev, { ...product, quantity: 1 }]
     })
+    
+    return { success: true, message: 'Added to cart' }
   }
 
   const removeFromCart = (productId) => {
@@ -124,6 +155,11 @@ function App() {
 
   const clearCart = () => {
     setCartItems([])
+    const cartKey = getCartKey()
+    if (cartKey) {
+      localStorage.removeItem(cartKey)
+    }
+    // Also remove any legacy cart data
     localStorage.removeItem('coffee-cart')
   }
 
@@ -169,9 +205,27 @@ function App() {
               
               <Footer />
               
-              {/* Chat Components - Available on all pages */}
-              <ChatButton />
-              <ChatWindow />
+              {/* Chat Components - Only available for authenticated users */}
+              {isAuthenticated && (
+                <>
+                  <ChatButton />
+                  <ChatWindow />
+                </>
+              )}
+              
+              {/* Toast Container for global toast notifications */}
+              <ToastContainer
+                position="top-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={isRTL}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="light"
+              />
             </div>
           </Router>
         </ChatProvider>

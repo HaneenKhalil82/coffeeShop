@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { FaPlus, FaMinus, FaTrash, FaShoppingBag, FaArrowLeft, FaArrowRight, FaTimes, FaCheck, FaExclamationTriangle } from 'react-icons/fa'
 import { useCart, useRTL } from '../App'
+import { useAuth } from '../contexts/AuthContext'
 import HeroSection from './../components/HeroSection'
 
 // Toast Notification Component
@@ -27,8 +28,16 @@ const Toast = ({ message, type, onClose }) => {
 
 const Cart = () => {
   const { isArabic } = useRTL()
+  const { isAuthenticated } = useAuth()
   const { cartItems, removeFromCart, updateCartItemQuantity, clearCart, cartItemsCount } = useCart()
   const navigate = useNavigate()
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/login')
+    }
+  }, [isAuthenticated, navigate])
   
   const [loading, setLoading] = useState(false)
   const [toast, setToast] = useState(null)
@@ -78,11 +87,9 @@ const Cart = () => {
     summary: {
       title: 'ملخص الطلب',
       subtotal: 'المجموع الفرعي',
-      tax: 'ضريبة القيمة المضافة (15%)',
       shipping: 'التوصيل',
       total: 'المجموع الكلي',
-      delivery: 'التوصيل',
-      discount: 'الخصم'
+      delivery: 'التوصيل'
     },
     buttons: {
       continueShopping: 'متابعة التسوق',
@@ -120,11 +127,9 @@ const Cart = () => {
     summary: {
       title: 'Order Summary',
       subtotal: 'Subtotal',
-      tax: 'VAT (15%)',
       shipping: 'Shipping',
       total: 'Total',
-      delivery: 'Delivery',
-      discount: 'Discount'
+      delivery: 'Delivery'
     },
     buttons: {
       continueShopping: 'Continue Shopping',
@@ -149,11 +154,8 @@ const Cart = () => {
 
   // Calculate totals
   const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0)
-  const taxRate = 0.15
-  const tax = subtotal * taxRate
   const deliveryFee = subtotal >= 100 ? 0 : 10
-  const discount = subtotal >= 50 ? 5 : 0
-  const finalTotal = subtotal + tax + deliveryFee - discount
+  const finalTotal = subtotal + deliveryFee
 
   const handleQuantityChange = async (itemId, newQuantity, showNotification = true) => {
     if (newQuantity < 1) {
@@ -681,15 +683,6 @@ const Cart = () => {
                     </div>
                     
                     <div className="flex justify-between items-center text-gray-300">
-                      <span className="arabic-body text-sm md:text-base lg:text-lg">
-                        {content.summary.tax}
-                      </span>
-                      <span className="font-bold text-white text-sm md:text-base lg:text-lg">
-                        EGP {tax.toFixed(2)}
-                      </span>
-                    </div>
-                    
-                    <div className="flex justify-between items-center text-gray-300">
                       <div>
                         <span className="arabic-body text-sm md:text-base lg:text-lg">{content.summary.delivery}</span>
                         {deliveryFee === 0 && (
@@ -702,15 +695,6 @@ const Cart = () => {
                         {deliveryFee === 0 ? (isArabic ? 'مجاني' : 'Free') : `EGP ${deliveryFee.toFixed(2)}`}
                       </span>
                     </div>
-
-                    {discount > 0 && (
-                      <div className="flex justify-between items-center text-gray-300">
-                        <span className="arabic-body text-sm md:text-base lg:text-lg">{content.summary.discount}</span>
-                        <span className="font-bold text-green-400 text-sm md:text-base lg:text-lg">
-                          -EGP {discount.toFixed(2)}
-                        </span>
-                      </div>
-                    )}
 
                     <div className="border-t border-gray-600 pt-4 md:pt-5 lg:pt-7">
                       <div className="flex justify-between items-center text-base md:text-lg lg:text-xl font-bold">
