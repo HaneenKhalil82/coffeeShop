@@ -173,6 +173,17 @@ export const deleteUserAddress = async (addressId) => {
 
 // =================== 🚚 ORDER PLACEMENT & DELIVERY ===================
 
+// API Health Check
+export const checkApiHealth = async () => {
+  try {
+    const response = await api.get('/health');
+    return response;
+  } catch (error) {
+    console.error('API Health Check failed:', error);
+    throw error;
+  }
+};
+
 export const getDeliveryLocations = async () => {
   try {
     const response = await api.get(config.ENDPOINTS.DELIVERY.GET_DELIVERY_LOCATIONS);
@@ -210,10 +221,17 @@ export const validatePromoCode = async (code, orderAmount) => {
 
 export const placeOrder = async (orderData) => {
   try {
+    console.log('API: Sending order to endpoint:', config.ENDPOINTS.DELIVERY.PLACE_ORDER);
+    console.log('API: Order data:', orderData);
+    
     const response = await api.post(config.ENDPOINTS.DELIVERY.PLACE_ORDER, orderData);
+    
+    console.log('API: Order response:', response.data);
     return response;
   } catch (error) {
-    console.error('Error placing order:', error);
+    console.error('API: Error placing order:', error);
+    console.error('API: Error response:', error.response?.data);
+    console.error('API: Error status:', error.response?.status);
     throw error;
   }
 };
@@ -385,6 +403,91 @@ export const formatPrice = (price, currency = 'USD') => {
     style: 'currency',
     currency: currency,
   }).format(price);
+};
+
+// =================== LOCAL ORDER STORAGE ===================
+
+// Get user-specific order storage key
+const getOrderStorageKey = (userId) => `coffee-orders-${userId}`;
+
+// Save order to local storage
+export const saveOrderLocally = (orderData, userId) => {
+  try {
+    const storageKey = getOrderStorageKey(userId);
+    const existingOrders = JSON.parse(localStorage.getItem(storageKey) || '[]');
+    
+    // Add timestamp and user info to order
+    const orderWithMetadata = {
+      ...orderData,
+      id: orderData.orderNumber || Date.now().toString(),
+      user_id: userId,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      status: orderData.status || 'pending_confirmation'
+    };
+    
+    // Add to beginning of array (newest first)
+    existingOrders.unshift(orderWithMetadata);
+    
+    // Keep only last 50 orders to prevent storage bloat
+    const trimmedOrders = existingOrders.slice(0, 50);
+    
+    localStorage.setItem(storageKey, JSON.stringify(trimmedOrders));
+    
+    console.log('Order saved locally:', orderWithMetadata);
+    return orderWithMetadata;
+  } catch (error) {
+    console.error('Error saving order locally:', error);
+    throw error;
+  }
+};
+
+// Get user's local orders
+export const getLocalOrders = (userId) => {
+  try {
+    const storageKey = getOrderStorageKey(userId);
+    const orders = JSON.parse(localStorage.getItem(storageKey) || '[]');
+    return orders;
+  } catch (error) {
+    console.error('Error getting local orders:', error);
+    return [];
+  }
+};
+
+// Get specific local order by ID
+export const getLocalOrderById = (orderId, userId) => {
+  try {
+    const orders = getLocalOrders(userId);
+    return orders.find(order => order.id === orderId || order.orderNumber === orderId);
+  } catch (error) {
+    console.error('Error getting local order by ID:', error);
+    return null;
+  }
+};
+
+// Update local order status
+export const updateLocalOrderStatus = (orderId, status, userId) => {
+  try {
+    const storageKey = getOrderStorageKey(userId);
+    const orders = JSON.parse(localStorage.getItem(storageKey) || '[]');
+    
+    const updatedOrders = orders.map(order => {
+      if (order.id === orderId || order.orderNumber === orderId) {
+        return {
+          ...order,
+          status,
+          updated_at: new Date().toISOString()
+        };
+      }
+      return order;
+    });
+    
+    localStorage.setItem(storageKey, JSON.stringify(updatedOrders));
+    return true;
+  } catch (error) {
+    console.error('Error updating local order status:', error);
+    return false;
+  }
 };
 
 // Function to handle API errors consistently

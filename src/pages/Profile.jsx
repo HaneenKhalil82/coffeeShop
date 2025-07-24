@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { User, Mail, Phone, Camera, Edit, Save, X, Package, Clock, CheckCircle, XCircle, Truck, Eye } from 'lucide-react';
 import { toast } from 'react-toastify';
-import { updateUserProfile, changePassword, getUserOrders, getOrderDetails } from '../services/api';
+import { updateUserProfile, changePassword, getUserOrders, getOrderDetails, getLocalOrders, getLocalOrderById } from '../services/api';
 import { useRTL } from '../App';
 
 const createProfileSchema = (isArabic) => z.object({
@@ -139,34 +139,53 @@ const Profile = () => {
       console.log('🔑 Auth token available:', !!localStorage.getItem('auth_token'));
       console.log('👤 User authenticated:', !!user);
       
-      const response = await getUserOrders();
-      console.log('🛒 Orders API Response Status:', response.status);
-      console.log('🛒 Orders API Response Data:', response.data);
-      
-      // Handle different response structures
+      // Try to get orders from API first
       let ordersData = [];
-      if (response.data) {
-        if (Array.isArray(response.data)) {
-          ordersData = response.data;
-        } else if (response.data.orders && Array.isArray(response.data.orders)) {
-          ordersData = response.data.orders;
-        } else if (response.data.data && Array.isArray(response.data.data)) {
-          ordersData = response.data.data;
-        } else {
-          console.log('🛒 Unexpected response structure, treating as empty array');
-          ordersData = [];
+      try {
+        const response = await getUserOrders();
+        console.log('🛒 Orders API Response Status:', response.status);
+        console.log('🛒 Orders API Response Data:', response.data);
+        
+        // Handle different response structures
+        if (response.data) {
+          if (Array.isArray(response.data)) {
+            ordersData = response.data;
+          } else if (response.data.orders && Array.isArray(response.data.orders)) {
+            ordersData = response.data.orders;
+          } else if (response.data.data && Array.isArray(response.data.data)) {
+            ordersData = response.data.data;
+          } else {
+            console.log('🛒 Unexpected response structure, treating as empty array');
+            ordersData = [];
+          }
         }
+        
+        console.log('🛒 Processed API orders data:', ordersData);
+        console.log('🛒 Number of API orders found:', ordersData.length);
+        
+        if (ordersData.length > 0) {
+          setOrders(ordersData);
+          toast.success(isArabic ? `تم العثور على ${ordersData.length} طلب` : `Found ${ordersData.length} orders`);
+          return;
+        }
+      } catch (apiError) {
+        console.log('⚠️ API orders failed, using local orders:', apiError.message);
       }
       
-      console.log('🛒 Processed orders data:', ordersData);
-      console.log('🛒 Number of orders found:', ordersData.length);
-      
-      setOrders(ordersData);
-      
-      if (ordersData.length === 0) {
-        toast.info(isArabic ? 'لا توجد طلبات حالياً' : 'No orders found');
+      // Fallback to local orders
+      if (user) {
+        const localOrders = getLocalOrders(user.id || user.email);
+        console.log('📦 Local orders:', localOrders);
+        setOrders(localOrders);
+        
+        if (localOrders.length > 0) {
+          toast.success(isArabic ? `تم العثور على ${localOrders.length} طلب محلي` : `Found ${localOrders.length} local orders`);
+        } else {
+          toast.info(isArabic ? 'لا توجد طلبات حالياً' : 'No orders found');
+        }
       } else {
-        toast.success(isArabic ? `تم العثور على ${ordersData.length} طلب` : `Found ${ordersData.length} orders`);
+        setOrders([]);
+        toast.info(isArabic ? 'لا توجد طلبات حالياً' : 'No orders found');
       }
       
     } catch (error) {
@@ -183,6 +202,7 @@ const Profile = () => {
                           (isArabic ? 'فشل في جلب الطلبات' : 'Failed to fetch orders');
       
       toast.error(errorMessage);
+      setOrders([]);
     } finally {
       setOrdersLoading(false);
     }
@@ -192,10 +212,31 @@ const Profile = () => {
     setOrderDetailsLoading(true);
     try {
       console.log('🛒 Fetching order details for ID:', orderId);
-      const response = await getOrderDetails(orderId);
-      console.log('🛒 Order details response:', response.data);
       
-      setSelectedOrder(response.data.order || response.data);
+      // Try to get order details from API first
+      try {
+        const response = await getOrderDetails(orderId);
+        console.log('🛒 Order details API response:', response.data);
+        
+        setSelectedOrder(response.data.order || response.data);
+        return;
+      } catch (apiError) {
+        console.log('⚠️ API order details failed, using local order:', apiError.message);
+      }
+      
+      // Fallback to local order details
+      if (user) {
+        const localOrder = getLocalOrderById(orderId, user.id || user.email);
+        console.log('📦 Local order details:', localOrder);
+        
+        if (localOrder) {
+          setSelectedOrder(localOrder);
+        } else {
+          toast.error(isArabic ? 'لم يتم العثور على الطلب' : 'Order not found');
+        }
+      } else {
+        toast.error(isArabic ? 'لم يتم العثور على الطلب' : 'Order not found');
+      }
       
     } catch (error) {
       console.error('❌ Error fetching order details:', error);
@@ -254,6 +295,23 @@ const Profile = () => {
       fetchUserOrders();
     }
   }, [activeTab, user]);
+
+  // Handle Escape key to close order details modal
+  useEffect(() => {
+    const handleEscapeKey = (event) => {
+      if (event.key === 'Escape' && selectedOrder) {
+        setSelectedOrder(null);
+      }
+    };
+
+    if (selectedOrder) {
+      document.addEventListener('keydown', handleEscapeKey);
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEscapeKey);
+    };
+  }, [selectedOrder]);
 
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
@@ -597,106 +655,201 @@ const Profile = () => {
             )}
 
             {activeTab === 'orders' && (
-              <div className="space-y-6">
-                {/* Orders Header */}
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold text-white">
+              <div className="space-y-8">
+                {/* Enhanced Orders Header */}
+                <div className="text-center mb-8">
+                  <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-amber-400 to-primary rounded-full mb-4">
+                    <Package className="text-white" size={32} />
+                  </div>
+                  <h3 className="text-2xl font-bold text-white mb-2">
                     {isArabic ? 'طلباتي' : 'My Orders'}
                   </h3>
+                  <p className="text-white/80 text-sm">
+                    {isArabic ? 'تتبع جميع طلباتك السابقة والحالية' : 'Track all your previous and current orders'}
+                  </p>
+                </div>
+
+                {/* Enhanced Refresh Button */}
+                <div className="flex justify-center mb-6">
                   <button
                     onClick={fetchUserOrders}
                     disabled={ordersLoading}
-                    className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary transition-colors disabled:opacity-50"
+                    className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-primary to-amber-600 text-white rounded-full hover:from-amber-600 hover:to-primary transition-all duration-300 disabled:opacity-50 shadow-lg hover:shadow-xl transform hover:scale-105"
                   >
-                    {ordersLoading ? (isArabic ? 'جاري التحديث...' : 'Refreshing...') : (isArabic ? 'تحديث' : 'Refresh')}
+                    {ordersLoading ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        {isArabic ? 'جاري التحديث...' : 'Refreshing...'}
+                      </>
+                    ) : (
+                      <>
+                        <Package size={18} />
+                        {isArabic ? 'تحديث الطلبات' : 'Refresh Orders'}
+                      </>
+                    )}
                   </button>
                 </div>
 
-                {/* Orders List */}
+                {/* Enhanced Orders List */}
                 {ordersLoading ? (
-                  <div className="flex items-center justify-center py-12">
+                  <div className="flex items-center justify-center py-16">
                     <div className="text-center">
-                      <Package className="mx-auto text-white mb-4" size={48} />
-                      <p className="text-white">
-                        {isArabic ? 'جاري تحميل الطلبات...' : 'Loading orders...'}
+                      <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-amber-400 to-primary rounded-full mb-6 animate-pulse">
+                        <Package className="text-white" size={40} />
+                      </div>
+                      <h4 className="text-xl font-semibold text-white mb-2">
+                        {isArabic ? 'جاري تحميل الطلبات...' : 'Loading Orders...'}
+                      </h4>
+                      <p className="text-white/70">
+                        {isArabic ? 'يرجى الانتظار قليلاً' : 'Please wait a moment'}
                       </p>
                     </div>
                   </div>
                 ) : orders.length === 0 ? (
-                  <div className="flex items-center justify-center py-12">
+                  <div className="flex items-center justify-center py-16">
                     <div className="text-center">
-                      <Package className="mx-auto text-white mb-4" size={48} />
-                      <p className="text-white">
-                        {isArabic ? 'لا توجد طلبات حتى الآن' : 'No orders yet'}
+                      <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-r from-gray-400 to-gray-600 rounded-full mb-6">
+                        <Package className="text-white" size={48} />
+                      </div>
+                      <h4 className="text-xl font-semibold text-white mb-2">
+                        {isArabic ? 'لا توجد طلبات حتى الآن' : 'No Orders Yet'}
+                      </h4>
+                      <p className="text-white/70 mb-6">
+                        {isArabic ? 'ابدأ بالتسوق وستظهر طلباتك هنا' : 'Start shopping and your orders will appear here'}
                       </p>
+                      <button
+                        onClick={() => window.location.href = '/shop'}
+                        className="px-6 py-3 bg-gradient-to-r from-primary to-amber-600 text-white rounded-full hover:from-amber-600 hover:to-primary transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+                      >
+                        {isArabic ? 'تسوق الآن' : 'Shop Now'}
+                      </button>
                     </div>
                   </div>
                 ) : (
-                  <div className="space-y-4">
-                    {orders.map((order) => (
-                      <div
-                        key={order.id}
-                        className="bg-gray-50 rounded-lg p-4 border border-gray-200 hover:border-primary hover:shadow-md transition-all duration-200"
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-4">
-                            {getOrderStatusIcon(order.status)}
-                            <div>
-                              <h4 className="font-medium text-white">
-                                {isArabic ? `طلب رقم #${order.id}` : `Order #${order.id}`}
-                              </h4>
-                              <p className="text-sm text-white">
-                                {isArabic ? `النوع: ${order.order_type === 'delivery' ? 'توصيل' : 'استلام'}` : `Type: ${order.order_type}`}
-                              </p>
-                              <p className="text-sm text-white">
-                                {order.created_at ? new Date(order.created_at).toLocaleDateString(isArabic ? 'ar-SA' : 'en-US') : ''}
-                              </p>
-                            </div>
-                          </div>
+                                     <div className="space-y-6">
+                     {orders.map((order) => (
+                       <div
+                         key={order.id}
+                         className="group relative overflow-hidden rounded-2xl border-2 border-primary/30 hover:border-primary transition-all duration-500 bg-cover bg-center shadow-lg hover:shadow-2xl transform hover:scale-[1.02]"
+                         style={{ backgroundImage: 'url(/images/bg_4.jpg)' }}
+                       >
+                         
+                        
 
-                          <div className="flex items-center space-x-4">
-                            <div className="text-right">
-                              <p className="font-medium text-white">
-                                {order.total_amount ? `$${parseFloat(order.total_amount).toFixed(2)}` : 'N/A'}
-                              </p>
-                              <p className="text-sm text-white">
-                                {getOrderStatusText(order.status)}
-                              </p>
-                            </div>
-                            <button
-                              onClick={() => fetchOrderDetails(order.id)}
-                              disabled={orderDetailsLoading}
-                              className="flex items-center gap-2 px-3 py-2 bg-primary text-white rounded-lg hover:bg-primary transition-colors disabled:opacity-50"
-                            >
-                              <Eye size={16} />
-                              {isArabic ? 'عرض' : 'View'}
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
+                         <div className="relative z-10 p-6">
+                           {/* Order Header */}
+                           <div className="flex items-start justify-between mb-4">
+                             <div className="flex-1">
+                               <div className="flex items-center gap-3 mb-2">
+                                 <div className="w-10 h-10 bg-gradient-to-r from-amber-400 to-primary rounded-full flex items-center justify-center">
+                                   
+                                 </div>
+                                 <div>
+                                   <h4 className="text-lg font-bold text-white">
+                                     {isArabic ? `طلب رقم #${order.id || order.orderNumber}` : `Order #${order.id || order.orderNumber}`}
+                                   </h4>
+                                   <p className="text-white/80 text-sm">
+                                     {order.created_at ? new Date(order.created_at).toLocaleDateString(isArabic ? 'ar-SA' : 'en-US', {
+                                       year: 'numeric',
+                                       month: 'long',
+                                       day: 'numeric',
+                                       hour: '2-digit',
+                                       minute: '2-digit'
+                                     }) : ''}
+                                   </p>
+                                 </div>
+                               </div>
+                             </div>
+                             
+                             {/* Total Amount */}
+                             <div className="text-right">
+                               <div className="bg-gradient-to-r from-amber-400 to-primary px-4 py-2 rounded-full">
+                                 <p className="text-white font-bold text-lg">
+                                   ${order.total_amount ? parseFloat(order.total_amount).toFixed(2) : 
+                                     order.totals?.total ? parseFloat(order.totals.total).toFixed(2) : '0.00'}
+                                 </p>
+                               </div>
+                             </div>
+                           </div>
+
+                           {/* Order Details */}
+                           <div className="grid md:grid-cols-2 gap-4 mb-4">
+                             <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 border border-white/20">
+                               <p className="text-white/80 text-xs mb-1">
+                                 {isArabic ? 'نوع الطلب' : 'Order Type'}
+                               </p>
+                               <p className="text-white font-medium">
+                                 {isArabic ? 
+                                   (order.order_type === 'delivery' ? '🚚 توصيل' : '🏪 استلام') : 
+                                   (order.order_type === 'delivery' ? '🚚 Delivery' : '🏪 Takeaway')}
+                               </p>
+                             </div>
+                             
+                             <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 border border-white/20">
+                               <p className="text-white/80 text-xs mb-1">
+                                 {isArabic ? 'عدد العناصر' : 'Items Count'}
+                               </p>
+                               <p className="text-white font-medium">
+                                 {order.items ? order.items.length : 0} {isArabic ? 'عنصر' : 'items'}
+                               </p>
+                             </div>
+                           </div>
+
+                           {/* Action Button */}
+                           <div className="flex justify-center">
+                             <button
+                               onClick={() => fetchOrderDetails(order.id || order.orderNumber)}
+                               disabled={orderDetailsLoading}
+                               className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-primary to-amber-600 text-white rounded-full hover:from-amber-600 hover:to-primary transition-all duration-300 disabled:opacity-50 shadow-lg hover:shadow-xl transform hover:scale-105 group-hover:scale-110"
+                             >
+                               <Eye size={18} />
+                               {isArabic ? 'عرض التفاصيل' : 'View Details'}
+                             </button>
+                           </div>
+                         </div>
+                       </div>
+                     ))}
                   </div>
                 )}
 
-                {/* Order Details Modal */}
+                {/* Enhanced Order Details Modal */}
                 {selectedOrder && (
-                  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                                        <div 
-                      className="bg-white bg-opacity-95 backdrop-blur-sm rounded-xl shadow-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto border-2 border-primary"
+                  <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
+                    <div 
+                      className="fixed inset-0 bg-black/60 backdrop-blur-sm"
+                      onClick={() => setSelectedOrder(null)}
+                    ></div>
+                    <div 
+                      className="relative bg-gradient-to-br from-white to-amber-50 rounded-2xl shadow-2xl max-w-3xl w-full max-h-[85vh] overflow-y-auto border-2 border-primary/30"
                     >
-                      <div className="p-6">
-                        {/* Modal Header */}
-                        <div className="flex items-center justify-between mb-6">
-                          <h3 className="text-xl font-semibold text-gray-900">
-                            {isArabic ? `تفاصيل الطلب #${selectedOrder.id}` : `Order #${selectedOrder.id} Details`}
+                                              <div className="p-8">
+                        {/* Enhanced Modal Header */}
+                        <div className="text-center mb-8">
+                          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-amber-400 to-primary rounded-full mb-4">
+                            <Package className="text-white" size={32} />
+                          </div>
+                          <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                            {isArabic ? `تفاصيل الطلب #${selectedOrder.id || selectedOrder.orderNumber}` : `Order #${selectedOrder.id || selectedOrder.orderNumber} Details`}
                           </h3>
-                          <button
-                            onClick={() => setSelectedOrder(null)}
-                            className="text-gray-400 hover:text-primary transition-colors"
-                          >
-                            <X size={24} />
-                          </button>
+                          <div className="flex items-center justify-center gap-2">
+                            {getOrderStatusIcon(selectedOrder.status)}
+                            <span className="text-gray-600 font-medium">
+                              {getOrderStatusText(selectedOrder.status)}
+                            </span>
+                          </div>
+                          <p className="text-xs text-gray-500 mt-2">
+                            {isArabic ? 'اضغط ESC أو انقر خارج النافذة للإغلاق' : 'Press ESC or click outside to close'}
+                          </p>
                         </div>
+                        
+                        {/* Enhanced Close Button */}
+                        <button
+                          onClick={() => setSelectedOrder(null)}
+                          className="absolute top-4 right-4 z-20 bg-white/90 backdrop-blur-sm text-gray-600 hover:text-red-500 transition-all duration-300 p-2 hover:bg-white rounded-full shadow-lg hover:shadow-xl transform hover:scale-110 border border-gray-200 hover:border-red-200"
+                          title={isArabic ? 'إغلاق' : 'Close'}
+                        >
+                          <X size={24} />
+                        </button>
 
                         {orderDetailsLoading ? (
                           <div className="flex items-center justify-center py-8">
@@ -728,10 +881,10 @@ const Profile = () => {
                                   {isArabic ? 'الإجمالي' : 'Total'}
                                 </h4>
                                 <div className="space-y-2 text-sm">
-                                  <p><span className="font-medium">{isArabic ? 'المبلغ الفرعي:' : 'Subtotal:'}</span> ${selectedOrder.subtotal || '0.00'}</p>
-                                  <p><span className="font-medium">{isArabic ? 'رسوم التوصيل:' : 'Delivery Fee:'}</span> ${selectedOrder.delivery_fee || '0.00'}</p>
-                                  <p><span className="font-medium">{isArabic ? 'الخصم:' : 'Discount:'}</span> ${selectedOrder.discount_amount || '0.00'}</p>
-                                  <p className="font-bold text-lg"><span className="font-medium">{isArabic ? 'الإجمالي:' : 'Total:'}</span> ${selectedOrder.total_amount || '0.00'}</p>
+                                  <p><span className="font-medium">{isArabic ? 'المبلغ الفرعي:' : 'Subtotal:'}</span> {selectedOrder.subtotal || selectedOrder.totals?.subtotal || '0.00'}</p>
+                                  <p><span className="font-medium">{isArabic ? 'رسوم التوصيل:' : 'Delivery Fee:'}</span> {selectedOrder.delivery_fee || selectedOrder.totals?.deliveryFee || '0.00'}</p>
+                                  <p><span className="font-medium">{isArabic ? 'الخصم:' : 'Discount:'}</span> {selectedOrder.discount_amount || selectedOrder.totals?.discount || '0.00'}</p>
+                                  <p className="font-bold text-lg"><span className="font-medium">{isArabic ? 'الإجمالي:' : 'Total:'}</span> {selectedOrder.total_amount || selectedOrder.totals?.total || '0.00'}</p>
                                 </div>
                               </div>
                             </div>
@@ -752,8 +905,8 @@ const Profile = () => {
                                         )}
                                       </div>
                                       <div className="text-right">
-                                        <p className="font-medium">${item.price || '0.00'} × {item.quantity || 1}</p>
-                                        <p className="text-sm text-gray-500">${((item.price || 0) * (item.quantity || 1)).toFixed(2)}</p>
+                                        <p className="font-medium">{item.price || '0.00'} × {item.quantity || 1}</p>
+                                        <p className="text-sm text-gray-500">{((item.price || 0) * (item.quantity || 1)).toFixed(2)}</p>
                                       </div>
                                     </div>
                                   ))}

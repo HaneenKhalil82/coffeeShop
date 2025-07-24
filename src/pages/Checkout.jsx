@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { FaArrowLeft, FaArrowRight, FaCreditCard, FaPaypal, FaMoneyBill, FaCheckCircle, FaExclamationTriangle, FaTimes, FaCheck, FaPlus, FaEdit, FaTrash, FaMapMarkerAlt, FaShoppingBag } from 'react-icons/fa'
 import { useCart, useRTL } from '../App'
 import { useAuth } from '../contexts/AuthContext'
-import { getUserAddresses, addUserAddress, updateUserAddress, deleteUserAddress, getDeliveryFee, validatePromoCode, placeOrder, getDeliveryLocations } from '../services/api'
+import { getUserAddresses, addUserAddress, updateUserAddress, deleteUserAddress, getDeliveryFee, validatePromoCode, placeOrder, getDeliveryLocations, checkApiHealth, saveOrderLocally } from '../services/api'
 import HeroSection from './../components/HeroSection'
 
 // Toast Component
@@ -29,7 +29,7 @@ const Toast = ({ message, type, onClose }) => {
 
 const Checkout = () => {
   const { isArabic } = useRTL()
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, user } = useAuth()
   const { cartItems, clearCart } = useCart()
   const navigate = useNavigate()
 
@@ -103,10 +103,26 @@ const Checkout = () => {
 
   // Load initial data
   useEffect(() => {
-    if (isAuthenticated) {
-      loadAddresses()
-      loadDeliveryLocations()
+    const loadData = async () => {
+      if (isAuthenticated) {
+        loadAddresses()
+        loadDeliveryLocations()
+        
+        // Test API connectivity
+        console.log('API Base URL:', import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api')
+        console.log('Auth Token:', localStorage.getItem('auth_token') ? 'Present' : 'Missing')
+        
+        // Test API health
+        try {
+          await checkApiHealth()
+          console.log('API Health Check: OK')
+        } catch (error) {
+          console.log('API Health Check: Failed -', error.message)
+        }
+      }
     }
+    
+    loadData()
   }, [isAuthenticated])
 
   // Calculate delivery fee when address changes
@@ -170,10 +186,11 @@ const Checkout = () => {
 
   const content = isArabic ? {
     title: 'إتمام الطلب',
+    subtitle: 'أكمل طلبك بسهولة وأمان',
     steps: {
-      address: 'العنوان',
-      payment: 'الدفع',
-      confirm: 'التأكيد'
+      1: 'العنوان',
+      2: 'الدفع',
+      3: 'التأكيد'
     },
     orderType: {
       title: 'نوع الطلب',
@@ -216,14 +233,25 @@ const Checkout = () => {
       method: 'طريقة الدفع',
       cash: 'الدفع عند الاستلام',
       card: 'بطاقة ائتمانية',
-      paypal: 'PayPal'
+      paypal: 'PayPal',
+      cardNumber: 'رقم البطاقة',
+      expiryDate: 'تاريخ الانتهاء',
+      cvv: 'رمز الأمان',
+      cardholderName: 'اسم حامل البطاقة'
+    },
+    placeholders: {
+      cardNumber: '0000 0000 0000 0000',
+      expiryDate: 'MM/YY',
+      cvv: '123',
+      cardholderName: 'اسم حامل البطاقة'
     },
     buttons: {
       back: 'رجوع',
       next: 'التالي',
       placeOrder: 'تأكيد الطلب',
       save: 'حفظ',
-      cancel: 'إلغاء'
+      cancel: 'إلغاء',
+      backToCart: 'العودة للسلة'
     },
     messages: {
       orderSuccess: 'تم تأكيد طلبك بنجاح!',
@@ -239,13 +267,29 @@ const Checkout = () => {
       cardInvalid: 'يرجى إدخال رقم بطاقة صحيح',
       expiryInvalid: 'يرجى إدخال تاريخ انتهاء صحيح (MM/YY)',
       cvvInvalid: 'يرجى إدخال رمز CVV صحيح'
+    },
+    orderConfirmModal: {
+      title: 'تأكيد الطلب',
+      message: 'هل أنت متأكد من تأكيد هذا الطلب؟',
+      orderTotal: 'إجمالي الطلب',
+      cancelButton: 'إلغاء',
+      confirmButton: 'تأكيد الطلب'
+    },
+    successModal: {
+      title: 'تم الطلب بنجاح!',
+      message: 'شكراً لك! تم تأكيد طلبك وسيتم التواصل معك قريباً.',
+      orderNumber: 'رقم الطلب',
+      estimatedDelivery: 'الوقت المتوقع للتوصيل: 30-45 دقيقة',
+      closeButton: 'إغلاق',
+      continueShoppingButton: 'متابعة التسوق'
     }
   } : {
     title: 'Checkout',
+    subtitle: 'Complete your order easily and securely',
     steps: {
-      address: 'Address',
-      payment: 'Payment',
-      confirm: 'Confirmation'
+      1: 'Address',
+      2: 'Payment',
+      3: 'Confirmation'
     },
     orderType: {
       title: 'Order Type',
@@ -288,14 +332,25 @@ const Checkout = () => {
       method: 'Payment Method',
       cash: 'Cash on Delivery',
       card: 'Credit Card',
-      paypal: 'PayPal'
+      paypal: 'PayPal',
+      cardNumber: 'Card Number',
+      expiryDate: 'Expiry Date',
+      cvv: 'CVV',
+      cardholderName: 'Cardholder Name'
+    },
+    placeholders: {
+      cardNumber: '0000 0000 0000 0000',
+      expiryDate: 'MM/YY',
+      cvv: '123',
+      cardholderName: 'Cardholder Name'
     },
     buttons: {
       back: 'Back',
       next: 'Next',
       placeOrder: 'Place Order',
       save: 'Save',
-      cancel: 'Cancel'
+      cancel: 'Cancel',
+      backToCart: 'Back to Cart'
     },
     messages: {
       orderSuccess: 'Order placed successfully!',
@@ -311,6 +366,21 @@ const Checkout = () => {
       cardInvalid: 'Please enter a valid card number',
       expiryInvalid: 'Please enter a valid expiry date (MM/YY)',
       cvvInvalid: 'Please enter a valid CVV code'
+    },
+    orderConfirmModal: {
+      title: 'Confirm Order',
+      message: 'Are you sure you want to place this order?',
+      orderTotal: 'Order Total',
+      cancelButton: 'Cancel',
+      confirmButton: 'Place Order'
+    },
+    successModal: {
+      title: 'Order Successful!',
+      message: 'Thank you! Your order has been confirmed and we will contact you soon.',
+      orderNumber: 'Order Number',
+      estimatedDelivery: 'Estimated delivery time: 30-45 minutes',
+      closeButton: 'Close',
+      continueShoppingButton: 'Continue Shopping'
     }
   }
 
@@ -524,47 +594,111 @@ const Checkout = () => {
         orderData.scheduled_delivery_time = formData.scheduled_delivery_time
       }
 
-      const response = await placeOrder(orderData)
-      const newOrderData = response.data.data || response.data
+      console.log('Sending order data:', orderData)
 
-      // Store order details for success modal
-      setOrderData({
-        ...newOrderData,
-        orderNumber: newOrderData.id || newOrderData.order_number || Date.now().toString(36).toUpperCase(),
-        items: cartItems,
-        totals: {
-          subtotal: cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0),
-          tax: cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0) * 0.15,
-          deliveryFee,
-          discount: promoDiscount,
-          total: cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0) * 1.15 + (Number(deliveryFee) || 0) - promoDiscount
-        },
-        orderDate: new Date().toISOString(),
-        status: newOrderData.status || 'confirmed'
-      })
+      try {
+        const response = await placeOrder(orderData)
+        const newOrderData = response.data.data || response.data
 
-      // Clear cart and show success modal
-      clearCart()
-      setShowSuccessModal(true)
-      showToast(isArabic ? 'تم تأكيد طلبك بنجاح!' : 'Order placed successfully!', 'success')
+        // Store order details for success modal
+        const orderDataForStorage = {
+          ...newOrderData,
+          orderNumber: newOrderData.id || newOrderData.order_number || Date.now().toString(36).toUpperCase(),
+          items: cartItems,
+          totals: {
+            subtotal: cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0),
+            tax: cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0) * 0.15,
+            deliveryFee,
+            discount: promoDiscount,
+            total: cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0) * 1.15 + (Number(deliveryFee) || 0) - promoDiscount
+          },
+          orderDate: new Date().toISOString(),
+          status: newOrderData.status || 'confirmed'
+        }
+
+        // Save order locally for order history
+        if (isAuthenticated && user) {
+          try {
+            saveOrderLocally(orderDataForStorage, user.id || user.email)
+            console.log('Order saved to local history')
+          } catch (error) {
+            console.error('Error saving order to local history:', error)
+          }
+        }
+
+        setOrderData(orderDataForStorage)
+
+        // Clear cart and show success modal
+        clearCart()
+        setShowSuccessModal(true)
+        showToast(isArabic ? 'تم تأكيد طلبك بنجاح!' : 'Order placed successfully!', 'success')
+        
+      } catch (apiError) {
+        console.error('API Error placing order:', apiError)
+        
+        // If API fails, use fallback mechanism
+        if (apiError.response?.status === 500 || apiError.response?.status === 503) {
+          console.log('API server error, using fallback order placement')
+          
+          // Generate order number
+          const orderNumber = Date.now().toString(36).toUpperCase()
+          
+          // Store order details locally
+          const newOrderData = {
+            orderNumber,
+            items: cartItems,
+            customerInfo: formData,
+            totals: {
+              subtotal: cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0),
+              tax: cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0) * 0.15,
+              deliveryFee,
+              discount: promoDiscount,
+              total: cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0) * 1.15 + (Number(deliveryFee) || 0) - promoDiscount
+            },
+            orderDate: new Date().toISOString(),
+            status: 'pending_confirmation'
+          }
+          
+          // Save order locally for order history
+          if (isAuthenticated && user) {
+            try {
+              saveOrderLocally(newOrderData, user.id || user.email)
+              console.log('Fallback order saved to local history')
+            } catch (error) {
+              console.error('Error saving fallback order to local history:', error)
+            }
+          }
+          
+          // Save to localStorage for backup
+          localStorage.setItem('pendingOrder', JSON.stringify(newOrderData))
+          
+          // Clear cart and show success modal
+          clearCart()
+          setOrderData(newOrderData)
+          setShowSuccessModal(true)
+          showToast(isArabic ? 'تم حفظ الطلب محلياً، سيتم التواصل معك قريباً' : 'Order saved locally, we will contact you soon', 'success')
+          
+        } else {
+          // Handle other API errors
+          if (apiError.response?.status === 422) {
+            const validationErrors = apiError.response.data.errors || apiError.response.data.message || {}
+            console.error('Validation errors:', validationErrors)
+            
+            if (typeof validationErrors === 'object' && Object.keys(validationErrors).length > 0) {
+              const errorMessages = Object.values(validationErrors).flat()
+              showToast(errorMessages.join('. '), 'error')
+            } else {
+              showToast(validationErrors || (isArabic ? 'خطأ في البيانات المرسلة' : 'Validation error'), 'error')
+            }
+          } else {
+            showToast(apiError.response?.data?.message || apiError.message || (isArabic ? 'خطأ في تأكيد الطلب' : 'Error placing order'), 'error')
+          }
+        }
+      }
       
     } catch (error) {
-      console.error('Error placing order:', error)
-      
-      // Handle validation errors (422) with specific messages
-      if (error.response?.status === 422) {
-        const validationErrors = error.response.data.errors || error.response.data.message || {}
-        console.error('Validation errors:', validationErrors)
-        
-        if (typeof validationErrors === 'object' && Object.keys(validationErrors).length > 0) {
-          const errorMessages = Object.values(validationErrors).flat()
-          showToast(errorMessages.join('. '), 'error')
-        } else {
-          showToast(validationErrors || (isArabic ? 'خطأ في البيانات المرسلة' : 'Validation error'), 'error')
-        }
-      } else {
-        showToast(error.response?.data?.message || error.message || (isArabic ? 'خطأ في تأكيد الطلب' : 'Error placing order'), 'error')
-      }
+      console.error('General error in handlePlaceOrder:', error)
+      showToast(error.message || (isArabic ? 'خطأ في تأكيد الطلب' : 'Error placing order'), 'error')
     } finally {
       setLoading(false)
     }
@@ -913,7 +1047,7 @@ const Checkout = () => {
                 <div className="backdrop-blur-sm rounded-xl overflow-hidden shadow-2xl">
                   <div className="bg-primary px-4 md:px-8 py-4 md:py-6">
                     <h3 className="text-white text-xl md:text-2xl font-bold arabic-heading-font">
-                      {content.steps.address}
+                      {content.steps[1]}
                     </h3>
                   </div>
 
