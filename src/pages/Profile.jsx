@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { User, Mail, Phone, Camera, Edit, Save, X, Package, Clock, CheckCircle, XCircle, Truck, Eye } from 'lucide-react';
 import { toast } from 'react-toastify';
-import { updateUserProfile, changePassword, getUserOrders, getOrderDetails, getLocalOrders, getLocalOrderById } from '../services/api';
+import { updateUserProfile, changePassword, getUserOrders, getOrderDetails, getLocalOrders, getLocalOrderById, cancelOrder } from '../services/api';
 import { useRTL } from '../App';
 
 const createProfileSchema = (isArabic) => z.object({
@@ -243,6 +243,27 @@ const Profile = () => {
       toast.error(isArabic ? 'فشل في جلب تفاصيل الطلب' : 'Failed to fetch order details');
     } finally {
       setOrderDetailsLoading(false);
+    }
+  };
+
+  const handleCancelOrder = async (orderId) => {
+    try {
+      console.log('❌ Cancelling order ID:', orderId);
+      
+      const response = await cancelOrder(orderId, 'Cancelled by user');
+      console.log('✅ Order cancellation response:', response.data);
+      
+      toast.success(isArabic ? 'تم إلغاء الطلب بنجاح' : 'Order cancelled successfully');
+      
+      // Refresh orders list
+      await fetchUserOrders();
+      
+      // Close modal if open
+      setSelectedOrder(null);
+      
+    } catch (error) {
+      console.error('❌ Error cancelling order:', error);
+      toast.error(error.message || (isArabic ? 'فشل في إلغاء الطلب' : 'Failed to cancel order'));
     }
   };
 
@@ -923,6 +944,18 @@ const Profile = () => {
                                 <p className="text-sm text-gray-600 bg-amber-50 border border-primary p-3 rounded-lg">
                                   {selectedOrder.customer_notes}
                                 </p>
+                              </div>
+                            )}
+
+                            {/* Cancel Order Button - Only show for pending/confirmed orders */}
+                            {selectedOrder.status && ['pending', 'confirmed'].includes(selectedOrder.status.toLowerCase()) && (
+                              <div className="pt-6 border-t border-gray-200">
+                                <button
+                                  onClick={() => handleCancelOrder(selectedOrder.id || selectedOrder.orderNumber)}
+                                  className="w-full px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors disabled:opacity-50"
+                                >
+                                  {isArabic ? 'إلغاء الطلب' : 'Cancel Order'}
+                                </button>
                               </div>
                             )}
                           </div>

@@ -560,7 +560,7 @@ const Checkout = () => {
     setLoading(true)
     
     try {
-      // Prepare order data for API
+      // Prepare order data for API according to Postman collection structure
       const orderItems = cartItems.map(item => ({
         product_id: Number(item.id),
         quantity: Number(item.quantity),
@@ -575,7 +575,7 @@ const Checkout = () => {
         items: orderItems
       }
 
-      // Add delivery-specific fields
+      // Add delivery-specific fields according to Postman collection
       if (orderType === 'delivery') {
         if (!selectedAddressId) {
           throw new Error(isArabic ? 'يرجى تحديد عنوان التوصيل' : 'Please select delivery address')
@@ -584,14 +584,19 @@ const Checkout = () => {
         orderData.delivery_notes = addresses.find(addr => addr.id === selectedAddressId)?.additional_notes || ''
       }
 
-      // Add promo code if applied
+      // Add promo code if applied (matches Postman collection structure)
       if (promoCode && promoDiscount > 0) {
         orderData.promo_code = promoCode
       }
 
-      // Add scheduled delivery time if provided
+      // Add scheduled delivery time if provided (matches Postman collection)
       if (formData.scheduled_delivery_time) {
         orderData.scheduled_delivery_time = formData.scheduled_delivery_time
+      }
+
+      // Add loyalty points if available (matches Postman collection structure)
+      if (formData.loyalty_points_used && formData.loyalty_points_used > 0) {
+        orderData.loyalty_points_used = Number(formData.loyalty_points_used)
       }
 
       console.log('Sending order data:', orderData)
