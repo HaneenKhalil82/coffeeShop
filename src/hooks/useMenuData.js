@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getProducts, getCategories, searchProducts, getCategoryProducts } from '../services/api';
+import { getProducts, getCategories, searchProducts, getCategoryProducts, getImageUrl } from '../services/api';
 
 export const useMenuData = () => {
   const [products, setProducts] = useState([]);
@@ -136,10 +136,22 @@ export const useMenuData = () => {
     
     console.log('Transforming product:', apiProduct);
     
-    // Handle image URL properly
-    const getImageUrl = (product) => {
-      // Use random.jpeg for all products
-      return '/images/random.png';
+    // Handle image URL properly from API response
+    const getProductImageUrl = (product) => {
+      console.log('🖼️ Processing image for product:', product.name, 'Image data:', product.image);
+      
+      // Use the existing getImageUrl utility function
+      const imageUrl = getImageUrl(product.image);
+      
+      console.log('🖼️ Generated image URL:', imageUrl);
+      
+      // If no image from API, use fallback
+      if (!imageUrl) {
+        console.log('🖼️ No image URL generated, using fallback');
+        return '/images/menu-1.jpg';
+      }
+      
+      return imageUrl;
     };
     
     return {
@@ -149,7 +161,7 @@ export const useMenuData = () => {
       category: apiProduct.category_id || 'other', // Use category_id for filtering
       categoryName: apiProduct.category?.name || 'Other', // Keep category name for display
       description: apiProduct.description || `Delicious ${apiProduct.name || 'item'} made with the finest ingredients.`,
-      image: getImageUrl(apiProduct),
+      image: getProductImageUrl(apiProduct),
       popular: apiProduct.is_popular || Math.random() > 0.7, // Random popular if not specified
       rating: apiProduct.rating || (4.0 + Math.random() * 1), // Random rating between 4-5
       ingredients: Array.isArray(apiProduct.ingredients) ? apiProduct.ingredients : ['Premium ingredients'],

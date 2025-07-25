@@ -134,6 +134,30 @@ The API is expected to return data in this format:
 - ✅ `Menu.jsx` - Now uses API data with fallback to hardcoded data
 - ✅ Created `useMenuData` hook for data management
 - ✅ API service with proper error handling and interceptors
+- ✅ **Image handling updated** - Now properly processes `response.data.image` from API
+
+## Image URL Processing
+
+The application now properly handles different image URL formats from the API:
+
+### Supported Image Formats
+- **Full URLs**: `https://api.coffee.test/images/espresso.jpg`
+- **Relative paths**: `/images/cappuccino.jpg`
+- **Filenames**: `latte.jpg` (assumes `/images/` folder)
+- **Null/undefined**: Falls back to default image
+
+### Image Processing Flow
+1. API returns product data with `image` field
+2. `getImageUrl()` utility function processes the image path
+3. If image is a full URL, it's used directly
+4. If image is relative, it's combined with API base URL
+5. If image is just a filename, it's prefixed with `/images/`
+6. If no image is provided, falls back to `/images/menu-1.jpg`
+
+### Updated Components
+- `useMenuData.js` - Now uses `getImageUrl()` for proper image processing
+- `ProductSingle.jsx` - Handles both single images and image arrays
+- Added console logging for debugging image processing
 
 ## Error Handling
 
@@ -141,4 +165,5 @@ The API service includes:
 - Request/response interceptors
 - Automatic token management
 - Comprehensive error logging
-- Fallback mechanisms in components 
+- Fallback mechanisms in components
+- Image fallback handling 

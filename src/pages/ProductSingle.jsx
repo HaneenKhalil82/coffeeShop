@@ -3,7 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom'
 import { FaStar, FaHeart, FaShoppingCart, FaMinus, FaPlus, FaArrowLeft } from 'react-icons/fa'
 import { useRTL, useCart } from '../App'
 import HeroSection from './../components/HeroSection'
-import { getProductById } from '../services/api'
+import { getProductById, getImageUrl } from '../services/api'
 
 const ProductSingle = () => {
   const { id } = useParams()
@@ -171,14 +171,17 @@ const ProductSingle = () => {
         const response = await getProductById(id)
         
         if (response.data) {
+          console.log('🖼️ ProductSingle: Raw API response data:', response.data);
+          console.log('🖼️ ProductSingle: Processing image:', response.data.image);
+          
           // Transform API data to component format
           const transformedProduct = {
             id: response.data.id,
             name: response.data.name,
             price: response.data.price,
             originalPrice: response.data.original_price || null,
-            image: response.data.image || '/images/menu-1.jpg',
-            images: response.data.images || [response.data.image || '/images/menu-1.jpg'],
+            image: getImageUrl(response.data.image) || '/images/menu-1.jpg',
+            images: response.data.images ? response.data.images.map(img => getImageUrl(img)) : [getImageUrl(response.data.image) || '/images/menu-1.jpg'],
             description: response.data.description,
             category: response.data.category?.name || 'Unknown',
             rating: response.data.rating || 4.0,
@@ -194,6 +197,8 @@ const ProductSingle = () => {
               { name: 'large', price: response.data.price * 1.3, arabicName: 'كبير' }
             ]
           }
+          
+          console.log('🖼️ ProductSingle: Transformed product with image:', transformedProduct.image);
           setProduct(transformedProduct)
         } else {
           setError('Product not found')
