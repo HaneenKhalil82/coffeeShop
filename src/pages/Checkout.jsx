@@ -223,7 +223,6 @@ const Checkout = () => {
     orderSummary: {
       title: 'ملخص الطلب',
       subtotal: 'المجموع الفرعي',
-      tax: 'الضريبة',
       delivery: 'التوصيل',
       discount: 'الخصم',
       total: 'المجموع الكلي'
@@ -322,7 +321,6 @@ const Checkout = () => {
     orderSummary: {
       title: 'Order Summary',
       subtotal: 'Subtotal',
-      tax: 'Tax',
       delivery: 'Delivery',
       discount: 'Discount',
       total: 'Total'
