@@ -212,34 +212,64 @@ const Profile = () => {
     setOrderDetailsLoading(true);
     try {
       console.log('🛒 Fetching order details for ID:', orderId);
+      console.log('🛒 Available orders:', orders);
       
-      // Try to get order details from API first
+      // First, try to find the order in the current orders list
+      const currentOrder = orders.find(order => 
+        order.id === orderId || 
+        order.orderNumber === orderId || 
+        order.id?.toString() === orderId?.toString() ||
+        order.orderNumber?.toString() === orderId?.toString()
+      );
+      
+      if (currentOrder) {
+        console.log('✅ Found order in current list:', currentOrder);
+        setSelectedOrder(currentOrder);
+        setOrderDetailsLoading(false);
+        return;
+      }
+      
+      // Try to get order details from API
       try {
+        console.log('🌐 Attempting API call for order details...');
         const response = await getOrderDetails(orderId);
         console.log('🛒 Order details API response:', response.data);
         
-        setSelectedOrder(response.data.order || response.data);
-        return;
+        const orderData = response.data.order || response.data;
+        if (orderData) {
+          setSelectedOrder(orderData);
+          setOrderDetailsLoading(false);
+          return;
+        }
       } catch (apiError) {
-        console.log('⚠️ API order details failed, using local order:', apiError.message);
+        console.log('⚠️ API order details failed:', apiError.message);
+        console.log('⚠️ API error details:', apiError.response?.data);
       }
       
       // Fallback to local order details
       if (user) {
+        console.log('📦 Trying local order lookup...');
         const localOrder = getLocalOrderById(orderId, user.id || user.email);
         console.log('📦 Local order details:', localOrder);
         
         if (localOrder) {
           setSelectedOrder(localOrder);
-        } else {
-          toast.error(isArabic ? 'لم يتم العثور على الطلب' : 'Order not found');
+          setOrderDetailsLoading(false);
+          return;
         }
-      } else {
-        toast.error(isArabic ? 'لم يتم العثور على الطلب' : 'Order not found');
       }
+      
+      // If we get here, we couldn't find the order
+      console.error('❌ Order not found in any source');
+      toast.error(isArabic ? 'لم يتم العثور على الطلب' : 'Order not found');
       
     } catch (error) {
       console.error('❌ Error fetching order details:', error);
+      console.error('❌ Error details:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      });
       toast.error(isArabic ? 'فشل في جلب تفاصيل الطلب' : 'Failed to fetch order details');
     } finally {
       setOrderDetailsLoading(false);
@@ -332,6 +362,11 @@ const Profile = () => {
     return () => {
       document.removeEventListener('keydown', handleEscapeKey);
     };
+  }, [selectedOrder]);
+
+  // Debug selectedOrder changes
+  useEffect(() => {
+    console.log('🔍 selectedOrder state changed:', selectedOrder);
   }, [selectedOrder]);
 
   const handleImageUpload = (event) => {
@@ -748,7 +783,9 @@ const Profile = () => {
                   </div>
                 ) : (
                                      <div className="space-y-6">
-                     {orders.map((order) => (
+                     {orders.map((order) => {
+                       console.log('📋 Rendering order:', order);
+                       return (
                        <div
                          key={order.id}
                          className="group relative overflow-hidden rounded-2xl border-2 border-primary/30 hover:border-primary transition-all duration-500 bg-cover bg-center shadow-lg hover:shadow-2xl transform hover:scale-[1.02]"
@@ -819,7 +856,25 @@ const Profile = () => {
                            {/* Action Button */}
                            <div className="flex justify-center">
                              <button
-                               onClick={() => fetchOrderDetails(order.id || order.orderNumber)}
+                               onClick={() => {
+                                 console.log('🔍 View Details clicked for order:', order);
+                                 // First try to show directly from current orders list
+                                 const currentOrder = orders.find(o => 
+                                   o.id === order.id || 
+                                   o.orderNumber === order.orderNumber ||
+                                   o.id?.toString() === order.id?.toString()
+                                 );
+                                 
+                                 if (currentOrder) {
+                                   console.log('✅ Showing order from current list:', currentOrder);
+                                   setSelectedOrder(currentOrder);
+                                   console.log('🎉 Modal should now be visible');
+                                 } else {
+                                   // Fallback to API call
+                                   console.log('🔄 Falling back to API call');
+                                   fetchOrderDetails(order.id || order.orderNumber);
+                                 }
+                               }}
                                disabled={orderDetailsLoading}
                                className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-primary to-amber-600 text-white rounded-full hover:from-amber-600 hover:to-primary transition-all duration-300 disabled:opacity-50 shadow-lg hover:shadow-xl transform hover:scale-105 group-hover:scale-110"
                              >
@@ -829,7 +884,8 @@ const Profile = () => {
                            </div>
                          </div>
                        </div>
-                     ))}
+                     );
+                   })}
                   </div>
                 )}
 
