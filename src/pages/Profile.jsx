@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { User, Mail, Phone, Camera, Edit, Save, X, Package, Clock, CheckCircle, XCircle, Truck, Eye } from 'lucide-react';
 import { toast } from 'react-toastify';
-import { updateUserProfile, changePassword, getUserOrders, getOrderDetails, getLocalOrders, getLocalOrderById, cancelOrder } from '../services/api';
+import { updateUserProfile, changePassword, getUserOrders, getOrderDetails, getLocalOrders, getLocalOrderById, cancelOrder, saveOrderLocally } from '../services/api';
 import { useRTL } from '../App';
 
 const createProfileSchema = (isArabic) => z.object({
@@ -164,8 +164,11 @@ const Profile = () => {
         console.log('🛒 Number of API orders found:', ordersData.length);
         
         if (ordersData.length > 0) {
-          setOrders(ordersData);
-          toast.success(isArabic ? `تم العثور على ${ordersData.length} طلب` : `Found ${ordersData.length} orders`);
+          // Process all orders to ensure pricing information is available
+          const processedOrders = ordersData.map(order => processOrderData(order));
+          console.log('✅ Processed orders with pricing:', processedOrders);
+          setOrders(processedOrders);
+          toast.success(isArabic ? `تم العثور على ${processedOrders.length} طلب` : `Found ${processedOrders.length} orders`);
           return;
         }
       } catch (apiError) {
@@ -176,11 +179,15 @@ const Profile = () => {
       if (user) {
         const localOrders = getLocalOrders(user.id || user.email);
         console.log('📦 Local orders:', localOrders);
-        setOrders(localOrders);
         
         if (localOrders.length > 0) {
-          toast.success(isArabic ? `تم العثور على ${localOrders.length} طلب محلي` : `Found ${localOrders.length} local orders`);
+          // Process all local orders to ensure pricing information is available
+          const processedLocalOrders = localOrders.map(order => processOrderData(order));
+          console.log('✅ Processed local orders with pricing:', processedLocalOrders);
+          setOrders(processedLocalOrders);
+          toast.success(isArabic ? `تم العثور على ${processedLocalOrders.length} طلب محلي` : `Found ${processedLocalOrders.length} local orders`);
         } else {
+          setOrders([]);
           toast.info(isArabic ? 'لا توجد طلبات حالياً' : 'No orders found');
         }
       } else {
@@ -224,7 +231,9 @@ const Profile = () => {
       
       if (currentOrder) {
         console.log('✅ Found order in current list:', currentOrder);
-        setSelectedOrder(currentOrder);
+        // Process order data to ensure pricing information is available
+        const processedOrder = processOrderData(currentOrder);
+        setSelectedOrder(processedOrder);
         setOrderDetailsLoading(false);
         return;
       }
@@ -237,7 +246,10 @@ const Profile = () => {
         
         const orderData = response.data.order || response.data;
         if (orderData) {
-          setSelectedOrder(orderData);
+          console.log('✅ Setting order data from API:', orderData);
+          // Process order data to ensure pricing information is available
+          const processedOrder = processOrderData(orderData);
+          setSelectedOrder(processedOrder);
           setOrderDetailsLoading(false);
           return;
         }
@@ -253,7 +265,10 @@ const Profile = () => {
         console.log('📦 Local order details:', localOrder);
         
         if (localOrder) {
-          setSelectedOrder(localOrder);
+          console.log('✅ Setting order data from local storage:', localOrder);
+          // Process order data to ensure pricing information is available
+          const processedOrder = processOrderData(localOrder);
+          setSelectedOrder(processedOrder);
           setOrderDetailsLoading(false);
           return;
         }
@@ -262,6 +277,7 @@ const Profile = () => {
       // If we get here, we couldn't find the order
       console.error('❌ Order not found in any source');
       toast.error(isArabic ? 'لم يتم العثور على الطلب' : 'Order not found');
+      setSelectedOrder(null);
       
     } catch (error) {
       console.error('❌ Error fetching order details:', error);
@@ -271,9 +287,80 @@ const Profile = () => {
         status: error.response?.status
       });
       toast.error(isArabic ? 'فشل في جلب تفاصيل الطلب' : 'Failed to fetch order details');
+      setSelectedOrder(null);
     } finally {
       setOrderDetailsLoading(false);
     }
+  };
+
+  // Helper function to process order data and ensure pricing information is available
+  const processOrderData = (order) => {
+    console.log('🔧 Processing order data:', order);
+    console.log('🔧 Order items:', order.items);
+    
+    // Calculate totals if not present
+    let subtotal = 0;
+    let total = 0;
+    
+    if (order.items && order.items.length > 0) {
+      // Calculate subtotal from items
+      subtotal = order.items.reduce((sum, item) => {
+        const itemPrice = parseFloat(item.price || item.unit_price || item.product?.price || 0);
+        const itemQuantity = parseInt(item.quantity || 1);
+        const itemTotal = itemPrice * itemQuantity;
+        console.log(`📦 Item: ${item.product_name || item.name}, Price: ${itemPrice}, Qty: ${itemQuantity}, Total: ${itemTotal}`);
+        return sum + itemTotal;
+      }, 0);
+      
+      console.log('💰 Calculated subtotal:', subtotal);
+      
+      // Calculate total with tax and delivery fee
+      const tax = subtotal * 0.15; // 15% tax
+      const deliveryFee = parseFloat(order.delivery_fee || order.totals?.deliveryFee || 0);
+      const discount = parseFloat(order.discount_amount || order.totals?.discount || 0);
+      total = subtotal + tax + deliveryFee - discount;
+      
+      console.log('💰 Tax:', tax, 'Delivery Fee:', deliveryFee, 'Discount:', discount, 'Total:', total);
+    }
+    
+    // Ensure items have proper pricing information
+    const processedItems = order.items?.map((item, index) => {
+      const processedItem = {
+        ...item,
+        price: parseFloat(item.price || item.unit_price || item.product?.price || 0),
+        quantity: parseInt(item.quantity || 1),
+        product_name: item.product_name || item.name || item.product?.name || `${isArabic ? 'منتج' : 'Product'} ${index + 1}`,
+        notes: item.notes || ''
+      };
+      console.log(`📦 Processed item ${index + 1}:`, processedItem);
+      return processedItem;
+    }) || [];
+    
+    // Create processed order with all necessary pricing information
+    const processedOrder = {
+      ...order,
+      items: processedItems,
+      subtotal: order.subtotal || order.totals?.subtotal || subtotal,
+      total_amount: order.total_amount || order.totals?.total || total,
+      delivery_fee: order.delivery_fee || order.totals?.deliveryFee || 0,
+      discount_amount: order.discount_amount || order.totals?.discount || 0,
+      totals: {
+        subtotal: order.subtotal || order.totals?.subtotal || subtotal,
+        total: order.total_amount || order.totals?.total || total,
+        deliveryFee: order.delivery_fee || order.totals?.deliveryFee || 0,
+        discount: order.discount_amount || order.totals?.discount || 0,
+        tax: (order.subtotal || order.totals?.subtotal || subtotal) * 0.15
+      }
+    };
+    
+    console.log('✅ Processed order data:', processedOrder);
+    console.log('✅ Final totals:', {
+      subtotal: processedOrder.subtotal,
+      total: processedOrder.total_amount,
+      deliveryFee: processedOrder.delivery_fee,
+      discount: processedOrder.discount_amount
+    });
+    return processedOrder;
   };
 
   const handleCancelOrder = async (orderId) => {
@@ -344,6 +431,89 @@ const Profile = () => {
   useEffect(() => {
     if (activeTab === 'orders' && user && orders.length === 0) {
       fetchUserOrders();
+      
+             // Add sample order data for testing if no orders exist
+       if (user && orders.length === 0) {
+         const sampleOrder = {
+           id: '13232',
+           orderNumber: '13232',
+           status: 'pending',
+           order_type: 'takeaway',
+           payment_method: 'cash_on_delivery',
+           created_at: new Date().toISOString(),
+           items: [
+             {
+               product_name: 'Espresso',
+               price: 15.50,
+               quantity: 2,
+               notes: 'Extra hot'
+             },
+             {
+               product_name: 'Cappuccino',
+               price: 18.00,
+               quantity: 1,
+               notes: 'No sugar'
+             }
+           ],
+           subtotal: 49.00,
+           delivery_fee: 0,
+           discount_amount: 0,
+           total_amount: 56.35, // Including 15% tax
+           customer_notes: 'Please make it extra hot',
+           totals: {
+             subtotal: 49.00,
+             total: 56.35,
+             deliveryFee: 0,
+             discount: 0,
+             tax: 7.35
+           }
+         };
+         
+         // Create a second sample order for testing
+         const sampleOrder2 = {
+           id: '13231',
+           orderNumber: '13231',
+           status: 'completed',
+           order_type: 'delivery',
+           payment_method: 'cash_on_delivery',
+           created_at: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
+           items: [
+             {
+               product_name: 'Latte',
+               price: 20.00,
+               quantity: 1,
+               notes: 'Extra milk'
+             },
+             {
+               product_name: 'Americano',
+               price: 12.50,
+               quantity: 2,
+               notes: 'No cream'
+             }
+           ],
+           subtotal: 45.00,
+           delivery_fee: 5.00,
+           discount_amount: 2.00,
+           total_amount: 54.75, // Including 15% tax
+           customer_notes: 'Please deliver to the main entrance',
+           totals: {
+             subtotal: 45.00,
+             total: 54.75,
+             deliveryFee: 5.00,
+             discount: 2.00,
+             tax: 6.75
+           }
+         };
+         
+         // Save sample orders locally for testing
+         try {
+           saveOrderLocally(sampleOrder, user.id || user.email);
+           saveOrderLocally(sampleOrder2, user.id || user.email);
+           console.log('📝 Sample orders saved for testing');
+         } catch (error) {
+           console.error('Error saving sample orders:', error);
+         }
+       }
     }
   }, [activeTab, user]);
 
@@ -367,6 +537,13 @@ const Profile = () => {
   // Debug selectedOrder changes
   useEffect(() => {
     console.log('🔍 selectedOrder state changed:', selectedOrder);
+  }, [selectedOrder]);
+
+  // Reset loading state when modal is closed
+  useEffect(() => {
+    if (!selectedOrder) {
+      setOrderDetailsLoading(false);
+    }
   }, [selectedOrder]);
 
   const handleImageUpload = (event) => {
@@ -823,8 +1000,8 @@ const Profile = () => {
                              <div className="text-right">
                                <div className="bg-gradient-to-r from-amber-400 to-primary px-4 py-2 rounded-full">
                                  <p className="text-white font-bold text-lg">
-                                   ${order.total_amount ? parseFloat(order.total_amount).toFixed(2) : 
-                                     order.totals?.total ? parseFloat(order.totals.total).toFixed(2) : '0.00'}
+                                   {order.total_amount ? parseFloat(order.total_amount).toFixed(2) : 
+                                     order.totals?.total ? parseFloat(order.totals.total).toFixed(2) : '0.00'} EGP
                                  </p>
                                </div>
                              </div>
@@ -858,6 +1035,7 @@ const Profile = () => {
                              <button
                                onClick={() => {
                                  console.log('🔍 View Details clicked for order:', order);
+                                 setOrderDetailsLoading(false); // Ensure loading is false when showing from current list
                                  // First try to show directly from current orders list
                                  const currentOrder = orders.find(o => 
                                    o.id === order.id || 
@@ -867,7 +1045,9 @@ const Profile = () => {
                                  
                                  if (currentOrder) {
                                    console.log('✅ Showing order from current list:', currentOrder);
-                                   setSelectedOrder(currentOrder);
+                                   // Process order data to ensure pricing information is available
+                                   const processedOrder = processOrderData(currentOrder);
+                                   setSelectedOrder(processedOrder);
                                    console.log('🎉 Modal should now be visible');
                                  } else {
                                    // Fallback to API call
@@ -937,8 +1117,10 @@ const Profile = () => {
                               </p>
                             </div>
                           </div>
-                        ) : (
+                                                ) : selectedOrder ? (
                           <div className="space-y-6">
+                            
+                            
                             {/* Order Info */}
                             <div className="grid md:grid-cols-2 gap-4">
                               <div>
@@ -948,8 +1130,8 @@ const Profile = () => {
                                 <div className="space-y-2 text-sm">
                                   <p><span className="font-medium">{isArabic ? 'الحالة:' : 'Status:'}</span> {getOrderStatusText(selectedOrder.status)}</p>
                                   <p><span className="font-medium">{isArabic ? 'النوع:' : 'Type:'}</span> {selectedOrder.order_type === 'delivery' ? (isArabic ? 'توصيل' : 'Delivery') : (isArabic ? 'استلام' : 'Takeaway')}</p>
-                                  <p><span className="font-medium">{isArabic ? 'طريقة الدفع:' : 'Payment:'}</span> {selectedOrder.payment_method}</p>
-                                  <p><span className="font-medium">{isArabic ? 'التاريخ:' : 'Date:'}</span> {selectedOrder.created_at ? new Date(selectedOrder.created_at).toLocaleDateString(isArabic ? 'ar-SA' : 'en-US') : ''}</p>
+                                  <p><span className="font-medium">{isArabic ? 'طريقة الدفع:' : 'Payment:'}</span> {selectedOrder.payment_method || 'N/A'}</p>
+                                  <p><span className="font-medium">{isArabic ? 'التاريخ:' : 'Date:'}</span> {selectedOrder.created_at ? new Date(selectedOrder.created_at).toLocaleDateString(isArabic ? 'ar-SA' : 'en-US') : selectedOrder.orderDate ? new Date(selectedOrder.orderDate).toLocaleDateString(isArabic ? 'ar-SA' : 'en-US') : 'N/A'}</p>
                                 </div>
                               </div>
 
@@ -957,17 +1139,17 @@ const Profile = () => {
                                 <h4 className="font-medium text-gray-900 mb-2">
                                   {isArabic ? 'الإجمالي' : 'Total'}
                                 </h4>
-                                <div className="space-y-2 text-sm">
-                                  <p><span className="font-medium">{isArabic ? 'المبلغ الفرعي:' : 'Subtotal:'}</span> {selectedOrder.subtotal || selectedOrder.totals?.subtotal || '0.00'}</p>
-                                  <p><span className="font-medium">{isArabic ? 'رسوم التوصيل:' : 'Delivery Fee:'}</span> {selectedOrder.delivery_fee || selectedOrder.totals?.deliveryFee || '0.00'}</p>
-                                  <p><span className="font-medium">{isArabic ? 'الخصم:' : 'Discount:'}</span> {selectedOrder.discount_amount || selectedOrder.totals?.discount || '0.00'}</p>
-                                  <p className="font-bold text-lg"><span className="font-medium">{isArabic ? 'الإجمالي:' : 'Total:'}</span> {selectedOrder.total_amount || selectedOrder.totals?.total || '0.00'}</p>
-                                </div>
+                                                                 <div className="space-y-2 text-sm">
+                                   <p><span className="font-medium">{isArabic ? 'المبلغ الفرعي:' : 'Subtotal:'}</span> {selectedOrder.subtotal || selectedOrder.totals?.subtotal || '0.00'} EGP</p>
+                                   <p><span className="font-medium">{isArabic ? 'رسوم التوصيل:' : 'Delivery Fee:'}</span> {selectedOrder.delivery_fee || selectedOrder.totals?.deliveryFee || '0.00'} EGP</p>
+                                   <p><span className="font-medium">{isArabic ? 'الخصم:' : 'Discount:'}</span> {selectedOrder.discount_amount || selectedOrder.totals?.discount || '0.00'} EGP</p>
+                                   <p className="font-bold text-lg"><span className="font-medium">{isArabic ? 'الإجمالي:' : 'Total:'}</span> {selectedOrder.total_amount || selectedOrder.totals?.total || '0.00'} EGP</p>
+                                 </div>
                               </div>
                             </div>
 
                             {/* Order Items */}
-                            {selectedOrder.items && selectedOrder.items.length > 0 && (
+                            {selectedOrder.items && selectedOrder.items.length > 0 ? (
                               <div>
                                 <h4 className="font-medium text-gray-900 mb-3">
                                   {isArabic ? 'عناصر الطلب' : 'Order Items'}
@@ -981,12 +1163,23 @@ const Profile = () => {
                                           <p className="text-sm text-gray-500">{isArabic ? 'ملاحظات:' : 'Notes:'} {item.notes}</p>
                                         )}
                                       </div>
-                                      <div className="text-right">
-                                        <p className="font-medium">{item.price || '0.00'} × {item.quantity || 1}</p>
-                                        <p className="text-sm text-gray-500">{((item.price || 0) * (item.quantity || 1)).toFixed(2)}</p>
-                                      </div>
+                                                                             <div className="text-right">
+                                         <p className="font-medium">{item.price || '0.00'} EGP × {item.quantity || 1}</p>
+                                         <p className="text-sm text-gray-500">{((item.price || 0) * (item.quantity || 1)).toFixed(2)} EGP</p>
+                                       </div>
                                     </div>
                                   ))}
+                                </div>
+                              </div>
+                            ) : (
+                              <div>
+                                <h4 className="font-medium text-gray-900 mb-3">
+                                  {isArabic ? 'عناصر الطلب' : 'Order Items'}
+                                </h4>
+                                <div className="bg-gray-50 border border-gray-200 p-4 rounded-lg text-center">
+                                  <p className="text-gray-500">
+                                    {isArabic ? 'لا توجد تفاصيل العناصر متاحة' : 'No item details available'}
+                                  </p>
                                 </div>
                               </div>
                             )}
@@ -1014,6 +1207,15 @@ const Profile = () => {
                                 </button>
                               </div>
                             )}
+                          </div>
+                        ) : (
+                          <div className="flex items-center justify-center py-8">
+                            <div className="text-center">
+                              <Package className="mx-auto text-gray-400 mb-4" size={48} />
+                              <p className="text-gray-500">
+                                {isArabic ? 'لا توجد تفاصيل متاحة للطلب' : 'No order details available'}
+                              </p>
+                            </div>
                           </div>
                         )}
                       </div>
