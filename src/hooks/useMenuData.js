@@ -138,10 +138,10 @@ export const useMenuData = () => {
     
     // Handle image URL properly from API response
     const getProductImageUrl = (product) => {
-      console.log('🖼️ Processing image for product:', product.name, 'Image data:', product.image);
+      console.log('🖼️ Processing image for product:', product.name, 'Image data:', product.main_image_url);
       
       // Use the existing getImageUrl utility function
-      const imageUrl = getImageUrl(product.image);
+      const imageUrl = getImageUrl(product.main_image_url);
       
       console.log('🖼️ Generated image URL:', imageUrl);
       
