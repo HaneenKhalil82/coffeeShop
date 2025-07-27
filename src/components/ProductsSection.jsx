@@ -196,7 +196,8 @@ const ProductsSection = () => {
                     {/* Price */}
                     <div className="flex items-center justify-center space-x-2 space-x-reverse">
                       <span className="text-white text-2xl font-bold">
-                        {product.price} {content.currency}
+                        {product.price} 
+                       <span className="ml-1">{content.currency}</span>
                       </span>
                     </div>
                   </div>

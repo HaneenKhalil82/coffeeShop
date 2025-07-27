@@ -165,6 +165,7 @@ const SignUp = () => {
           }, 2000);
         }
       } else {
+        console.log("Register error:", result); 
         // Handle different types of errors in Arabic
         let errorMessage = result.error;
         
