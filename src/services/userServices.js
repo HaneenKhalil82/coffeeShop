@@ -113,10 +113,14 @@ export const orderService = {
 
   // Place new order
   placeOrder: async (orderData) => {
+      console.log("📦 Sending Order Data:", orderData); // ✅ هنا بنطبع البيانات قبل الإرسال
+
     try {
       const response = await api.post(config.ENDPOINTS.DELIVERY.PLACE_ORDER, orderData);
+      console.log("✅ Order response:", response.data); // ✅ وهنا بنطبع الرد من السيرفر
       return { success: true, data: response.data };
     } catch (error) {
+       console.error("❌ Error placing order:", error.response?.data || error.message); // 🛑 لو فيه خطأ
       return { success: false, error: error.response?.data?.message || 'Failed to place order' };
     }
   },
@@ -272,6 +276,7 @@ export const cartService = {
 
 // Example: Complete order flow
 export const completeOrderFlow = async (orderData) => {
+   console.log("🚀 Running completeOrderFlow with:", orderData); // 👈 ضيفي دي
   try {
     // 1. Validate promo code if provided
     if (orderData.promo_code) {

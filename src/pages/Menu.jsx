@@ -58,7 +58,7 @@ const Menu = () => {
   }
 
   const content = isArabic ? {
-    title: 'قائمة الطعام',
+    title: ' المنتجات',
     search: 'البحث في القائمة...',
     sortBy: 'ترتيب حسب',
     priceRange: 'نطاق السعر',
@@ -403,11 +403,13 @@ const Menu = () => {
                   </div>
                   
                   <div className="p-6">
-                    <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-start justify-between mb-3 ">
                       <h3 className="text-xl font-bold text-gray-800 group-hover:text-primary transition-colors duration-300 leading-tight">{item.name}</h3>
-                      <div className="ml-2">
+                      <div className="ml-2 ">
                         <span className="text-2xl font-black bg-gradient-to-r from-primary to-amber-600 bg-clip-text text-transparent">
-                          {item.price} {content.currency}
+                          {item.price} 
+                          
+                           <span className="ml-1">{content.currency}</span>
                         </span>
                       </div>
                     </div>
