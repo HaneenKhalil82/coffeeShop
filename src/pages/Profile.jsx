@@ -132,181 +132,181 @@ const Profile = () => {
 
   // =================== 🛒 ORDERS FUNCTIONALITY ===================
   
-  // const fetchUserOrders = async () => {
-  //   setOrdersLoading(true);
-  //   try {
-  //     console.log('🛒 Fetching user orders...');
-  //     console.log('🔑 Auth token available:', !!localStorage.getItem('auth_token'));
-  //     console.log('👤 User authenticated:', !!user);
-      
-  //     // Try to get orders from API first
-  //     let ordersData = [];
-  //     try {
-  //       const response = await getUserOrders();
-  //       console.log('🛒 Orders API Response Status:', response.status);
-  //       console.log('🛒 Orders API Response Data:', response.data);
-        
-  //       // Handle different response structures
-  //       if (response.data) {
-  //         if (Array.isArray(response.data)) {
-  //           ordersData = response.data;
-  //         } else if (response.data.orders && Array.isArray(response.data.orders)) {
-  //           ordersData = response.data.orders;
-  //         } else if (response.data.data && Array.isArray(response.data.data)) {
-  //           ordersData = response.data.data;
-  //         } else {
-  //           console.log('🛒 Unexpected response structure, treating as empty array');
-  //           ordersData = [];
-  //         }
-  //       }
-        
-  //       console.log('🛒 Processed API orders data:', ordersData);
-  //       console.log('🛒 Number of API orders found:', ordersData.length);
-        
-  //       if (ordersData.length > 0) {
-  //         // Process all orders to ensure pricing information is available
-  //         const processedOrders = ordersData.map(order => processOrderData(order));
-  //         console.log('✅ Processed orders with pricing:', processedOrders);
-  //         setOrders(processedOrders);
-  //         toast.success(isArabic ? `تم العثور على ${processedOrders.length} طلب` : `Found ${processedOrders.length} orders`);
-  //         return;
-
-  //       }
-        
-  //     } catch (apiError) {
-  //       console.log('⚠️ API orders failed, using local orders:', apiError.message);
-  //     }
-      
-  //     // Fallback to local orders
-  //     if (user) {
-  //       const localOrders = getLocalOrders(user.id || user.email);
-  //       console.log('📦 Local orders:', localOrders);
-        
-  //       if (localOrders.length > 0) {
-  //         // Process all local orders to ensure pricing information is available
-  //         const processedLocalOrders = localOrders.map(order => processOrderData(order));
-  //         console.log('✅ Processed local orders with pricing:', processedLocalOrders);
-  //         setOrders(processedLocalOrders);
-  //         toast.success(isArabic ? `تم العثور على ${processedLocalOrders.length} طلب محلي` : `Found ${processedLocalOrders.length} local orders`);
-  //       } else {
-  //         setOrders([]);
-  //         toast.info(isArabic ? 'لا توجد طلبات حالياً' : 'No orders found');
-  //       }
-  //     } else {
-  //       setOrders([]);
-  //       toast.info(isArabic ? 'لا توجد طلبات حالياً' : 'No orders found');
-  //     }
-      
-  //   } catch (error) {
-  //     console.error('❌ Error fetching orders details:', {
-  //       message: error.message,
-  //       response: error.response?.data,
-  //       status: error.response?.status,
-  //       statusText: error.response?.statusText
-  //     });
-      
-  //     const errorMessage = error.response?.data?.message || 
-  //                         error.response?.data?.error || 
-  //                         error.message || 
-  //                         (isArabic ? 'فشل في جلب الطلبات' : 'Failed to fetch orders');
-      
-  //     toast.error(errorMessage);
-  //     setOrders([]);
-  //   } finally {
-  //     setOrdersLoading(false);
-  //   }
-  // };
-
-
   const fetchUserOrders = async () => {
-  setOrdersLoading(true);
-
-  try {
-    console.log('🛒 Fetching user orders...');
-    console.log('🔑 Auth token available:', !!localStorage.getItem('auth_token'));
-    console.log('👤 User authenticated:', !!user);
-
-    let ordersData = [];
-
+    setOrdersLoading(true);
     try {
-      const response = await getUserOrders();
-      console.log('🛒 Orders API Response Status:', response.status);
-      console.log('🛒 Orders API Response Data:', response.data);
-
-      // استخراج الطلبات حسب تركيب البيانات
-      if (response.data) {
-        if (Array.isArray(response.data)) {
-          ordersData = response.data;
-        } else if (response.data.orders && Array.isArray(response.data.orders)) {
-          ordersData = response.data.orders;
-        } else if (response.data.data && Array.isArray(response.data.data)) {
-          ordersData = response.data.data;
-        } else {
-          ordersData = [];
+      console.log('🛒 Fetching user orders...');
+      console.log('🔑 Auth token available:', !!localStorage.getItem('auth_token'));
+      console.log('👤 User authenticated:', !!user);
+      
+      // Try to get orders from API first
+      let ordersData = [];
+      try {
+        const response = await getUserOrders();
+        console.log('🛒 Orders API Response Status:', response.status);
+        console.log('🛒 Orders API Response Data:', response.data);
+        
+        // Handle different response structures
+        if (response.data) {
+          if (Array.isArray(response.data)) {
+            ordersData = response.data;
+          } else if (response.data.orders && Array.isArray(response.data.orders)) {
+            ordersData = response.data.orders;
+          } else if (response.data.data && Array.isArray(response.data.data)) {
+            ordersData = response.data.data;
+          } else {
+            console.log('🛒 Unexpected response structure, treating as empty array');
+            ordersData = [];
+          }
         }
+        
+        console.log('🛒 Processed API orders data:', ordersData);
+        console.log('🛒 Number of API orders found:', ordersData.length);
+        
+        if (ordersData.length > 0) {
+          // Process all orders to ensure pricing information is available
+          const processedOrders = ordersData.map(order => processOrderData(order));
+          console.log('✅ Processed orders with pricing:', processedOrders);
+          setOrders(processedOrders);
+          toast.success(isArabic ? `تم العثور على ${processedOrders.length} طلب` : `Found ${processedOrders.length} orders`);
+          return;
+
+        }
+        
+      } catch (apiError) {
+        console.log('⚠️ API orders failed, using local orders:', apiError.message);
       }
-
-      console.log('🛒 Processed API orders data:', ordersData);
-      console.log('🛒 Number of API orders found:', ordersData.length);
-
-      if (ordersData.length > 0) {
-        const processedOrders = ordersData.map(order => processOrderData(order));
-        console.log('✅ Processed orders with pricing:', processedOrders);
-
-        setOrders(processedOrders);
-
-        // ✅ احفظ الطلبات الحقيقية في localStorage
-        saveOrderLocally(processedOrders, user.id || user.email);
-
-        toast.success(isArabic ? `تم العثور على ${processedOrders.length} طلب` : `Found ${processedOrders.length} orders`);
-        return;
+      
+      // Fallback to local orders
+      if (user) {
+        const localOrders = getLocalOrders(user.id || user.email);
+        console.log('📦 Local orders:', localOrders);
+        
+        if (localOrders.length > 0) {
+          // Process all local orders to ensure pricing information is available
+          const processedLocalOrders = localOrders.map(order => processOrderData(order));
+          console.log('✅ Processed local orders with pricing:', processedLocalOrders);
+          setOrders(processedLocalOrders);
+          toast.success(isArabic ? `تم العثور على ${processedLocalOrders.length} طلب محلي` : `Found ${processedLocalOrders.length} local orders`);
+        } else {
+          setOrders([]);
+          toast.info(isArabic ? 'لا توجد طلبات حالياً' : 'No orders found');
+        }
       } else {
         setOrders([]);
         toast.info(isArabic ? 'لا توجد طلبات حالياً' : 'No orders found');
-        return;
       }
-
-    } catch (apiError) {
-      console.error('⚠️ API orders failed:', apiError.message);
-    }
-
-    // fallback: لو فشل الـ API نجيب الطلبات من localStorage
-    if (user) {
-      const localOrders = getLocalOrders(user.id || user.email);
-      console.log('📦 Local orders:', localOrders);
-
-      if (localOrders.length > 0) {
-        const processedLocalOrders = localOrders.map(order => processOrderData(order));
-        setOrders(processedLocalOrders);
-        toast.success(isArabic ? `تم العثور على ${processedLocalOrders.length} طلب محلي` : `Found ${processedLocalOrders.length} local orders`);
-      } else {
-        setOrders([]);
-        toast.info(isArabic ? 'لا توجد طلبات محلية' : 'No local orders found');
-      }
-    } else {
+      
+    } catch (error) {
+      console.error('❌ Error fetching orders details:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+        statusText: error.response?.statusText
+      });
+      
+      const errorMessage = error.response?.data?.message || 
+                          error.response?.data?.error || 
+                          error.message || 
+                          (isArabic ? 'فشل في جلب الطلبات' : 'Failed to fetch orders');
+      
+      toast.error(errorMessage);
       setOrders([]);
-      toast.info(isArabic ? 'لا توجد طلبات حالياً' : 'No orders found');
+    } finally {
+      setOrdersLoading(false);
     }
+  };
+  
 
-  } catch (error) {
-    console.error('❌ Error fetching orders details:', {
-      message: error.message,
-      response: error.response?.data,
-      status: error.response?.status,
-      statusText: error.response?.statusText
-    });
+//   const fetchUserOrders = async () => {
+//   setOrdersLoading(true);
 
-    const errorMessage = error.response?.data?.message || 
-                        error.response?.data?.error || 
-                        error.message || 
-                        (isArabic ? 'فشل في جلب الطلبات' : 'Failed to fetch orders');
+//   try {
+//     console.log('🛒 Fetching user orders...');
+//     console.log('🔑 Auth token available:', !!localStorage.getItem('auth_token'));
+//     console.log('👤 User authenticated:', !!user);
 
-    toast.error(errorMessage);
-    setOrders([]);
-  } finally {
-    setOrdersLoading(false);
-  }
-};
+//     let ordersData = [];
+
+//     try {
+//       const response = await getUserOrders();
+//       console.log('🛒 Orders API Response Status:', response.status);
+//       console.log('🛒 Orders API Response Data:', response.data);
+
+//       // استخراج الطلبات حسب تركيب البيانات
+//       if (response.data) {
+//         if (Array.isArray(response.data)) {
+//           ordersData = response.data;
+//         } else if (response.data.orders && Array.isArray(response.data.orders)) {
+//           ordersData = response.data.orders;
+//         } else if (response.data.data && Array.isArray(response.data.data)) {
+//           ordersData = response.data.data;
+//         } else {
+//           ordersData = [];
+//         }
+//       }
+
+//       console.log('🛒 Processed API orders data:', ordersData);
+//       console.log('🛒 Number of API orders found:', ordersData.length);
+
+//       if (ordersData.length > 0) {
+//         const processedOrders = ordersData.map(order => processOrderData(order));
+//         console.log('✅ Processed orders with pricing:', processedOrders);
+
+//         setOrders(processedOrders);
+
+//         // ✅ احفظ الطلبات الحقيقية في localStorage
+//         saveOrderLocally(processedOrders, user.id || user.email);
+
+//         toast.success(isArabic ? `تم العثور على ${processedOrders.length} طلب` : `Found ${processedOrders.length} orders`);
+//         return;
+//       } else {
+//         setOrders([]);
+//         toast.info(isArabic ? 'لا توجد طلبات حالياً' : 'No orders found');
+//         return;
+//       }
+
+//     } catch (apiError) {
+//       console.error('⚠️ API orders failed:', apiError.message);
+//     }
+
+//     // fallback: لو فشل الـ API نجيب الطلبات من localStorage
+//     if (user) {
+//       const localOrders = getLocalOrders(user.id || user.email);
+//       console.log('📦 Local orders:', localOrders);
+
+//       if (localOrders.length > 0) {
+//         const processedLocalOrders = localOrders.map(order => processOrderData(order));
+//         setOrders(processedLocalOrders);
+//         toast.success(isArabic ? `تم العثور على ${processedLocalOrders.length} طلب محلي` : `Found ${processedLocalOrders.length} local orders`);
+//       } else {
+//         setOrders([]);
+//         toast.info(isArabic ? 'لا توجد طلبات محلية' : 'No local orders found');
+//       }
+//     } else {
+//       setOrders([]);
+//       toast.info(isArabic ? 'لا توجد طلبات حالياً' : 'No orders found');
+//     }
+
+//   } catch (error) {
+//     console.error('❌ Error fetching orders details:', {
+//       message: error.message,
+//       response: error.response?.data,
+//       status: error.response?.status,
+//       statusText: error.response?.statusText
+//     });
+
+//     const errorMessage = error.response?.data?.message || 
+//                         error.response?.data?.error || 
+//                         error.message || 
+//                         (isArabic ? 'فشل في جلب الطلبات' : 'Failed to fetch orders');
+
+//     toast.error(errorMessage);
+//     setOrders([]);
+//   } finally {
+//     setOrdersLoading(false);
+//   }
+// };
 
 
   const fetchOrderDetails = async (orderId) => {
