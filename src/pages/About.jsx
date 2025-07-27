@@ -193,19 +193,6 @@ const About = () => {
           'Our journey began in 2018 with a simple dream: to serve the best coffee in the region. We started with a deep passion for coffee and a belief that a good cup of coffee can change someone\'s day.We carefully select our coffee beans from the finest farms around the world. Every coffee bean goes through a rigorous inspection process to ensure high quality. We roast our coffee daily to guarantee fresh taste and aromatic fragrance.Our café is not just a place to serve coffee, but a small community that brings together coffee lovers and those who appreciate peaceful atmospheres. We believe in the importance of creating a safe and comfortable space where people can relax, work, and connect.'
       }
 
-
-
-
-
-
-
-
-
-
-
-
-      
- 
   return (
   <div className="pt-20 md:pt-24">
      <HeroSection
@@ -271,8 +258,8 @@ const About = () => {
 
           {/* Testimony  */}
         <div className="text-center">
-	       <span className="subheading text-[#c49b63] text-[60px] leading-none about-subtitle-ibm" style={{ fontFamily: '"Great Vibes", cursive' }}>Testimony</span>
-	       <h2 className="mb-4 text-white text-[45px] about-title-ibm">CUSTOMERS SAYS</h2>
+	       <span className="subheading text-[#c49b63] text-[60px] leading-none about-subtitle-ibm" style={{ fontFamily: '"Great Vibes", cursive' }}> {isArabic ? "" : "Testimony"}</span>
+	       <h2 className="mb-4 text-white text-[45px] about-title-ibm"> {isArabic ? "ماذا يقول عملائنا" : "CUSTOMERS SAYS"}</h2>
 	      </div>
        </div>
       

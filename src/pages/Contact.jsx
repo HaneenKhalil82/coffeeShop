@@ -144,9 +144,9 @@ const Contact = () => {
   }
 
   const socialLinks = [
-    { icon: FaFacebookF, href: '#', label: 'Facebook', color: 'bg-blue-600' },
-    { icon: FaTwitter, href: '#', label: 'Twitter', color: 'bg-blue-400' },
-    { icon: FaInstagram, href: '#', label: 'Instagram', color: 'bg-pink-600' }
+    { icon: FaFacebookF, href: 'https://www.facebook.com', label: 'Facebook', color: 'bg-blue-600' },
+    { icon: FaTwitter, href: 'https://x.com', label: 'Twitter', color: 'bg-blue-400' },
+    { icon: FaInstagram, href: 'https://www.instagram.com', label: 'Instagram', color: 'bg-pink-600' }
   ]
 
   return (

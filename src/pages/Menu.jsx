@@ -485,7 +485,8 @@ const Menu = () => {
                   </div>
                   <div className="text-right">
                     <span className="text-2xl font-black bg-gradient-to-r from-primary to-amber-600 bg-clip-text text-transparent">
-                      {selectedItem.price} {content.currency}
+                      {selectedItem.price} 
+                      <span className="ml-1">{content.currency}</span>
                     </span>
                   </div>
                 </div>
@@ -516,7 +517,8 @@ const Menu = () => {
                     </button>
                   </div>
                   <span className="text-lg font-black bg-gradient-to-r from-primary to-amber-600 bg-clip-text text-transparent">
-                    {(selectedItem.price * itemQuantity).toFixed(2)} {content.currency}
+                    {(selectedItem.price * itemQuantity).toFixed(2)} 
+                    <span className="ml-1">{content.currency}</span>
                   </span>
                 </div>
                 
