@@ -295,7 +295,7 @@ export const placeOrder = async (orderData) => {
       throw new Error('Order items are required');
     }
     
-    const response = await api.get(config.ENDPOINTS.DELIVERY.PLACE_ORDER, orderData);
+    const response = await api.post(config.ENDPOINTS.DELIVERY.PLACE_ORDER, orderData);
     
     console.log('✅ API: Order placed successfully');
     console.log('📋 API: Order response:', response.data);

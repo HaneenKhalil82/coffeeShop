@@ -132,88 +132,182 @@ const Profile = () => {
 
   // =================== 🛒 ORDERS FUNCTIONALITY ===================
   
+  // const fetchUserOrders = async () => {
+  //   setOrdersLoading(true);
+  //   try {
+  //     console.log('🛒 Fetching user orders...');
+  //     console.log('🔑 Auth token available:', !!localStorage.getItem('auth_token'));
+  //     console.log('👤 User authenticated:', !!user);
+      
+  //     // Try to get orders from API first
+  //     let ordersData = [];
+  //     try {
+  //       const response = await getUserOrders();
+  //       console.log('🛒 Orders API Response Status:', response.status);
+  //       console.log('🛒 Orders API Response Data:', response.data);
+        
+  //       // Handle different response structures
+  //       if (response.data) {
+  //         if (Array.isArray(response.data)) {
+  //           ordersData = response.data;
+  //         } else if (response.data.orders && Array.isArray(response.data.orders)) {
+  //           ordersData = response.data.orders;
+  //         } else if (response.data.data && Array.isArray(response.data.data)) {
+  //           ordersData = response.data.data;
+  //         } else {
+  //           console.log('🛒 Unexpected response structure, treating as empty array');
+  //           ordersData = [];
+  //         }
+  //       }
+        
+  //       console.log('🛒 Processed API orders data:', ordersData);
+  //       console.log('🛒 Number of API orders found:', ordersData.length);
+        
+  //       if (ordersData.length > 0) {
+  //         // Process all orders to ensure pricing information is available
+  //         const processedOrders = ordersData.map(order => processOrderData(order));
+  //         console.log('✅ Processed orders with pricing:', processedOrders);
+  //         setOrders(processedOrders);
+  //         toast.success(isArabic ? `تم العثور على ${processedOrders.length} طلب` : `Found ${processedOrders.length} orders`);
+  //         return;
+
+  //       }
+        
+  //     } catch (apiError) {
+  //       console.log('⚠️ API orders failed, using local orders:', apiError.message);
+  //     }
+      
+  //     // Fallback to local orders
+  //     if (user) {
+  //       const localOrders = getLocalOrders(user.id || user.email);
+  //       console.log('📦 Local orders:', localOrders);
+        
+  //       if (localOrders.length > 0) {
+  //         // Process all local orders to ensure pricing information is available
+  //         const processedLocalOrders = localOrders.map(order => processOrderData(order));
+  //         console.log('✅ Processed local orders with pricing:', processedLocalOrders);
+  //         setOrders(processedLocalOrders);
+  //         toast.success(isArabic ? `تم العثور على ${processedLocalOrders.length} طلب محلي` : `Found ${processedLocalOrders.length} local orders`);
+  //       } else {
+  //         setOrders([]);
+  //         toast.info(isArabic ? 'لا توجد طلبات حالياً' : 'No orders found');
+  //       }
+  //     } else {
+  //       setOrders([]);
+  //       toast.info(isArabic ? 'لا توجد طلبات حالياً' : 'No orders found');
+  //     }
+      
+  //   } catch (error) {
+  //     console.error('❌ Error fetching orders details:', {
+  //       message: error.message,
+  //       response: error.response?.data,
+  //       status: error.response?.status,
+  //       statusText: error.response?.statusText
+  //     });
+      
+  //     const errorMessage = error.response?.data?.message || 
+  //                         error.response?.data?.error || 
+  //                         error.message || 
+  //                         (isArabic ? 'فشل في جلب الطلبات' : 'Failed to fetch orders');
+      
+  //     toast.error(errorMessage);
+  //     setOrders([]);
+  //   } finally {
+  //     setOrdersLoading(false);
+  //   }
+  // };
+
+
   const fetchUserOrders = async () => {
-    setOrdersLoading(true);
+  setOrdersLoading(true);
+
+  try {
+    console.log('🛒 Fetching user orders...');
+    console.log('🔑 Auth token available:', !!localStorage.getItem('auth_token'));
+    console.log('👤 User authenticated:', !!user);
+
+    let ordersData = [];
+
     try {
-      console.log('🛒 Fetching user orders...');
-      console.log('🔑 Auth token available:', !!localStorage.getItem('auth_token'));
-      console.log('👤 User authenticated:', !!user);
-      
-      // Try to get orders from API first
-      let ordersData = [];
-      try {
-        const response = await getUserOrders();
-        console.log('🛒 Orders API Response Status:', response.status);
-        console.log('🛒 Orders API Response Data:', response.data);
-        
-        // Handle different response structures
-        if (response.data) {
-          if (Array.isArray(response.data)) {
-            ordersData = response.data;
-          } else if (response.data.orders && Array.isArray(response.data.orders)) {
-            ordersData = response.data.orders;
-          } else if (response.data.data && Array.isArray(response.data.data)) {
-            ordersData = response.data.data;
-          } else {
-            console.log('🛒 Unexpected response structure, treating as empty array');
-            ordersData = [];
-          }
-        }
-        
-        console.log('🛒 Processed API orders data:', ordersData);
-        console.log('🛒 Number of API orders found:', ordersData.length);
-        
-        if (ordersData.length > 0) {
-          // Process all orders to ensure pricing information is available
-          const processedOrders = ordersData.map(order => processOrderData(order));
-          console.log('✅ Processed orders with pricing:', processedOrders);
-          setOrders(processedOrders);
-          toast.success(isArabic ? `تم العثور على ${processedOrders.length} طلب` : `Found ${processedOrders.length} orders`);
-          return;
-        }
-      } catch (apiError) {
-        console.log('⚠️ API orders failed, using local orders:', apiError.message);
-      }
-      
-      // Fallback to local orders
-      if (user) {
-        const localOrders = getLocalOrders(user.id || user.email);
-        console.log('📦 Local orders:', localOrders);
-        
-        if (localOrders.length > 0) {
-          // Process all local orders to ensure pricing information is available
-          const processedLocalOrders = localOrders.map(order => processOrderData(order));
-          console.log('✅ Processed local orders with pricing:', processedLocalOrders);
-          setOrders(processedLocalOrders);
-          toast.success(isArabic ? `تم العثور على ${processedLocalOrders.length} طلب محلي` : `Found ${processedLocalOrders.length} local orders`);
+      const response = await getUserOrders();
+      console.log('🛒 Orders API Response Status:', response.status);
+      console.log('🛒 Orders API Response Data:', response.data);
+
+      // استخراج الطلبات حسب تركيب البيانات
+      if (response.data) {
+        if (Array.isArray(response.data)) {
+          ordersData = response.data;
+        } else if (response.data.orders && Array.isArray(response.data.orders)) {
+          ordersData = response.data.orders;
+        } else if (response.data.data && Array.isArray(response.data.data)) {
+          ordersData = response.data.data;
         } else {
-          setOrders([]);
-          toast.info(isArabic ? 'لا توجد طلبات حالياً' : 'No orders found');
+          ordersData = [];
         }
+      }
+
+      console.log('🛒 Processed API orders data:', ordersData);
+      console.log('🛒 Number of API orders found:', ordersData.length);
+
+      if (ordersData.length > 0) {
+        const processedOrders = ordersData.map(order => processOrderData(order));
+        console.log('✅ Processed orders with pricing:', processedOrders);
+
+        setOrders(processedOrders);
+
+        // ✅ احفظ الطلبات الحقيقية في localStorage
+        saveOrderLocally(processedOrders, user.id || user.email);
+
+        toast.success(isArabic ? `تم العثور على ${processedOrders.length} طلب` : `Found ${processedOrders.length} orders`);
+        return;
       } else {
         setOrders([]);
         toast.info(isArabic ? 'لا توجد طلبات حالياً' : 'No orders found');
+        return;
       }
-      
-    } catch (error) {
-      console.error('❌ Error fetching orders details:', {
-        message: error.message,
-        response: error.response?.data,
-        status: error.response?.status,
-        statusText: error.response?.statusText
-      });
-      
-      const errorMessage = error.response?.data?.message || 
-                          error.response?.data?.error || 
-                          error.message || 
-                          (isArabic ? 'فشل في جلب الطلبات' : 'Failed to fetch orders');
-      
-      toast.error(errorMessage);
-      setOrders([]);
-    } finally {
-      setOrdersLoading(false);
+
+    } catch (apiError) {
+      console.error('⚠️ API orders failed:', apiError.message);
     }
-  };
+
+    // fallback: لو فشل الـ API نجيب الطلبات من localStorage
+    if (user) {
+      const localOrders = getLocalOrders(user.id || user.email);
+      console.log('📦 Local orders:', localOrders);
+
+      if (localOrders.length > 0) {
+        const processedLocalOrders = localOrders.map(order => processOrderData(order));
+        setOrders(processedLocalOrders);
+        toast.success(isArabic ? `تم العثور على ${processedLocalOrders.length} طلب محلي` : `Found ${processedLocalOrders.length} local orders`);
+      } else {
+        setOrders([]);
+        toast.info(isArabic ? 'لا توجد طلبات محلية' : 'No local orders found');
+      }
+    } else {
+      setOrders([]);
+      toast.info(isArabic ? 'لا توجد طلبات حالياً' : 'No orders found');
+    }
+
+  } catch (error) {
+    console.error('❌ Error fetching orders details:', {
+      message: error.message,
+      response: error.response?.data,
+      status: error.response?.status,
+      statusText: error.response?.statusText
+    });
+
+    const errorMessage = error.response?.data?.message || 
+                        error.response?.data?.error || 
+                        error.message || 
+                        (isArabic ? 'فشل في جلب الطلبات' : 'Failed to fetch orders');
+
+    toast.error(errorMessage);
+    setOrders([]);
+  } finally {
+    setOrdersLoading(false);
+  }
+};
+
 
   const fetchOrderDetails = async (orderId) => {
     setOrderDetailsLoading(true);
@@ -432,88 +526,88 @@ const Profile = () => {
     if (activeTab === 'orders' && user && orders.length === 0) {
       fetchUserOrders();
       
-             // Add sample order data for testing if no orders exist
-       if (user && orders.length === 0) {
-         const sampleOrder = {
-           id: '13232',
-           orderNumber: '13232',
-           status: 'pending',
-           order_type: 'takeaway',
-           payment_method: 'cash_on_delivery',
-           created_at: new Date().toISOString(),
-           items: [
-             {
-               product_name: 'Espresso',
-               price: 15.50,
-               quantity: 2,
-               notes: 'Extra hot'
-             },
-             {
-               product_name: 'Cappuccino',
-               price: 18.00,
-               quantity: 1,
-               notes: 'No sugar'
-             }
-           ],
-           subtotal: 49.00,
-           delivery_fee: 0,
-           discount_amount: 0,
-           total_amount: 56.35, // Including 15% tax
-           customer_notes: 'Please make it extra hot',
-           totals: {
-             subtotal: 49.00,
-             total: 56.35,
-             deliveryFee: 0,
-             discount: 0,
-             tax: 7.35
-           }
-         };
+  //            Add sample order data for testing if no orders exist
+  //      if (user && orders.length === 0) {
+  //        const sampleOrder = {
+  //          id: '13232',
+  //          orderNumber: '13232',
+  //          status: 'pending',
+  //          order_type: 'takeaway',
+  //          payment_method: 'cash_on_delivery',
+  //          created_at: new Date().toISOString(),
+  //          items: [
+  //            {
+  //              product_name: 'Espresso',
+  //              price: 15.50,
+  //              quantity: 2,
+  //              notes: 'Extra hot'
+  //            },
+  //            {
+  //              product_name: 'Cappuccino',
+  //              price: 18.00,
+  //              quantity: 1,
+  //              notes: 'No sugar'
+  //            }
+  //          ],
+  //          subtotal: 49.00,
+  //          delivery_fee: 0,
+  //          discount_amount: 0,
+  //          total_amount: 56.35, // Including 15% tax
+  //          customer_notes: 'Please make it extra hot',
+  //          totals: {
+  //            subtotal: 49.00,
+  //            total: 56.35,
+  //            deliveryFee: 0,
+  //            discount: 0,
+  //            tax: 7.35
+  //          }
+  //        };
          
-         // Create a second sample order for testing
-         const sampleOrder2 = {
-           id: '13231',
-           orderNumber: '13231',
-           status: 'completed',
-           order_type: 'delivery',
-           payment_method: 'cash_on_delivery',
-           created_at: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
-           items: [
-             {
-               product_name: 'Latte',
-               price: 20.00,
-               quantity: 1,
-               notes: 'Extra milk'
-             },
-             {
-               product_name: 'Americano',
-               price: 12.50,
-               quantity: 2,
-               notes: 'No cream'
-             }
-           ],
-           subtotal: 45.00,
-           delivery_fee: 5.00,
-           discount_amount: 2.00,
-           total_amount: 54.75, // Including 15% tax
-           customer_notes: 'Please deliver to the main entrance',
-           totals: {
-             subtotal: 45.00,
-             total: 54.75,
-             deliveryFee: 5.00,
-             discount: 2.00,
-             tax: 6.75
-           }
-         };
+  //        // Create a second sample order for testing
+  //        const sampleOrder2 = {
+  //          id: '13231',
+  //          orderNumber: '13231',
+  //          status: 'completed',
+  //          order_type: 'delivery',
+  //          payment_method: 'cash_on_delivery',
+  //          created_at: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
+  //          items: [
+  //            {
+  //              product_name: 'Latte',
+  //              price: 20.00,
+  //              quantity: 1,
+  //              notes: 'Extra milk'
+  //            },
+  //            {
+  //              product_name: 'Americano',
+  //              price: 12.50,
+  //              quantity: 2,
+  //              notes: 'No cream'
+  //            }
+  //          ],
+  //          subtotal: 45.00,
+  //          delivery_fee: 5.00,
+  //          discount_amount: 2.00,
+  //          total_amount: 54.75, // Including 15% tax
+  //          customer_notes: 'Please deliver to the main entrance',
+  //          totals: {
+  //            subtotal: 45.00,
+  //            total: 54.75,
+  //            deliveryFee: 5.00,
+  //            discount: 2.00,
+  //            tax: 6.75
+  //          }
+  //        };
          
-         // Save sample orders locally for testing
-         try {
-           saveOrderLocally(sampleOrder, user.id || user.email);
-           saveOrderLocally(sampleOrder2, user.id || user.email);
-           console.log('📝 Sample orders saved for testing');
-         } catch (error) {
-           console.error('Error saving sample orders:', error);
-         }
-       }
+  //        // Save sample orders locally for testing
+  //        try {
+  //          saveOrderLocally(sampleOrder, user.id || user.email);
+  //          saveOrderLocally(sampleOrder2, user.id || user.email);
+  //          console.log('📝 Sample orders saved for testing');
+  //        } catch (error) {
+  //          console.error('Error saving sample orders:', error);
+  //        }
+  //      }
     }
   }, [activeTab, user]);
 
