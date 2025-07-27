@@ -166,10 +166,9 @@ export const useMenuData = () => {
       rating: apiProduct.rating || (4.0 + Math.random() * 1), // Random rating between 4-5
       ingredients: Array.isArray(apiProduct.ingredients) ? apiProduct.ingredients : ['Premium ingredients'],
       calories: apiProduct.calories || Math.floor(Math.random() * 200) + 50, // Random calories if not provided
-      stock: parseFloat(apiProduct.stock) || 0,
+      stock: apiProduct.stock || 0,
       barcode: apiProduct.barcode || '',
-      acceptFloat: apiProduct.accept_float || false,
-      type: apiProduct.type || 'unit'
+      acceptFloat: apiProduct.accept_float || false
     };
   };
 

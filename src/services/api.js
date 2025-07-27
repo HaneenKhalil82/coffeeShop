@@ -187,15 +187,15 @@ export const checkApiHealth = async () => {
 export const getDeliveryLocations = async () => {
   try {
     console.log('📍 API: Getting delivery locations');
-    
+
     const response = await api.get(config.ENDPOINTS.DELIVERY.GET_DELIVERY_LOCATIONS);
-    
+
     console.log('✅ API: Delivery locations response:', response.data);
     return response;
   } catch (error) {
     console.error('❌ API: Error getting delivery locations:', error);
     console.error('🔍 API: Error response:', error.response?.data);
-    
+
     // Enhanced error handling
     if (error.response?.status >= 500) {
       throw new Error('Server error fetching delivery locations');
@@ -208,17 +208,17 @@ export const getDeliveryLocations = async () => {
 export const getDeliveryFee = async (userAddressId) => {
   try {
     console.log('🚚 API: Getting delivery fee for address:', userAddressId);
-    
+
     const response = await api.post(config.ENDPOINTS.DELIVERY.GET_DELIVERY_FEE, {
       user_address_id: userAddressId
     });
-    
+
     console.log('✅ API: Delivery fee response:', response.data);
     return response;
   } catch (error) {
     console.error('❌ API: Error getting delivery fee:', error);
     console.error('🔍 API: Error response:', error.response?.data);
-    
+
     // Enhanced error handling
     if (error.response?.status === 422) {
       throw new Error('Invalid address ID provided');
@@ -235,18 +235,18 @@ export const getDeliveryFee = async (userAddressId) => {
 export const validatePromoCode = async (code, orderAmount) => {
   try {
     console.log('🎫 API: Validating promo code:', code, 'for amount:', orderAmount);
-    
+
     const response = await api.post(config.ENDPOINTS.DELIVERY.VALIDATE_PROMO_CODE, {
       code: code,
       order_amount: orderAmount
     });
-    
+
     console.log('✅ API: Promo code validation response:', response.data);
     return response;
   } catch (error) {
     console.error('❌ API: Error validating promo code:', error);
     console.error('🔍 API: Error response:', error.response?.data);
-    
+
     // Enhanced error handling
     if (error.response?.status === 422) {
       throw new Error('Invalid promo code format');
@@ -265,19 +265,8 @@ export const validatePromoCode = async (code, orderAmount) => {
 export const placeOrder = async (orderData) => {
   try {
     console.log('🚚 API: Sending order to endpoint:', config.ENDPOINTS.DELIVERY.PLACE_ORDER);
-    console.log('📦 API: Order data structure:', {
-      branch_id: orderData.branch_id,
-      order_type: orderData.order_type,
-      payment_method: orderData.payment_method,
-      user_address_id: orderData.user_address_id,
-      promo_code: orderData.promo_code,
-      scheduled_delivery_time: orderData.scheduled_delivery_time,
-      delivery_notes: orderData.delivery_notes,
-      customer_notes: orderData.customer_notes,
-      loyalty_points_used: orderData.loyalty_points_used,
-      items_count: orderData.items?.length || 0
-    });
-    
+    console.log('📦 API: Complete order data being sent:', orderData);
+
     // Validate required fields according to Postman collection
     if (!orderData.branch_id) {
       throw new Error('Branch ID is required');
@@ -294,9 +283,19 @@ export const placeOrder = async (orderData) => {
     if (!orderData.items || orderData.items.length === 0) {
       throw new Error('Order items are required');
     }
-    
-    const response = await api.get(config.ENDPOINTS.DELIVERY.PLACE_ORDER, orderData);
-    
+
+    // Validate each item has required fields
+    orderData.items.forEach((item, index) => {
+      if (!item.product_id) {
+        throw new Error(`Item ${index + 1}: product_id is required`);
+      }
+      if (!item.quantity || item.quantity <= 0) {
+        throw new Error(`Item ${index + 1}: quantity must be greater than 0`);
+      }
+    });
+
+    const response = await api.post(config.ENDPOINTS.DELIVERY.PLACE_ORDER, orderData);
+
     console.log('✅ API: Order placed successfully');
     console.log('📋 API: Order response:', response.data);
     return response;
@@ -304,7 +303,7 @@ export const placeOrder = async (orderData) => {
     console.error('❌ API: Error placing order:', error);
     console.error('🔍 API: Error response:', error.response?.data);
     console.error('📊 API: Error status:', error.response?.status);
-    
+
     // Enhanced error handling for different scenarios
     if (error.response?.status === 422) {
       const validationErrors = error.response.data.errors || {};
@@ -329,15 +328,15 @@ export const placeOrder = async (orderData) => {
 export const getUserOrders = async () => {
   try {
     console.log('🛒 API: Getting user orders');
-    
+
     const response = await api.get(config.ENDPOINTS.ORDERS.GET_USER_ORDERS);
-    
+
     console.log('✅ API: User orders response:', response.data);
     return response;
   } catch (error) {
     console.error('❌ API: Error getting user orders:', error);
     console.error('🔍 API: Error response:', error.response?.data);
-    
+
     // Enhanced error handling
     if (error.response?.status === 401) {
       throw new Error('Authentication required to view orders');
@@ -352,15 +351,15 @@ export const getUserOrders = async () => {
 export const getOrderDetails = async (orderId) => {
   try {
     console.log('📋 API: Getting order details for ID:', orderId);
-    
+
     const response = await api.get(`${config.ENDPOINTS.ORDERS.GET_ORDER_DETAILS}/${orderId}`);
-    
+
     console.log('✅ API: Order details response:', response.data);
     return response;
   } catch (error) {
     console.error('❌ API: Error getting order details:', error);
     console.error('🔍 API: Error response:', error.response?.data);
-    
+
     // Enhanced error handling
     if (error.response?.status === 404) {
       throw new Error('Order not found');
@@ -378,17 +377,17 @@ export const getOrderDetails = async (orderId) => {
 export const cancelOrder = async (orderId, reason = '') => {
   try {
     console.log('❌ API: Cancelling order ID:', orderId);
-    
+
     const response = await api.post(`${config.ENDPOINTS.ORDERS.GET_ORDER_DETAILS}/${orderId}/cancel`, {
       reason: reason
     });
-    
+
     console.log('✅ API: Order cancellation response:', response.data);
     return response;
   } catch (error) {
     console.error('❌ API: Error cancelling order:', error);
     console.error('🔍 API: Error response:', error.response?.data);
-    
+
     // Enhanced error handling
     if (error.response?.status === 404) {
       throw new Error('Order not found');
@@ -464,13 +463,13 @@ export const searchProducts = async (searchParams = {}) => {
   try {
     const { q, category_id, branch_id, min_price, max_price } = searchParams;
     const params = new URLSearchParams();
-    
+
     if (q) params.append('q', q);
     if (category_id) params.append('category_id', category_id);
     if (branch_id) params.append('branch_id', branch_id);
     if (min_price) params.append('min_price', min_price);
     if (max_price) params.append('max_price', max_price);
-    
+
     const response = await api.get(`${config.ENDPOINTS.PRODUCTS.SEARCH_PRODUCTS}?${params.toString()}`);
     return response;
   } catch (error) {
@@ -561,7 +560,7 @@ export const saveOrderLocally = (orderData, userId) => {
   try {
     const storageKey = getOrderStorageKey(userId);
     const existingOrders = JSON.parse(localStorage.getItem(storageKey) || '[]');
-    
+
     // Add timestamp and user info to order
     const orderWithMetadata = {
       ...orderData,
@@ -571,15 +570,15 @@ export const saveOrderLocally = (orderData, userId) => {
       updated_at: new Date().toISOString(),
       status: orderData.status || 'pending_confirmation'
     };
-    
+
     // Add to beginning of array (newest first)
     existingOrders.unshift(orderWithMetadata);
-    
+
     // Keep only last 50 orders to prevent storage bloat
     const trimmedOrders = existingOrders.slice(0, 50);
-    
+
     localStorage.setItem(storageKey, JSON.stringify(trimmedOrders));
-    
+
     console.log('Order saved locally:', orderWithMetadata);
     return orderWithMetadata;
   } catch (error) {
@@ -616,7 +615,7 @@ export const updateLocalOrderStatus = (orderId, status, userId) => {
   try {
     const storageKey = getOrderStorageKey(userId);
     const orders = JSON.parse(localStorage.getItem(storageKey) || '[]');
-    
+
     const updatedOrders = orders.map(order => {
       if (order.id === orderId || order.orderNumber === orderId) {
         return {
@@ -627,7 +626,7 @@ export const updateLocalOrderStatus = (orderId, status, userId) => {
       }
       return order;
     });
-    
+
     localStorage.setItem(storageKey, JSON.stringify(updatedOrders));
     return true;
   } catch (error) {

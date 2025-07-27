@@ -50,7 +50,7 @@ const config = {
       GET_DELIVERY_LOCATIONS: '/delivery-locations',
       GET_DELIVERY_FEE: '/get-delivery-fee',
       VALIDATE_PROMO_CODE: '/validate-promo-code',
-      PLACE_ORDER: '/delivery-locations',
+      PLACE_ORDER: '/orders',
     },
 
     // 🛍️ Public Products

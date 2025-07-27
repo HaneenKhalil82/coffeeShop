@@ -121,7 +121,7 @@ function App() {
       })
       return { success: false, message: 'Not authenticated' }
     }
-    
+
     setCartItems(prev => {
       const existingItem = prev.find(item => item.id === product.id)
       if (existingItem) {
@@ -131,9 +131,17 @@ function App() {
             : item
         )
       }
-      return [...prev, { ...product, quantity: 1 }]
+      return [...prev, {
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        image: product.image,
+        description: product.description,
+        category: product.category,
+        quantity: 1
+      }]
     })
-    
+
     return { success: true, message: 'Added to cart' }
   }
 
@@ -180,19 +188,19 @@ function App() {
         <ChatProvider>
           <Router>
             <div className={`App arabic-text ${isRTL ? 'rtl' : 'ltr'}`}>
-             
+
               <Navbar />
-              
+
 
               <main>
                 <Routes>
                   <Route path="/" element={<Home />} />
-                  <Route path= '/login' element= {<Login /> }/>
-                  <Route path= "/SignUp" element={<SignUp /> }/>
+                  <Route path='/login' element={<Login />} />
+                  <Route path="/SignUp" element={<SignUp />} />
                   <Route path="/menu" element={<Menu />} />
                   <Route path="/about" element={<About />} />
-        
-          
+
+
                   <Route path="/shop" element={<Shop />} />
                   <Route path="/product/:id" element={<ProductSingle />} />
                   <Route path="/contact" element={<Contact />} />
@@ -202,9 +210,9 @@ function App() {
                   <Route path="/api-demo" element={<ApiDemo />} />
                 </Routes>
               </main>
-              
+
               <Footer />
-              
+
               {/* Chat Components - Only available for authenticated users */}
               {isAuthenticated && (
                 <>
@@ -212,7 +220,7 @@ function App() {
                   <ChatWindow />
                 </>
               )}
-              
+
               {/* Toast Container for global toast notifications */}
               <ToastContainer
                 position="top-right"

@@ -113,14 +113,14 @@ export const orderService = {
 
   // Place new order
   placeOrder: async (orderData) => {
-      console.log("📦 Sending Order Data:", orderData); // ✅ هنا بنطبع البيانات قبل الإرسال
+    console.log("📦 Sending Order Data:", orderData);
 
     try {
       const response = await api.post(config.ENDPOINTS.DELIVERY.PLACE_ORDER, orderData);
-      console.log("✅ Order response:", response.data); // ✅ وهنا بنطبع الرد من السيرفر
+      console.log("✅ Order response:", response.data);
       return { success: true, data: response.data };
     } catch (error) {
-       console.error("❌ Error placing order:", error.response?.data || error.message); // 🛑 لو فيه خطأ
+      console.error("❌ Error placing order:", error.response?.data || error.message);
       return { success: false, error: error.response?.data?.message || 'Failed to place order' };
     }
   },
@@ -129,7 +129,7 @@ export const orderService = {
   getDeliveryLocations: async () => {
     try {
       const response = await api.get(config.ENDPOINTS.DELIVERY.GET_DELIVERY_LOCATIONS);
-      
+
       return { success: true, data: response.data };
     } catch (error) {
       return { success: false, error: error.response?.data?.message || 'Failed to fetch delivery locations' };
@@ -151,12 +151,21 @@ export const orderService = {
   // Validate promo code
   validatePromoCode: async (code, orderAmount) => {
     try {
+      console.log('🎫 Validating promo code:', code, 'with amount:', orderAmount);
+
+      if (!orderAmount || orderAmount <= 0) {
+        throw new Error('Order amount must be greater than 0');
+      }
+
       const response = await api.post(config.ENDPOINTS.DELIVERY.VALIDATE_PROMO_CODE, {
         code,
         order_amount: orderAmount
       });
+
+      console.log('✅ Promo validation response:', response.data);
       return { success: true, data: response.data };
     } catch (error) {
+      console.error('❌ Promo validation error:', error.response?.data || error.message);
       return { success: false, error: error.response?.data?.message || 'Invalid promo code' };
     }
   }
@@ -165,10 +174,12 @@ export const orderService = {
 // =================== 🛍️ CART SERVICES (Local Storage Based) ===================
 
 export const cartService = {
-  // Get cart items from localStorage
-  getCartItems: () => {
+  // Get cart items from localStorage with user-specific key
+  getCartItems: (userId = null) => {
     try {
-      const cart = localStorage.getItem('cart');
+      // Use user-specific cart key if available
+      const cartKey = userId ? `coffee-cart-${userId}` : 'coffee-cart';
+      const cart = localStorage.getItem(cartKey);
       return cart ? JSON.parse(cart) : [];
     } catch (error) {
       console.error('Error reading cart from localStorage:', error);
@@ -176,11 +187,11 @@ export const cartService = {
     }
   },
 
-  // Add item to cart
-  addToCart: (product, quantity = 1, notes = '') => {
+  // Add item to cart with user-specific storage
+  addToCart: (product, quantity = 1, notes = '', userId = null) => {
     try {
-      const cart = cartService.getCartItems();
-      const existingItemIndex = cart.findIndex(item => item.product_id === product.id);
+      const cart = cartService.getCartItems(userId);
+      const existingItemIndex = cart.findIndex(item => item.id === product.id);
 
       if (existingItemIndex > -1) {
         // Update existing item
@@ -189,26 +200,29 @@ export const cartService = {
       } else {
         // Add new item
         cart.push({
-          product_id: product.id,
-          product,
+          id: product.id,
+          name: product.name,
+          price: product.price,
+          image: product.image,
           quantity,
           notes,
           addedAt: new Date().toISOString()
         });
       }
 
-      localStorage.setItem('cart', JSON.stringify(cart));
+      const cartKey = userId ? `coffee-cart-${userId}` : 'coffee-cart';
+      localStorage.setItem(cartKey, JSON.stringify(cart));
       return { success: true, cart };
     } catch (error) {
       return { success: false, error: 'Failed to add item to cart' };
     }
   },
 
-  // Update cart item quantity
-  updateCartItem: (productId, quantity, notes = '') => {
+  // Update cart item quantity with user-specific storage
+  updateCartItem: (productId, quantity, notes = '', userId = null) => {
     try {
-      const cart = cartService.getCartItems();
-      const itemIndex = cart.findIndex(item => item.product_id === productId);
+      const cart = cartService.getCartItems(userId);
+      const itemIndex = cart.findIndex(item => item.id === productId);
 
       if (itemIndex > -1) {
         if (quantity <= 0) {
@@ -217,7 +231,8 @@ export const cartService = {
           cart[itemIndex].quantity = quantity;
           if (notes !== undefined) cart[itemIndex].notes = notes;
         }
-        localStorage.setItem('cart', JSON.stringify(cart));
+        const cartKey = userId ? `coffee-cart-${userId}` : 'coffee-cart';
+        localStorage.setItem(cartKey, JSON.stringify(cart));
         return { success: true, cart };
       }
       return { success: false, error: 'Item not found in cart' };
@@ -226,47 +241,58 @@ export const cartService = {
     }
   },
 
-  // Remove item from cart
-  removeFromCart: (productId) => {
+  // Remove item from cart with user-specific storage
+  removeFromCart: (productId, userId = null) => {
     try {
-      const cart = cartService.getCartItems();
-      const filteredCart = cart.filter(item => item.product_id !== productId);
-      localStorage.setItem('cart', JSON.stringify(filteredCart));
+      const cart = cartService.getCartItems(userId);
+      const filteredCart = cart.filter(item => item.id !== productId);
+      const cartKey = userId ? `coffee-cart-${userId}` : 'coffee-cart';
+      localStorage.setItem(cartKey, JSON.stringify(filteredCart));
       return { success: true, cart: filteredCart };
     } catch (error) {
       return { success: false, error: 'Failed to remove item from cart' };
     }
   },
 
-  // Clear entire cart
-  clearCart: () => {
+  // Clear entire cart with user-specific storage
+  clearCart: (userId = null) => {
     try {
-      localStorage.removeItem('cart');
+      const cartKey = userId ? `coffee-cart-${userId}` : 'coffee-cart';
+      localStorage.removeItem(cartKey);
       return { success: true, cart: [] };
     } catch (error) {
       return { success: false, error: 'Failed to clear cart' };
     }
   },
 
-  // Get cart total
-  getCartTotal: () => {
-    const cart = cartService.getCartItems();
+  // Get cart total with user-specific storage
+  getCartTotal: (userId = null) => {
+    const cart = cartService.getCartItems(userId);
     return cart.reduce((total, item) => {
-      return total + (item.product.price * item.quantity);
+      return total + (item.price * item.quantity);
     }, 0);
   },
 
-  // Get cart item count
-  getCartItemCount: () => {
-    const cart = cartService.getCartItems();
+  // Get cart item count with user-specific storage
+  getCartItemCount: (userId = null) => {
+    const cart = cartService.getCartItems(userId);
     return cart.reduce((count, item) => count + item.quantity, 0);
   },
 
-  // Format cart for API order placement
-  formatCartForOrder: () => {
-    const cart = cartService.getCartItems();
+  // Format cart for API order placement according to your JSON structure
+  formatCartForOrder: (userId = null) => {
+    const cart = cartService.getCartItems(userId);
+    console.log('🛒 Raw cart items:', cart);
+
+    const formattedItems = cart.map(item => ({
+      product_id: item.id,
+      quantity: item.quantity,
+      notes: item.notes || ''
+    }));
+
+    console.log('📦 Formatted items for API:', formattedItems);
     return cart.map(item => ({
-      product_id: item.product_id,
+      product_id: item.id,
       quantity: item.quantity,
       notes: item.notes || ''
     }));
@@ -276,43 +302,85 @@ export const cartService = {
 // =================== 📊 EXAMPLE USAGE FUNCTIONS ===================
 
 // Example: Complete order flow
-export const completeOrderFlow = async (orderData) => {
-   console.log("🚀 Running completeOrderFlow with:", orderData); // 👈 ضيفي دي
+export const completeOrderFlow = async (orderData, userId = null) => {
+  console.log("🚀 Running completeOrderFlow with:", orderData);
+
   try {
-    // 1. Validate promo code if provided
-    if (orderData.promo_code) {
-      const promoResult = await orderService.validatePromoCode(
-        orderData.promo_code, 
-        cartService.getCartTotal()
-      );
-      if (!promoResult.success) {
-        return { success: false, error: 'Invalid promo code' };
-      }
+    // 1. Get cart items and calculate total FIRST
+    const cartItems = cartService.getCartItems(userId);
+    const cartTotal = cartService.getCartTotal(userId);
+
+    console.log('🛒 Cart items for order:', cartItems);
+    console.log('💰 Cart total:', cartTotal);
+
+    if (!cartItems || cartItems.length === 0) {
+      return { success: false, error: 'Cart is empty. Please add items before placing order.' };
     }
 
-    // 2. Calculate delivery fee if delivery order
+    // 2. Validate promo code if provided (with correct cart total)
+    if (orderData.promo_code) {
+      console.log('🎫 Validating promo code with amount:', cartTotal);
+      const promoResult = await orderService.validatePromoCode(
+        orderData.promo_code,
+        cartTotal
+      );
+      if (!promoResult.success) {
+        console.log('❌ Promo validation failed:', promoResult.error);
+        return { success: false, error: promoResult.error || 'Invalid promo code' };
+      }
+      console.log('✅ Promo code validated successfully');
+    }
+
+    // 3. Calculate delivery fee if delivery order
     if (orderData.order_type === 'delivery' && orderData.user_address_id) {
       const feeResult = await orderService.getDeliveryFee(orderData.user_address_id);
       if (!feeResult.success) {
-        return { success: false, error: 'Could not calculate delivery fee' };
+        console.log('⚠️ Could not calculate delivery fee, using default');
+        orderData.delivery_fee = 10; // Default delivery fee
+      } else {
+        orderData.delivery_fee = feeResult.data.delivery_fee;
       }
-      orderData.delivery_fee = feeResult.data.delivery_fee;
     }
 
-    // 3. Format cart items for order
-    orderData.items = cartService.formatCartForOrder();
+    // 4. Format cart items for order (CRITICAL: This must not be empty)
+    const formattedItems = cartService.formatCartForOrder(userId);
 
-    // 4. Place the order
+    if (!formattedItems || formattedItems.length === 0) {
+      return { success: false, error: 'No items to order. Please add items to cart first.' };
+    }
+
+    // Add items to order data
+    orderData.items = formattedItems;
+
+    // Add order amount for promo validation
+    orderData.order_amount = cartTotal;
+
+    console.log('📦 Final order data being sent:', {
+      ...orderData,
+      itemsCount: orderData.items.length,
+      totalAmount: cartTotal
+    });
+
+    // 5. Place the order
     const orderResult = await orderService.placeOrder(orderData);
-    
-    // 5. Clear cart if order successful
+
+    if (!orderResult.success) {
+      console.error('❌ Order placement failed:', orderResult.error);
+      return orderResult;
+    }
+
+    console.log('✅ Order placed successfully:', orderResult.data);
+
+    // 6. Clear cart if order successful
     if (orderResult.success) {
-      cartService.clearCart();
+      cartService.clearCart(userId);
+      console.log('🗑️ Cart cleared after successful order');
     }
 
     return orderResult;
   } catch (error) {
-    return { success: false, error: 'Failed to complete order' };
+    console.error('❌ Complete order flow error:', error);
+    return { success: false, error: error.message || 'Failed to complete order' };
   }
 };
 
@@ -322,4 +390,4 @@ export default {
   orderService,
   cartService,
   completeOrderFlow
-}; 
+};
