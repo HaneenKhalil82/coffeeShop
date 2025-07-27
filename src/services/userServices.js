@@ -129,6 +129,7 @@ export const orderService = {
   getDeliveryLocations: async () => {
     try {
       const response = await api.get(config.ENDPOINTS.DELIVERY.GET_DELIVERY_LOCATIONS);
+      
       return { success: true, data: response.data };
     } catch (error) {
       return { success: false, error: error.response?.data?.message || 'Failed to fetch delivery locations' };
